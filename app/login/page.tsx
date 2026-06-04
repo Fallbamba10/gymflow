@@ -58,6 +58,11 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
           Creer un compte
         </Link>
       </p>
+      <p className="mt-3 text-center text-sm text-neutral-500">
+        <Link className="font-semibold text-neutral-700" href="/site">
+          Voir la presentation
+        </Link>
+      </p>
     </AuthCard>
   );
 }

@@ -1,7 +1,7 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { createServerClient } from "@supabase/ssr";
 
-const protectedPrefixes = ["/", "/members", "/subscriptions", "/checkin"];
+const protectedPrefixes = ["/members", "/subscriptions", "/checkin", "/payments", "/settings"];
 const authPrefixes = ["/login", "/signup"];
 
 type CookieToSet = {
@@ -40,9 +40,9 @@ export async function middleware(request: NextRequest) {
 
   const path = request.nextUrl.pathname;
   const isAuthRoute = authPrefixes.some((prefix) => path.startsWith(prefix));
-  const isProtectedRoute = protectedPrefixes.some(
-    (prefix) => path === prefix || path.startsWith(`${prefix}/`),
-  );
+  const isProtectedRoute =
+    path === "/" ||
+    protectedPrefixes.some((prefix) => path === prefix || path.startsWith(`${prefix}/`));
 
   if (!user && isProtectedRoute) {
     const url = request.nextUrl.clone();
