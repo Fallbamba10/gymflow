@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
-import { CreditCard, Dumbbell, LayoutDashboard, LogOut, UserCheck, Users } from "lucide-react";
+import { Banknote, CreditCard, Dumbbell, LayoutDashboard, LogOut, UserCheck, Users } from "lucide-react";
 import { signOut } from "@/app/auth/actions";
 import { useGymFlow } from "@/components/gymflow-provider";
 import { createClient } from "@/lib/supabase/client";
@@ -13,6 +13,7 @@ const navItems = [
   { label: "Dashboard", href: "/", icon: LayoutDashboard },
   { label: "Membres", href: "/members", icon: Users },
   { label: "Abonnements", href: "/subscriptions", icon: CreditCard },
+  { label: "Caisse", href: "/payments", icon: Banknote },
   { label: "Pointage", href: "/checkin", icon: UserCheck },
 ];
 

@@ -93,6 +93,28 @@ export type DashboardData = {
   alerts: DashboardAlert[];
 };
 
+export type PaymentMethod = "cash" | "wave" | "orange_money" | "card" | "other";
+
+export type PaymentRecord = {
+  id: string;
+  amount: number;
+  method: PaymentMethod;
+  kind: "subscription" | "manual_adjustment";
+  paid_at: string;
+  notes: string | null;
+  member_id: string | null;
+  member_name: string;
+  plan: string | null;
+};
+
+export type PaymentsData = {
+  payments: PaymentRecord[];
+  total: number;
+  count: number;
+  todayTotal: number;
+  methodTotals: Record<PaymentMethod, number>;
+};
+
 export async function getCurrentGym(): Promise<CurrentGym | null> {
   const supabase = await createClient();
   const {
@@ -142,6 +164,25 @@ export async function getSubscriptionTypes(gymId: string): Promise<SubscriptionT
   }
 
   return data ?? [];
+}
+
+export async function getSubscriptionType(
+  gymId: string,
+  subscriptionTypeId: string,
+): Promise<SubscriptionTypeRecord | null> {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("subscription_types")
+    .select("id, name, duration_days, sessions, price, active, created_at")
+    .eq("gym_id", gymId)
+    .eq("id", subscriptionTypeId)
+    .single();
+
+  if (error || !data) {
+    return null;
+  }
+
+  return data;
 }
 
 export async function getMembers(gymId: string): Promise<MemberRecord[]> {
@@ -466,5 +507,139 @@ export async function getDashboardData(gymId: string): Promise<DashboardData> {
     activeMembers,
     totalMembers: members.length,
     alerts: alerts.slice(0, 8),
+  };
+}
+
+export type PaymentsPeriod = "today" | "week" | "month" | "all";
+
+function getPeriodStart(period: PaymentsPeriod) {
+  const date = new Date();
+  date.setHours(0, 0, 0, 0);
+
+  if (period === "week") {
+    const day = date.getDay();
+    const diff = day === 0 ? 6 : day - 1;
+    date.setDate(date.getDate() - diff);
+  }
+
+  if (period === "month") {
+    date.setDate(1);
+  }
+
+  return date;
+}
+
+function normalizePaymentMethod(method: unknown): PaymentMethod {
+  if (
+    method === "cash" ||
+    method === "wave" ||
+    method === "orange_money" ||
+    method === "card" ||
+    method === "other"
+  ) {
+    return method;
+  }
+
+  return "other";
+}
+
+export async function getPaymentsData(
+  gymId: string,
+  filters?: {
+    period?: PaymentsPeriod;
+    method?: PaymentMethod | "all";
+    query?: string;
+  },
+): Promise<PaymentsData> {
+  const supabase = await createClient();
+  const period = filters?.period ?? "today";
+  const method = filters?.method ?? "all";
+  const query = filters?.query?.trim().toLowerCase() ?? "";
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  let request = supabase
+    .from("payments")
+    .select("id, amount, method, kind, paid_at, notes, member_id, members(full_name), subscriptions(subscription_types(name))")
+    .eq("gym_id", gymId)
+    .order("paid_at", { ascending: false })
+    .limit(200);
+
+  if (period !== "all") {
+    request = request.gte("paid_at", getPeriodStart(period).toISOString());
+  }
+
+  if (method !== "all") {
+    request = request.eq("method", method);
+  }
+
+  const [{ data, error }, todayResult] = await Promise.all([
+    request,
+    supabase
+      .from("payments")
+      .select("amount")
+      .eq("gym_id", gymId)
+      .gte("paid_at", today.toISOString()),
+  ]);
+
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  if (todayResult.error) {
+    throw new Error(todayResult.error.message);
+  }
+
+  const payments = (data ?? []).map((payment) => {
+    const member = Array.isArray(payment.members) ? payment.members[0] : payment.members;
+    const subscription = Array.isArray(payment.subscriptions)
+      ? payment.subscriptions[0]
+      : payment.subscriptions;
+    const subscriptionType = Array.isArray(subscription?.subscription_types)
+      ? subscription?.subscription_types[0]
+      : subscription?.subscription_types;
+    const paymentMethod = normalizePaymentMethod(payment.method);
+
+    return {
+      id: payment.id,
+      amount: Number(payment.amount ?? 0),
+      method: paymentMethod,
+      kind: payment.kind,
+      paid_at: payment.paid_at,
+      notes: payment.notes,
+      member_id: payment.member_id,
+      member_name: member?.full_name ?? "Membre supprime",
+      plan: subscriptionType?.name ?? null,
+    };
+  });
+
+  const filteredPayments = query
+    ? payments.filter((payment) => {
+        const haystack = `${payment.member_name} ${payment.plan ?? ""} ${payment.method}`.toLowerCase();
+        return haystack.includes(query);
+      })
+    : payments;
+
+  const methodTotals: PaymentsData["methodTotals"] = {
+    cash: 0,
+    wave: 0,
+    orange_money: 0,
+    card: 0,
+    other: 0,
+  };
+
+  for (const payment of filteredPayments) {
+    methodTotals[payment.method] += payment.amount;
+  }
+
+  return {
+    payments: filteredPayments,
+    total: filteredPayments.reduce((sum, payment) => sum + payment.amount, 0),
+    count: filteredPayments.length,
+    todayTotal: (todayResult.data ?? []).reduce(
+      (sum, payment) => sum + Number(payment.amount ?? 0),
+      0,
+    ),
+    methodTotals,
   };
 }

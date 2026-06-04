@@ -2,11 +2,18 @@ import Link from "next/link";
 import { CreditCard, Plus, RotateCcw } from "lucide-react";
 import { AppShell } from "@/components/app-shell";
 import { PageHeader } from "@/components/page-header";
-import { Button } from "@/components/ui/button";
 import { formatCurrency, formatDuration, formatSessions } from "@/lib/demo-data";
 import { getCurrentGym, getSubscriptionTypes } from "@/lib/supabase/queries";
 
-export default async function SubscriptionsPage() {
+type SubscriptionsPageProps = {
+  searchParams: Promise<{
+    success?: string;
+    error?: string;
+  }>;
+};
+
+export default async function SubscriptionsPage({ searchParams }: SubscriptionsPageProps) {
+  const params = await searchParams;
   const gym = await getCurrentGym();
   const subscriptionTypes = gym ? await getSubscriptionTypes(gym.id) : [];
 
@@ -33,6 +40,18 @@ export default async function SubscriptionsPage() {
             <CreditCard className="text-mint" size={22} />
           </div>
 
+          {params.success ? (
+            <div className="mx-5 mt-5 rounded-md border border-emerald-200 bg-emerald-50 p-4 text-sm font-semibold text-mint">
+              {params.success}
+            </div>
+          ) : null}
+
+          {params.error ? (
+            <div className="mx-5 mt-5 rounded-md border border-red-200 bg-red-50 p-4 text-sm font-semibold text-danger">
+              {params.error}
+            </div>
+          ) : null}
+
           <div className="divide-y divide-line">
             {subscriptionTypes.length > 0 ? (
               subscriptionTypes.map((type) => (
@@ -44,9 +63,12 @@ export default async function SubscriptionsPage() {
                   <p className="text-sm">{formatDuration(type.duration_days)}</p>
                   <p className="text-sm">{formatSessions(type.sessions)}</p>
                   <p className="text-sm font-semibold">{formatCurrency(type.price)}</p>
-                  <Button variant="secondary" className="h-9 justify-self-start px-3 md:justify-self-end">
+                  <Link
+                    href={`/subscriptions/${type.id}/edit`}
+                    className="inline-flex h-9 items-center justify-center rounded-md border border-line bg-white px-3 text-sm font-semibold transition hover:bg-neutral-50 md:justify-self-end"
+                  >
                     Modifier
-                  </Button>
+                  </Link>
                 </div>
               ))
             ) : (
@@ -77,4 +99,3 @@ export default async function SubscriptionsPage() {
     </AppShell>
   );
 }
-
