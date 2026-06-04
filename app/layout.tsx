@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import { GymFlowProvider } from "@/components/gymflow-provider";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -15,7 +14,7 @@ export default function RootLayout({
   return (
     <html lang="fr">
       <body>
-        <GymFlowProvider>{children}</GymFlowProvider>
+        {children}
       </body>
     </html>
   );

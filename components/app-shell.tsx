@@ -3,9 +3,8 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
-import { Banknote, CreditCard, Dumbbell, LayoutDashboard, LogOut, UserCheck, Users } from "lucide-react";
+import { Banknote, CreditCard, Dumbbell, LayoutDashboard, LogOut, Settings, UserCheck, Users } from "lucide-react";
 import { signOut } from "@/app/auth/actions";
-import { useGymFlow } from "@/components/gymflow-provider";
 import { createClient } from "@/lib/supabase/client";
 import { cn } from "@/lib/utils";
 
@@ -15,11 +14,11 @@ const navItems = [
   { label: "Abonnements", href: "/subscriptions", icon: CreditCard },
   { label: "Caisse", href: "/payments", icon: Banknote },
   { label: "Pointage", href: "/checkin", icon: UserCheck },
+  { label: "Parametres", href: "/settings", icon: Settings },
 ];
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
-  const { resetDemo } = useGymFlow();
   const [gymName, setGymName] = useState("Salle Plateau");
   const [role, setRole] = useState<string | null>(null);
 
@@ -76,7 +75,8 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
         <nav className="mt-10 space-y-1">
           {navItems.map((item) => {
-            const active = pathname === item.href;
+            const active =
+              pathname === item.href || (item.href !== "/" && pathname.startsWith(`${item.href}/`));
             return (
               <Link
                 key={item.href}
@@ -96,12 +96,6 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         </nav>
 
         <div className="absolute bottom-5 left-5 right-5 space-y-2">
-          <button
-            className="h-10 w-full rounded-md border border-line bg-white px-3 text-sm font-semibold text-neutral-600 hover:bg-neutral-50"
-            onClick={resetDemo}
-          >
-            Reinitialiser demo
-          </button>
           <form action={signOut}>
             <button className="flex h-10 w-full items-center justify-center gap-2 rounded-md border border-line bg-white px-3 text-sm font-semibold text-neutral-600 hover:bg-neutral-50">
               <LogOut size={16} />
