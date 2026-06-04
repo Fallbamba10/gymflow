@@ -21,7 +21,7 @@ export default async function SubscriptionsPage({ searchParams }: SubscriptionsP
     <AppShell>
       <PageHeader
         title="Abonnements"
-        eyebrow="Formules reelles Supabase"
+        eyebrow="Formules et tarifs"
         actions={
           <Link href="/subscriptions/new" className="inline-flex h-11 items-center justify-center gap-2 rounded-md bg-mint px-4 text-sm font-semibold text-white shadow-sm transition hover:bg-emerald-700">
             <Plus size={18} />
@@ -35,7 +35,7 @@ export default async function SubscriptionsPage({ searchParams }: SubscriptionsP
           <div className="flex items-center justify-between border-b border-line p-5">
             <div>
               <h2 className="text-lg font-semibold">Formules disponibles</h2>
-              <p className="mt-1 text-sm text-neutral-500">Prix, duree et nombre de seances depuis Supabase.</p>
+              <p className="mt-1 text-sm text-neutral-500">Prix, duree et nombre de seances.</p>
             </div>
             <CreditCard className="text-mint" size={22} />
           </div>
@@ -87,12 +87,19 @@ export default async function SubscriptionsPage({ searchParams }: SubscriptionsP
           <div className="flex items-center justify-between border-b border-line p-5">
             <div>
               <h2 className="text-lg font-semibold">Renouvellements</h2>
-              <p className="mt-1 text-sm text-neutral-500">Les renouvellements reels seront branches avec les membres.</p>
+              <p className="mt-1 text-sm text-neutral-500">Les renouvellements se font depuis la fiche membre.</p>
             </div>
             <RotateCcw className="text-amber" size={22} />
           </div>
-          <div className="p-5 text-sm text-neutral-500">
-            Prochaine etape: connecter les membres et les abonnements actifs.
+          <div className="space-y-4 p-5 text-sm">
+            <div className="rounded-md bg-paper p-4">
+              <p className="font-semibold">Modifier une formule</p>
+              <p className="mt-1 text-neutral-500">Mets a jour le prix ou la duree pour les prochains abonnements.</p>
+            </div>
+            <div className="rounded-md bg-paper p-4">
+              <p className="font-semibold">Desactiver une formule</p>
+              <p className="mt-1 text-neutral-500">La formule disparait des nouvelles ventes sans casser l&apos;historique.</p>
+            </div>
           </div>
         </aside>
       </div>

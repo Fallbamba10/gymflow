@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Activity, AlertTriangle, Banknote, CalendarClock, CheckCircle2, Plus, Search, TrendingUp, Users } from "lucide-react";
+import { Activity, AlertTriangle, Banknote, CalendarClock, CheckCircle2, Plus, TrendingUp, Users } from "lucide-react";
 import { AppShell } from "@/components/app-shell";
 import { PageHeader } from "@/components/page-header";
 import { StatusBadge } from "@/components/status-badge";
@@ -154,24 +154,14 @@ export default async function Home() {
             <div className="flex items-center justify-between border-b border-line p-5">
               <div>
                 <h2 className="text-lg font-semibold">Pointage rapide</h2>
-                <p className="mt-1 text-sm text-neutral-500">Acces direct au pointage connecte a Supabase.</p>
+                <p className="mt-1 text-sm text-neutral-500">Acces direct a la validation des entrees.</p>
               </div>
               <CheckCircle2 className="text-mint" size={22} />
             </div>
             <div className="p-5">
-              <div className="flex flex-col gap-3 sm:flex-row">
-                <div className="relative flex-1">
-                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-400" size={18} />
-                  <input
-                    className="h-12 w-full rounded-md border border-line bg-paper pl-10 pr-3 text-sm outline-none focus:border-mint"
-                    placeholder="Recherche sur la page Pointage"
-                    disabled
-                  />
-                </div>
-                <Link href="/checkin" className="inline-flex h-12 items-center justify-center rounded-md bg-ink px-5 text-sm font-semibold text-white">
-                  Ouvrir le pointage
-                </Link>
-              </div>
+              <Link href="/checkin" className="inline-flex h-12 w-full items-center justify-center rounded-md bg-ink px-5 text-sm font-semibold text-white sm:w-auto">
+                Ouvrir le pointage
+              </Link>
 
               <div className="mt-5 overflow-hidden rounded-md border border-line">
                 {dashboard.checkinsToday.length > 0 ? (

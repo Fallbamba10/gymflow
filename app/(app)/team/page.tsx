@@ -19,6 +19,10 @@ function formatDate(value: string) {
   return new Intl.DateTimeFormat("fr-FR").format(new Date(value));
 }
 
+function formatRole(role: "admin" | "operator") {
+  return role === "admin" ? "Admin" : "Operateur";
+}
+
 export default async function TeamPage({ searchParams }: TeamPageProps) {
   const params = await searchParams;
   const gym = await getCurrentGym();
@@ -65,7 +69,7 @@ export default async function TeamPage({ searchParams }: TeamPageProps) {
                   {user.active ? "Actif" : "Desactive"}
                 </StatusBadge>
                 <div>
-                  <p className="font-semibold">{user.role}</p>
+                  <p className="font-semibold">{formatRole(user.role)}</p>
                   <p className="mt-1 text-xs text-neutral-500">Ajoute le {formatDate(user.created_at)}</p>
                 </div>
                 <div className="flex flex-col gap-2 sm:flex-row xl:justify-end">
@@ -77,7 +81,7 @@ export default async function TeamPage({ searchParams }: TeamPageProps) {
                       defaultValue={user.role}
                       disabled={!user.active}
                     >
-                      <option value="operator">Operator</option>
+                      <option value="operator">Operateur</option>
                       <option value="admin">Admin</option>
                     </select>
                     <SubmitButton className="h-10 px-3" pendingLabel="...">
@@ -128,7 +132,7 @@ export default async function TeamPage({ searchParams }: TeamPageProps) {
                 className="h-11 w-full rounded-md border border-line bg-paper px-3 outline-none focus:border-mint"
                 defaultValue="operator"
               >
-                <option value="operator">Operator</option>
+                <option value="operator">Operateur</option>
                 <option value="admin">Admin</option>
               </select>
             </FormField>
@@ -144,7 +148,7 @@ export default async function TeamPage({ searchParams }: TeamPageProps) {
               Roles
             </div>
             <p className="mt-2 text-neutral-500">
-              Un admin gere les parametres, formules et employes. Un operator gere les membres, pointages et paiements.
+              Un admin gere les parametres, formules et employes. Un operateur gere les membres, pointages et paiements.
             </p>
           </div>
         </aside>

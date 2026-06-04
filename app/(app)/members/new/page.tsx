@@ -40,7 +40,7 @@ export default async function NewMemberPage({ searchParams }: NewMemberPageProps
             </div>
             <div>
               <h2 className="text-lg font-semibold">Informations membre</h2>
-              <p className="mt-1 text-sm text-neutral-500">Creation du membre et premier abonnement Supabase.</p>
+              <p className="mt-1 text-sm text-neutral-500">Creation du membre et de son premier abonnement.</p>
             </div>
           </div>
 
@@ -52,10 +52,10 @@ export default async function NewMemberPage({ searchParams }: NewMemberPageProps
 
           <div className="mt-5 grid gap-5 md:grid-cols-2">
             <FormField label="Nom complet">
-              <input name="full_name" className="h-11 w-full rounded-md border border-line bg-paper px-3 outline-none focus:border-mint" defaultValue="Awa Diop" required />
+              <input name="full_name" className="h-11 w-full rounded-md border border-line bg-paper px-3 outline-none focus:border-mint" placeholder="Nom complet" required />
             </FormField>
             <FormField label="Telephone">
-              <input name="phone" className="h-11 w-full rounded-md border border-line bg-paper px-3 outline-none focus:border-mint" defaultValue="+221 77 123 45 67" />
+              <input name="phone" className="h-11 w-full rounded-md border border-line bg-paper px-3 outline-none focus:border-mint" placeholder="+221 77 123 45 67" />
             </FormField>
             <FormField label="Formule">
               <select name="subscription_type_id" className="h-11 w-full rounded-md border border-line bg-paper px-3 outline-none focus:border-mint" required>
@@ -76,7 +76,7 @@ export default async function NewMemberPage({ searchParams }: NewMemberPageProps
               </select>
             </FormField>
             <FormField label="Date de debut">
-              <input name="starts_at" type="date" className="h-11 w-full rounded-md border border-line bg-paper px-3 outline-none focus:border-mint" defaultValue="2026-06-03" />
+              <input name="starts_at" type="date" className="h-11 w-full rounded-md border border-line bg-paper px-3 outline-none focus:border-mint" />
             </FormField>
           </div>
 

@@ -156,7 +156,7 @@ export default function SitePage() {
           <div className="rounded-md bg-paper p-6">
             <ShieldCheck className="text-mint" size={24} />
             <h3 className="mt-4 text-lg font-semibold">Données isolées</h3>
-            <p className="mt-2 text-sm leading-6 text-neutral-600">Chaque salle travaille dans son espace, connecté à Supabase avec RLS.</p>
+            <p className="mt-2 text-sm leading-6 text-neutral-600">Chaque salle travaille dans son propre espace avec des accès séparés.</p>
           </div>
         </div>
       </section>

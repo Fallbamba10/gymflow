@@ -1,9 +1,8 @@
-import { CheckCircle2, Search, UserCheck } from "lucide-react";
+import { CheckCircle2, Search } from "lucide-react";
 import { AppShell } from "@/components/app-shell";
 import { PageHeader } from "@/components/page-header";
 import { StatusBadge } from "@/components/status-badge";
 import { SubmitButton } from "@/components/submit-button";
-import { Button } from "@/components/ui/button";
 import { performMemberCheckin } from "@/app/(app)/checkin/actions";
 import { getCheckinCandidates, getCurrentGym, getTodayCheckins } from "@/lib/supabase/queries";
 
@@ -47,19 +46,13 @@ export default async function CheckinPage({ searchParams }: CheckinPageProps) {
       <PageHeader
         title="Pointage"
         eyebrow={`${checkins.length} entree${checkins.length > 1 ? "s" : ""} aujourd'hui`}
-        actions={
-          <Button variant="accent" className="h-11 shadow-sm">
-            <UserCheck size={18} />
-            Scanner QR
-          </Button>
-        }
       />
 
       <div className="grid gap-6 px-4 py-6 md:px-8 xl:grid-cols-[1fr_420px]">
         <section className="rounded-md border border-line bg-white shadow-soft">
           <div className="border-b border-line p-5">
             <h2 className="text-lg font-semibold">Rechercher un membre</h2>
-            <p className="mt-1 text-sm text-neutral-500">Liste des membres reels Supabase.</p>
+            <p className="mt-1 text-sm text-neutral-500">Recherche par nom, telephone ou numero membre.</p>
           </div>
           <div className="p-5">
             <form className="flex flex-col gap-3 sm:flex-row" action="/checkin">

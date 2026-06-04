@@ -20,7 +20,7 @@ const navItems = [
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
-  const [gymName, setGymName] = useState("Salle Plateau");
+  const [gymName, setGymName] = useState("Salle");
   const [role, setRole] = useState<string | null>(null);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
@@ -50,7 +50,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           setRole(data?.role ?? null);
         }
       } catch {
-        // Keep demo fallback when Supabase is unavailable.
+        // Keep the current label if the gym cannot be loaded.
       }
     }
 

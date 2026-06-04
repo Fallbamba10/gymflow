@@ -38,7 +38,7 @@ export default async function NewSubscriptionTypePage({
             </div>
             <div>
               <h2 className="text-lg font-semibold">Details de la formule</h2>
-              <p className="mt-1 text-sm text-neutral-500">La formule sera enregistree dans Supabase.</p>
+              <p className="mt-1 text-sm text-neutral-500">La formule sera disponible pour les prochains abonnements.</p>
             </div>
           </div>
 
@@ -50,16 +50,16 @@ export default async function NewSubscriptionTypePage({
 
           <div className="mt-5 grid gap-5 md:grid-cols-2">
             <FormField label="Nom">
-              <input name="name" className="h-11 w-full rounded-md border border-line bg-paper px-3 outline-none focus:border-mint" defaultValue="Pack 15 seances" required />
+              <input name="name" className="h-11 w-full rounded-md border border-line bg-paper px-3 outline-none focus:border-mint" placeholder="Mensuel illimite" required />
             </FormField>
             <FormField label="Prix">
-              <input name="price" type="number" className="h-11 w-full rounded-md border border-line bg-paper px-3 outline-none focus:border-mint" defaultValue="18000" min="0" required />
+              <input name="price" type="number" className="h-11 w-full rounded-md border border-line bg-paper px-3 outline-none focus:border-mint" placeholder="15000" min="0" required />
             </FormField>
             <FormField label="Duree en jours">
-              <input name="duration_days" type="number" className="h-11 w-full rounded-md border border-line bg-paper px-3 outline-none focus:border-mint" defaultValue="90" min="1" required />
+              <input name="duration_days" type="number" className="h-11 w-full rounded-md border border-line bg-paper px-3 outline-none focus:border-mint" placeholder="30" min="1" required />
             </FormField>
             <FormField label="Nombre de seances">
-              <input name="sessions" type="number" className="h-11 w-full rounded-md border border-line bg-paper px-3 outline-none focus:border-mint" defaultValue="15" min="1" placeholder="Vide = illimite" />
+              <input name="sessions" type="number" className="h-11 w-full rounded-md border border-line bg-paper px-3 outline-none focus:border-mint" min="1" placeholder="Vide = illimite" />
             </FormField>
           </div>
 
