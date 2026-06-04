@@ -15,6 +15,15 @@ export type GymSettings = {
   currency: string;
 };
 
+export type GymUserRecord = {
+  id: string;
+  user_id: string;
+  role: "admin" | "operator";
+  full_name: string | null;
+  active: boolean;
+  created_at: string;
+};
+
 export type SubscriptionTypeRecord = {
   id: string;
   name: string;
@@ -206,6 +215,21 @@ export async function getGymSettings(gymId: string): Promise<GymSettings | null>
   }
 
   return data;
+}
+
+export async function getGymUsers(gymId: string): Promise<GymUserRecord[]> {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("gym_users")
+    .select("id, user_id, role, full_name, active, created_at")
+    .eq("gym_id", gymId)
+    .order("created_at", { ascending: true });
+
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  return data ?? [];
 }
 
 export async function getSubscriptionTypes(gymId: string): Promise<SubscriptionTypeRecord[]> {

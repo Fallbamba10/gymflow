@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
-import { Banknote, CreditCard, Dumbbell, LayoutDashboard, LogOut, Menu, Settings, UserCheck, Users, X } from "lucide-react";
+import { Banknote, CreditCard, Dumbbell, LayoutDashboard, LogOut, Menu, Settings, UserCheck, Users, UsersRound, X } from "lucide-react";
 import { signOut } from "@/app/auth/actions";
 import { createClient } from "@/lib/supabase/client";
 import { cn } from "@/lib/utils";
@@ -14,6 +14,7 @@ const navItems = [
   { label: "Abonnements", href: "/subscriptions", icon: CreditCard },
   { label: "Caisse", href: "/payments", icon: Banknote },
   { label: "Pointage", href: "/checkin", icon: UserCheck },
+  { label: "Equipe", href: "/team", icon: UsersRound },
   { label: "Parametres", href: "/settings", icon: Settings },
 ];
 

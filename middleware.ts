@@ -1,7 +1,7 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { createServerClient } from "@supabase/ssr";
 
-const protectedPrefixes = ["/members", "/subscriptions", "/checkin", "/payments", "/settings"];
+const protectedPrefixes = ["/members", "/subscriptions", "/checkin", "/payments", "/settings", "/team"];
 const authPrefixes = ["/login", "/signup"];
 
 type CookieToSet = {

@@ -29,6 +29,12 @@ Dans Supabase SQL Editor, executer:
 supabase/schema.sql
 ```
 
+Pour activer la gestion des employes par email, executer ensuite:
+
+```text
+supabase/team-management.sql
+```
+
 Ce schema cree:
 
 - les tables MVP;
@@ -52,4 +58,3 @@ Dans Supabase Authentication:
 3. Aller sur `/onboarding`.
 4. Creer une salle.
 5. Arriver sur le dashboard.
-
