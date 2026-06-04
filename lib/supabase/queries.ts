@@ -102,6 +102,28 @@ export type DashboardAlert = {
   status_label: string;
 };
 
+export type DashboardRevenueDay = {
+  date: string;
+  label: string;
+  amount: number;
+};
+
+export type DashboardRecentPayment = {
+  id: string;
+  amount: number;
+  method: PaymentMethod;
+  paid_at: string;
+  member_id: string | null;
+  member_name: string;
+  plan: string | null;
+};
+
+export type DashboardTopPlan = {
+  name: string;
+  amount: number;
+  count: number;
+};
+
 export type DashboardData = {
   revenueToday: number;
   paymentsToday: number;
@@ -109,6 +131,9 @@ export type DashboardData = {
   activeMembers: number;
   totalMembers: number;
   alerts: DashboardAlert[];
+  revenue7Days: DashboardRevenueDay[];
+  recentPayments: DashboardRecentPayment[];
+  topPlans: DashboardTopPlan[];
 };
 
 export type PaymentMethod = "cash" | "wave" | "orange_money" | "card" | "other";
@@ -506,8 +531,10 @@ export async function getDashboardData(gymId: string): Promise<DashboardData> {
   const supabase = await createClient();
   const today = new Date();
   today.setHours(0, 0, 0, 0);
+  const sevenDaysAgo = new Date(today);
+  sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 6);
 
-  const [members, checkinsResult, paymentsResult] = await Promise.all([
+  const [members, checkinsResult, paymentsResult, weekPaymentsResult, recentPaymentsResult] = await Promise.all([
     getMembers(gymId),
     getTodayCheckins(gymId),
     supabase
@@ -515,10 +542,27 @@ export async function getDashboardData(gymId: string): Promise<DashboardData> {
       .select("amount")
       .eq("gym_id", gymId)
       .gte("paid_at", today.toISOString()),
+    supabase
+      .from("payments")
+      .select("amount, paid_at, subscriptions(subscription_types(name))")
+      .eq("gym_id", gymId)
+      .gte("paid_at", sevenDaysAgo.toISOString()),
+    supabase
+      .from("payments")
+      .select("id, amount, method, paid_at, member_id, members(full_name), subscriptions(subscription_types(name))")
+      .eq("gym_id", gymId)
+      .order("paid_at", { ascending: false })
+      .limit(6),
   ]);
 
   if (paymentsResult.error) {
     throw new Error(paymentsResult.error.message);
+  }
+  if (weekPaymentsResult.error) {
+    throw new Error(weekPaymentsResult.error.message);
+  }
+  if (recentPaymentsResult.error) {
+    throw new Error(recentPaymentsResult.error.message);
   }
 
   const alerts: DashboardAlert[] = [];
@@ -569,6 +613,59 @@ export async function getDashboardData(gymId: string): Promise<DashboardData> {
     (sum, payment) => sum + Number(payment.amount ?? 0),
     0,
   );
+  const revenueByDate = new Map<string, number>();
+  const planTotals = new Map<string, DashboardTopPlan>();
+
+  for (let index = 0; index < 7; index += 1) {
+    const day = new Date(sevenDaysAgo);
+    day.setDate(sevenDaysAgo.getDate() + index);
+    revenueByDate.set(day.toISOString().slice(0, 10), 0);
+  }
+
+  for (const payment of weekPaymentsResult.data ?? []) {
+    const date = new Date(payment.paid_at).toISOString().slice(0, 10);
+    revenueByDate.set(date, (revenueByDate.get(date) ?? 0) + Number(payment.amount ?? 0));
+
+    const subscription = Array.isArray(payment.subscriptions)
+      ? payment.subscriptions[0]
+      : payment.subscriptions;
+    const subscriptionType = Array.isArray(subscription?.subscription_types)
+      ? subscription?.subscription_types[0]
+      : subscription?.subscription_types;
+    const planName = subscriptionType?.name ?? "Paiements manuels";
+    const current = planTotals.get(planName) ?? { name: planName, amount: 0, count: 0 };
+    planTotals.set(planName, {
+      ...current,
+      amount: current.amount + Number(payment.amount ?? 0),
+      count: current.count + 1,
+    });
+  }
+
+  const revenue7Days = Array.from(revenueByDate.entries()).map(([date, amount]) => ({
+    date,
+    label: new Intl.DateTimeFormat("fr-FR", { weekday: "short" }).format(new Date(date)),
+    amount,
+  }));
+
+  const recentPayments = (recentPaymentsResult.data ?? []).map((payment) => {
+    const member = Array.isArray(payment.members) ? payment.members[0] : payment.members;
+    const subscription = Array.isArray(payment.subscriptions)
+      ? payment.subscriptions[0]
+      : payment.subscriptions;
+    const subscriptionType = Array.isArray(subscription?.subscription_types)
+      ? subscription?.subscription_types[0]
+      : subscription?.subscription_types;
+
+    return {
+      id: payment.id,
+      amount: Number(payment.amount ?? 0),
+      method: normalizePaymentMethod(payment.method),
+      paid_at: payment.paid_at,
+      member_id: payment.member_id,
+      member_name: member?.full_name ?? "Membre supprime",
+      plan: subscriptionType?.name ?? null,
+    };
+  });
 
   return {
     revenueToday,
@@ -577,6 +674,11 @@ export async function getDashboardData(gymId: string): Promise<DashboardData> {
     activeMembers,
     totalMembers: members.length,
     alerts: alerts.slice(0, 8),
+    revenue7Days,
+    recentPayments,
+    topPlans: Array.from(planTotals.values())
+      .sort((a, b) => b.amount - a.amount)
+      .slice(0, 5),
   };
 }
 

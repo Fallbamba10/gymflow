@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Activity, AlertTriangle, Banknote, CalendarClock, CheckCircle2, Plus, Search, Users } from "lucide-react";
+import { Activity, AlertTriangle, Banknote, CalendarClock, CheckCircle2, Plus, Search, TrendingUp, Users } from "lucide-react";
 import { AppShell } from "@/components/app-shell";
 import { PageHeader } from "@/components/page-header";
 import { StatusBadge } from "@/components/status-badge";
@@ -24,7 +24,11 @@ export default async function Home() {
         activeMembers: 0,
         totalMembers: 0,
         alerts: [],
+        revenue7Days: [],
+        recentPayments: [],
+        topPlans: [],
       };
+  const maxRevenue = Math.max(...dashboard.revenue7Days.map((day) => day.amount), 1);
 
   const stats = [
     {
@@ -82,6 +86,67 @@ export default async function Home() {
               </div>
             </article>
           ))}
+        </section>
+
+        <section className="mt-6 grid gap-6 xl:grid-cols-[1.1fr_0.9fr]">
+          <div className="rounded-md border border-line bg-white shadow-soft">
+            <div className="flex items-center justify-between border-b border-line p-5">
+              <div>
+                <h2 className="text-lg font-semibold">Revenus 7 jours</h2>
+                <p className="mt-1 text-sm text-neutral-500">Evolution des encaissements recents.</p>
+              </div>
+              <TrendingUp className="text-mint" size={22} />
+            </div>
+            <div className="p-5">
+              <div className="flex h-56 items-end gap-3 rounded-md bg-paper p-4">
+                {dashboard.revenue7Days.map((day) => (
+                  <div key={day.date} className="flex h-full min-w-0 flex-1 flex-col justify-end gap-2">
+                    <div className="flex flex-1 items-end">
+                      <div
+                        className="w-full rounded-t-md bg-mint"
+                        style={{ height: `${Math.max((day.amount / maxRevenue) * 100, day.amount > 0 ? 8 : 2)}%` }}
+                        title={formatCurrency(day.amount)}
+                      />
+                    </div>
+                    <div className="text-center">
+                      <p className="truncate text-xs font-semibold capitalize text-neutral-600">{day.label}</p>
+                      <p className="mt-1 truncate text-[11px] text-neutral-500">{formatCurrency(day.amount)}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          <div className="rounded-md border border-line bg-white shadow-soft">
+            <div className="flex items-center justify-between border-b border-line p-5">
+              <div>
+                <h2 className="text-lg font-semibold">Top formules</h2>
+                <p className="mt-1 text-sm text-neutral-500">Classement par revenu sur 7 jours.</p>
+              </div>
+              <Banknote className="text-mint" size={22} />
+            </div>
+            <div className="divide-y divide-line">
+              {dashboard.topPlans.length > 0 ? (
+                dashboard.topPlans.map((plan, index) => (
+                  <div key={plan.name} className="flex items-center justify-between gap-4 p-5">
+                    <div className="flex min-w-0 items-center gap-3">
+                      <span className="flex size-8 shrink-0 items-center justify-center rounded-md bg-paper text-sm font-semibold">
+                        {index + 1}
+                      </span>
+                      <div className="min-w-0">
+                        <p className="truncate text-sm font-semibold">{plan.name}</p>
+                        <p className="mt-1 text-xs text-neutral-500">{plan.count} paiement{plan.count > 1 ? "s" : ""}</p>
+                      </div>
+                    </div>
+                    <p className="shrink-0 text-sm font-semibold">{formatCurrency(plan.amount)}</p>
+                  </div>
+                ))
+              ) : (
+                <p className="p-5 text-sm text-neutral-500">Aucune vente sur les 7 derniers jours.</p>
+              )}
+            </div>
+          </div>
         </section>
 
         <section className="mt-6 grid gap-6 xl:grid-cols-[1.1fr_0.9fr]">
@@ -156,6 +221,40 @@ export default async function Home() {
                 <p className="p-5 text-sm text-neutral-500">Aucune alerte pour le moment.</p>
               )}
             </div>
+          </div>
+        </section>
+
+        <section className="mt-6 rounded-md border border-line bg-white shadow-soft">
+          <div className="flex items-center justify-between border-b border-line p-5">
+            <div>
+              <h2 className="text-lg font-semibold">Paiements recents</h2>
+              <p className="mt-1 text-sm text-neutral-500">Derniers encaissements enregistres.</p>
+            </div>
+            <Link href="/payments" className="text-sm font-semibold text-mint">
+              Voir caisse
+            </Link>
+          </div>
+          <div className="divide-y divide-line">
+            {dashboard.recentPayments.length > 0 ? (
+              dashboard.recentPayments.map((payment) => (
+                <div key={payment.id} className="grid gap-3 p-5 text-sm md:grid-cols-[1.2fr_1fr_0.8fr] md:items-center">
+                  <div>
+                    {payment.member_id ? (
+                      <Link href={`/members/${payment.member_id}`} className="font-semibold transition hover:text-mint">
+                        {payment.member_name}
+                      </Link>
+                    ) : (
+                      <p className="font-semibold">{payment.member_name}</p>
+                    )}
+                    <p className="mt-1 text-xs text-neutral-500">{payment.plan ?? "Paiement manuel"}</p>
+                  </div>
+                  <p className="text-neutral-600">{formatTime(payment.paid_at)}</p>
+                  <p className="font-semibold md:text-right">{formatCurrency(payment.amount)}</p>
+                </div>
+              ))
+            ) : (
+              <p className="p-5 text-sm text-neutral-500">Aucun paiement recent.</p>
+            )}
           </div>
         </section>
       </div>
