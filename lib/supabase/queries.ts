@@ -24,6 +24,14 @@ export type GymUserRecord = {
   created_at: string;
 };
 
+export type GymStaffRecord = {
+  id: string;
+  role: "admin" | "operator";
+  full_name: string;
+  active: boolean;
+  created_at: string;
+};
+
 export type SubscriptionTypeRecord = {
   id: string;
   name: string;
@@ -226,6 +234,24 @@ export async function getGymUsers(gymId: string): Promise<GymUserRecord[]> {
     .order("created_at", { ascending: true });
 
   if (error) {
+    throw new Error(error.message);
+  }
+
+  return data ?? [];
+}
+
+export async function getGymStaff(gymId: string): Promise<GymStaffRecord[]> {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("gym_staff")
+    .select("id, role, full_name, active, created_at")
+    .eq("gym_id", gymId)
+    .order("created_at", { ascending: true });
+
+  if (error) {
+    if (error.message.includes("gym_staff")) {
+      return [];
+    }
     throw new Error(error.message);
   }
 

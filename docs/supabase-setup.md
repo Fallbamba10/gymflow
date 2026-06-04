@@ -29,7 +29,7 @@ Dans Supabase SQL Editor, executer:
 supabase/schema.sql
 ```
 
-Pour activer la gestion des employes par email, executer ensuite:
+Pour activer la gestion des employes par email et par PIN, executer ensuite:
 
 ```text
 supabase/team-management.sql

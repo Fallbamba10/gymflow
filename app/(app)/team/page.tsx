@@ -1,12 +1,19 @@
 import { notFound } from "next/navigation";
-import { ShieldCheck, UserPlus, UsersRound } from "lucide-react";
+import { KeyRound, ShieldCheck, UserPlus, UsersRound } from "lucide-react";
 import { AppShell } from "@/components/app-shell";
 import { FormField } from "@/components/form-field";
 import { PageHeader } from "@/components/page-header";
 import { StatusBadge } from "@/components/status-badge";
 import { SubmitButton } from "@/components/submit-button";
-import { addGymUser, deactivateGymUser, updateGymUserRole } from "@/app/(app)/team/actions";
-import { getCurrentGym, getGymUsers } from "@/lib/supabase/queries";
+import {
+  addGymStaff,
+  addGymUser,
+  deactivateGymStaff,
+  deactivateGymUser,
+  updateGymStaffRole,
+  updateGymUserRole,
+} from "@/app/(app)/team/actions";
+import { getCurrentGym, getGymStaff, getGymUsers } from "@/lib/supabase/queries";
 
 type TeamPageProps = {
   searchParams: Promise<{
@@ -30,18 +37,22 @@ export default async function TeamPage({ searchParams }: TeamPageProps) {
     notFound();
   }
 
-  const team = await getGymUsers(gym.id);
+  const [team, staff] = await Promise.all([
+    getGymUsers(gym.id),
+    getGymStaff(gym.id),
+  ]);
 
   return (
     <AppShell>
       <PageHeader title="Equipe" eyebrow="Employes et roles" />
 
       <div className="grid gap-6 px-4 py-6 md:px-8 xl:grid-cols-[1fr_380px]">
-        <section className="rounded-md border border-line bg-white shadow-soft">
+        <section className="space-y-6">
+          <div className="rounded-md border border-line bg-white shadow-soft">
           <div className="flex items-center justify-between border-b border-line p-5">
             <div>
-              <h2 className="text-lg font-semibold">Utilisateurs de la salle</h2>
-              <p className="mt-1 text-sm text-neutral-500">Admins et operateurs ayant acces a cet espace.</p>
+              <h2 className="text-lg font-semibold">Comptes connectes</h2>
+              <p className="mt-1 text-sm text-neutral-500">Admins et operateurs qui se connectent avec un email.</p>
             </div>
             <UsersRound className="text-mint" size={22} />
           </div>
@@ -103,9 +114,118 @@ export default async function TeamPage({ searchParams }: TeamPageProps) {
               </div>
             ))}
           </div>
+          </div>
+
+          <div className="rounded-md border border-line bg-white shadow-soft">
+            <div className="flex items-center justify-between border-b border-line p-5">
+              <div>
+                <h2 className="text-lg font-semibold">Employes PIN</h2>
+                <p className="mt-1 text-sm text-neutral-500">Employes terrain sans email, identifies par un code PIN.</p>
+              </div>
+              <KeyRound className="text-mint" size={22} />
+            </div>
+
+            <div className="divide-y divide-line">
+              {staff.length > 0 ? (
+                staff.map((user) => (
+                  <div key={user.id} className="grid gap-4 p-5 text-sm xl:grid-cols-[1.2fr_0.7fr_0.8fr_1.2fr] xl:items-center">
+                    <div>
+                      <p className="font-semibold">{user.full_name}</p>
+                      <p className="mt-1 text-xs text-neutral-500">Connexion locale par PIN</p>
+                    </div>
+                    <StatusBadge tone={user.active ? "active" : "neutral"}>
+                      {user.active ? "Actif" : "Desactive"}
+                    </StatusBadge>
+                    <div>
+                      <p className="font-semibold">{formatRole(user.role)}</p>
+                      <p className="mt-1 text-xs text-neutral-500">Ajoute le {formatDate(user.created_at)}</p>
+                    </div>
+                    <div className="flex flex-col gap-2 sm:flex-row xl:justify-end">
+                      <form action={updateGymStaffRole} className="flex gap-2">
+                        <input type="hidden" name="staff_id" value={user.id} />
+                        <select
+                          name="role"
+                          className="h-10 rounded-md border border-line bg-paper px-3 text-sm outline-none focus:border-mint"
+                          defaultValue={user.role}
+                          disabled={!user.active}
+                        >
+                          <option value="operator">Operateur</option>
+                          <option value="admin">Admin</option>
+                        </select>
+                        <SubmitButton className="h-10 px-3" pendingLabel="...">
+                          Sauver
+                        </SubmitButton>
+                      </form>
+                      <form action={deactivateGymStaff}>
+                        <input type="hidden" name="staff_id" value={user.id} />
+                        <SubmitButton
+                          variant="secondary"
+                          className="h-10 border-red-200 text-danger hover:bg-red-50"
+                          disabled={!user.active}
+                          pendingLabel="..."
+                        >
+                          Desactiver
+                        </SubmitButton>
+                      </form>
+                    </div>
+                  </div>
+                ))
+              ) : (
+                <p className="p-5 text-sm text-neutral-500">Aucun employe PIN pour le moment.</p>
+              )}
+            </div>
+          </div>
         </section>
 
-        <aside className="rounded-md border border-line bg-white p-5 shadow-soft">
+        <aside className="space-y-6">
+          <div className="rounded-md border border-line bg-white p-5 shadow-soft">
+            <div className="flex items-center gap-3 border-b border-line pb-5">
+              <div className="flex size-10 items-center justify-center rounded-md bg-paper text-ink">
+                <KeyRound size={20} />
+              </div>
+              <div>
+                <h2 className="text-lg font-semibold">Ajouter avec PIN</h2>
+                <p className="mt-1 text-sm text-neutral-500">Ideal pour les employes qui n&apos;ont pas d&apos;email.</p>
+              </div>
+            </div>
+
+            <form action={addGymStaff} className="mt-5 space-y-5">
+              <FormField label="Nom employe">
+                <input
+                  name="full_name"
+                  className="h-11 w-full rounded-md border border-line bg-paper px-3 outline-none focus:border-mint"
+                  placeholder="Moussa"
+                  required
+                />
+              </FormField>
+              <FormField label="PIN">
+                <input
+                  name="pin"
+                  inputMode="numeric"
+                  pattern="[0-9]{4,8}"
+                  className="h-11 w-full rounded-md border border-line bg-paper px-3 outline-none focus:border-mint"
+                  placeholder="1234"
+                  required
+                />
+              </FormField>
+              <FormField label="Role">
+                <select
+                  name="role"
+                  className="h-11 w-full rounded-md border border-line bg-paper px-3 outline-none focus:border-mint"
+                  defaultValue="operator"
+                >
+                  <option value="operator">Operateur</option>
+                  <option value="admin">Admin</option>
+                </select>
+              </FormField>
+              <SubmitButton type="submit" variant="accent" className="h-11 w-full" pendingLabel="Ajout...">
+                <KeyRound size={18} />
+                Ajouter PIN
+              </SubmitButton>
+            </form>
+          </div>
+
+          <div className="rounded-md border border-line bg-white p-5 shadow-soft">
           <div className="flex items-center gap-3 border-b border-line pb-5">
             <div className="flex size-10 items-center justify-center rounded-md bg-paper text-ink">
               <UserPlus size={20} />
@@ -150,6 +270,7 @@ export default async function TeamPage({ searchParams }: TeamPageProps) {
             <p className="mt-2 text-neutral-500">
               Un admin gere les parametres, formules et employes. Un operateur gere les membres, pointages et paiements.
             </p>
+          </div>
           </div>
         </aside>
       </div>
