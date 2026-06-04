@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Banknote, CalendarDays, CreditCard, Search, WalletCards } from "lucide-react";
+import { Banknote, CalendarDays, CreditCard, Plus, Search, WalletCards } from "lucide-react";
 import { AppShell } from "@/components/app-shell";
 import { PageHeader } from "@/components/page-header";
 import { StatusBadge } from "@/components/status-badge";
@@ -44,9 +44,11 @@ function formatDateTime(value: string) {
 
 type PaymentsPageProps = {
   searchParams: Promise<{
+    error?: string;
     period?: string;
     method?: string;
     q?: string;
+    success?: string;
   }>;
 };
 
@@ -116,9 +118,27 @@ export default async function PaymentsPage({ searchParams }: PaymentsPageProps) 
       <PageHeader
         title="Caisse"
         eyebrow="Paiements et encaissements"
+        actions={
+          <Link href="/payments/new" className="inline-flex h-11 items-center justify-center gap-2 rounded-md bg-mint px-4 text-sm font-semibold text-white shadow-sm transition hover:bg-emerald-700">
+            <Plus size={18} />
+            Encaisser
+          </Link>
+        }
       />
 
       <div className="px-4 py-6 md:px-8">
+        {params.success ? (
+          <div className="mb-5 rounded-md border border-emerald-200 bg-emerald-50 p-4 text-sm font-semibold text-mint">
+            {params.success}
+          </div>
+        ) : null}
+
+        {params.error ? (
+          <div className="mb-5 rounded-md border border-red-200 bg-red-50 p-4 text-sm font-semibold text-danger">
+            {params.error}
+          </div>
+        ) : null}
+
         <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
           {stats.map((stat) => (
             <article key={stat.label} className="rounded-md border border-line bg-white p-5 shadow-soft">
@@ -216,7 +236,7 @@ export default async function PaymentsPage({ searchParams }: PaymentsPageProps) 
                         payment.member_name
                       )}
                     </span>
-                    <span>{payment.plan ?? "-"}</span>
+                    <span>{payment.plan ?? payment.notes ?? "-"}</span>
                     <span>{methodLabels[payment.method]}</span>
                     <span>
                       <StatusBadge tone="neutral">
