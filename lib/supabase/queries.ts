@@ -84,6 +84,16 @@ export type MemberCheckin = {
   plan: string | null;
 };
 
+export type MemberPayment = {
+  id: string;
+  amount: number;
+  method: PaymentMethod;
+  kind: "subscription" | "manual_adjustment";
+  paid_at: string;
+  notes: string | null;
+  plan: string | null;
+};
+
 export type DashboardAlert = {
   member_id: string;
   member_name: string;
@@ -450,6 +460,43 @@ export async function getMemberCheckins(
     return {
       id: checkin.id,
       checked_in_at: checkin.checked_in_at,
+      plan: subscriptionType?.name ?? null,
+    };
+  });
+}
+
+export async function getMemberPayments(
+  gymId: string,
+  memberId: string,
+): Promise<MemberPayment[]> {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("payments")
+    .select("id, amount, method, kind, paid_at, notes, subscriptions(subscription_types(name))")
+    .eq("gym_id", gymId)
+    .eq("member_id", memberId)
+    .order("paid_at", { ascending: false })
+    .limit(20);
+
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  return (data ?? []).map((payment) => {
+    const subscription = Array.isArray(payment.subscriptions)
+      ? payment.subscriptions[0]
+      : payment.subscriptions;
+    const subscriptionType = Array.isArray(subscription?.subscription_types)
+      ? subscription?.subscription_types[0]
+      : subscription?.subscription_types;
+
+    return {
+      id: payment.id,
+      amount: Number(payment.amount ?? 0),
+      method: normalizePaymentMethod(payment.method),
+      kind: payment.kind,
+      paid_at: payment.paid_at,
+      notes: payment.notes,
       plan: subscriptionType?.name ?? null,
     };
   });

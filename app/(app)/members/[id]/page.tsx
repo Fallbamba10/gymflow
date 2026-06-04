@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { Archive, ArrowLeft, CalendarClock, CheckCircle2, Phone, RotateCcw, UserCheck, UserPen } from "lucide-react";
+import { Archive, ArrowLeft, Banknote, CalendarClock, CheckCircle2, Phone, RotateCcw, UserCheck, UserPen } from "lucide-react";
 import { AppShell } from "@/components/app-shell";
 import { PageHeader } from "@/components/page-header";
 import { StatusBadge } from "@/components/status-badge";
@@ -12,8 +12,10 @@ import {
   getCurrentGym,
   getMemberCheckins,
   getMemberDetail,
+  getMemberPayments,
   getMemberSubscriptions,
   getSubscriptionTypes,
+  type PaymentMethod,
 } from "@/lib/supabase/queries";
 
 type MemberDetailPageProps = {
@@ -40,6 +42,21 @@ function formatTime(value: string) {
   }).format(new Date(value));
 }
 
+function formatDateTime(value: string) {
+  return new Intl.DateTimeFormat("fr-FR", {
+    dateStyle: "medium",
+    timeStyle: "short",
+  }).format(new Date(value));
+}
+
+const methodLabels: Record<PaymentMethod, string> = {
+  cash: "Especes",
+  wave: "Wave",
+  orange_money: "Orange Money",
+  card: "Carte",
+  other: "Autre",
+};
+
 function getStatus(member: Awaited<ReturnType<typeof getMemberDetail>>) {
   const subscription = member?.active_subscription;
   if (!subscription) {
@@ -65,11 +82,12 @@ export default async function MemberDetailPage({
     notFound();
   }
 
-  const [member, subscriptionTypes, subscriptions, checkins] = await Promise.all([
+  const [member, subscriptionTypes, subscriptions, checkins, payments] = await Promise.all([
     getMemberDetail(gym.id, id),
     getSubscriptionTypes(gym.id),
     getMemberSubscriptions(gym.id, id),
     getMemberCheckins(gym.id, id),
+    getMemberPayments(gym.id, id),
   ]);
 
   if (!member) {
@@ -78,6 +96,8 @@ export default async function MemberDetailPage({
 
   const status = getStatus(member);
   const activeSubscription = member.active_subscription;
+  const totalPaid = payments.reduce((sum, payment) => sum + payment.amount, 0);
+  const lastPayment = payments[0] ?? null;
 
   return (
     <AppShell>
@@ -151,6 +171,53 @@ export default async function MemberDetailPage({
                 <p className="text-xs font-semibold uppercase text-neutral-500">Statut</p>
                 <p className="mt-2 font-semibold">{status.label}</p>
               </div>
+            </div>
+          </article>
+
+          <article className="rounded-md border border-line bg-white shadow-soft">
+            <div className="flex items-center justify-between gap-4 border-b border-line p-5">
+              <div>
+                <h2 className="text-lg font-semibold">Paiements</h2>
+                <p className="mt-1 text-sm text-neutral-500">Historique financier lie a ce membre.</p>
+              </div>
+              <Banknote className="text-mint" size={22} />
+            </div>
+
+            <div className="grid gap-3 border-b border-line p-5 md:grid-cols-3">
+              <div className="rounded-md bg-paper p-4">
+                <p className="text-xs font-semibold uppercase text-neutral-500">Total encaisse</p>
+                <p className="mt-2 font-semibold">{formatCurrency(totalPaid)}</p>
+              </div>
+              <div className="rounded-md bg-paper p-4">
+                <p className="text-xs font-semibold uppercase text-neutral-500">Paiements</p>
+                <p className="mt-2 font-semibold">{payments.length}</p>
+              </div>
+              <div className="rounded-md bg-paper p-4">
+                <p className="text-xs font-semibold uppercase text-neutral-500">Dernier paiement</p>
+                <p className="mt-2 font-semibold">
+                  {lastPayment ? formatCurrency(lastPayment.amount) : "-"}
+                </p>
+              </div>
+            </div>
+
+            <div className="divide-y divide-line">
+              {payments.length > 0 ? (
+                payments.map((payment) => (
+                  <div key={payment.id} className="grid gap-3 p-5 text-sm md:grid-cols-[1fr_1fr_0.8fr_0.8fr] md:items-center">
+                    <div>
+                      <p className="font-semibold">
+                        {payment.kind === "subscription" ? "Abonnement" : "Ajustement"}
+                      </p>
+                      <p className="mt-1 text-neutral-500">{payment.plan ?? payment.notes ?? "Paiement manuel"}</p>
+                    </div>
+                    <p className="text-neutral-600">{formatDateTime(payment.paid_at)}</p>
+                    <p>{methodLabels[payment.method]}</p>
+                    <p className="font-semibold md:text-right">{formatCurrency(payment.amount)}</p>
+                  </div>
+                ))
+              ) : (
+                <p className="p-5 text-sm text-neutral-500">Aucun paiement lie a ce membre.</p>
+              )}
             </div>
           </article>
 
