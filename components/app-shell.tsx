@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
-import { Banknote, CreditCard, Dumbbell, LayoutDashboard, LogOut, Settings, UserCheck, Users } from "lucide-react";
+import { Banknote, CreditCard, Dumbbell, LayoutDashboard, LogOut, Menu, Settings, UserCheck, Users, X } from "lucide-react";
 import { signOut } from "@/app/auth/actions";
 import { createClient } from "@/lib/supabase/client";
 import { cn } from "@/lib/utils";
@@ -21,6 +21,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const [gymName, setGymName] = useState("Salle Plateau");
   const [role, setRole] = useState<string | null>(null);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   useEffect(() => {
     let mounted = true;
@@ -59,8 +60,64 @@ export function AppShell({ children }: { children: React.ReactNode }) {
     };
   }, []);
 
+  useEffect(() => {
+    setMobileMenuOpen(false);
+  }, [pathname]);
+
   return (
     <main className="min-h-screen bg-paper text-ink">
+      <header className="sticky top-0 z-30 border-b border-line bg-white/95 px-4 py-3 backdrop-blur lg:hidden">
+        <div className="flex items-center justify-between gap-3">
+          <Link href="/" className="flex min-w-0 items-center gap-3">
+            <div className="flex size-10 shrink-0 items-center justify-center rounded-md bg-ink text-white">
+              <Dumbbell size={20} />
+            </div>
+            <div className="min-w-0">
+              <p className="text-base font-semibold leading-none">GymFlow</p>
+              <p className="mt-1 truncate text-sm text-neutral-500">{gymName}</p>
+            </div>
+          </Link>
+          <button
+            className="flex size-10 shrink-0 items-center justify-center rounded-md border border-line bg-white text-ink"
+            onClick={() => setMobileMenuOpen((current) => !current)}
+            aria-expanded={mobileMenuOpen}
+            aria-label={mobileMenuOpen ? "Fermer le menu" : "Ouvrir le menu"}
+          >
+            {mobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
+          </button>
+        </div>
+      </header>
+
+      {mobileMenuOpen ? (
+        <div className="fixed inset-x-0 top-[65px] z-30 border-b border-line bg-white px-4 py-4 shadow-soft lg:hidden">
+          <nav className="grid gap-2">
+            {navItems.map((item) => {
+              const active =
+                pathname === item.href || (item.href !== "/" && pathname.startsWith(`${item.href}/`));
+              return (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  className={cn(
+                    "flex h-11 items-center gap-3 rounded-md px-3 text-sm font-semibold transition",
+                    active ? "bg-ink text-white" : "border border-line bg-white text-neutral-700",
+                  )}
+                >
+                  <item.icon size={18} />
+                  {item.label}
+                </Link>
+              );
+            })}
+          </nav>
+          <form action={signOut} className="mt-4">
+            <button className="flex h-11 w-full items-center justify-center gap-2 rounded-md border border-line bg-paper px-3 text-sm font-semibold text-neutral-700">
+              <LogOut size={17} />
+              Deconnexion
+            </button>
+          </form>
+        </div>
+      ) : null}
+
       <aside className="fixed inset-y-0 left-0 hidden w-64 border-r border-line bg-white px-5 py-6 lg:block">
         <Link href="/" className="flex items-center gap-3">
           <div className="flex size-10 items-center justify-center rounded-md bg-ink text-white">
