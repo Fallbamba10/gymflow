@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Banknote, CalendarDays, CreditCard, Plus, Search, WalletCards } from "lucide-react";
+import { Banknote, CalendarDays, CreditCard, Download, Plus, Search, WalletCards } from "lucide-react";
 import { AppShell } from "@/components/app-shell";
 import { PageHeader } from "@/components/page-header";
 import { StatusBadge } from "@/components/status-badge";
@@ -112,6 +112,7 @@ export default async function PaymentsPage({ searchParams }: PaymentsPageProps) 
       icon: CreditCard,
     },
   ];
+  const exportHref = `/payments/export?period=${period}&method=${method}${query ? `&q=${encodeURIComponent(query)}` : ""}`;
 
   return (
     <AppShell>
@@ -119,10 +120,16 @@ export default async function PaymentsPage({ searchParams }: PaymentsPageProps) 
         title="Caisse"
         eyebrow="Paiements et encaissements"
         actions={
-          <Link href="/payments/new" className="inline-flex h-11 items-center justify-center gap-2 rounded-md bg-mint px-4 text-sm font-semibold text-white shadow-sm transition hover:bg-emerald-700">
-            <Plus size={18} />
-            Encaisser
-          </Link>
+          <>
+            <Link href={exportHref} className="inline-flex h-11 items-center justify-center gap-2 rounded-md border border-line bg-white px-4 text-sm font-semibold shadow-sm transition hover:bg-neutral-50">
+              <Download size={18} />
+              Export CSV
+            </Link>
+            <Link href="/payments/new" className="inline-flex h-11 items-center justify-center gap-2 rounded-md bg-mint px-4 text-sm font-semibold text-white shadow-sm transition hover:bg-emerald-700">
+              <Plus size={18} />
+              Encaisser
+            </Link>
+          </>
         }
       />
 

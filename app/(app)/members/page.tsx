@@ -3,7 +3,6 @@ import { Download, Plus, Search } from "lucide-react";
 import { AppShell } from "@/components/app-shell";
 import { PageHeader } from "@/components/page-header";
 import { StatusBadge } from "@/components/status-badge";
-import { Button } from "@/components/ui/button";
 import { getCurrentGym, getMembers } from "@/lib/supabase/queries";
 
 function getMemberStatus(member: Awaited<ReturnType<typeof getMembers>>[number]) {
@@ -74,10 +73,10 @@ export default async function MembersPage({ searchParams }: MembersPageProps) {
         eyebrow={`${members.length} membres enregistres`}
         actions={
           <>
-            <Button variant="secondary" className="h-11 shadow-sm">
+            <Link href="/members/export" className="inline-flex h-11 items-center justify-center gap-2 rounded-md border border-line bg-white px-4 text-sm font-semibold shadow-sm transition hover:bg-neutral-50">
               <Download size={18} />
-              Import CSV
-            </Button>
+              Export CSV
+            </Link>
             <Link href="/members/new" className="inline-flex h-11 items-center justify-center gap-2 rounded-md bg-mint px-4 text-sm font-semibold text-white shadow-sm transition hover:bg-emerald-700">
               <Plus size={18} />
               Nouveau membre
