@@ -2,6 +2,7 @@ import { CheckCircle2, Search, UserCheck } from "lucide-react";
 import { AppShell } from "@/components/app-shell";
 import { PageHeader } from "@/components/page-header";
 import { StatusBadge } from "@/components/status-badge";
+import { SubmitButton } from "@/components/submit-button";
 import { Button } from "@/components/ui/button";
 import { performMemberCheckin } from "@/app/(app)/checkin/actions";
 import { getCheckinCandidates, getCurrentGym, getTodayCheckins } from "@/lib/supabase/queries";
@@ -103,10 +104,10 @@ export default async function CheckinPage({ searchParams }: CheckinPageProps) {
                       </div>
                       <form action={performMemberCheckin}>
                         <input type="hidden" name="member_id" value={member.id} />
-                        <Button disabled={member.status === "expired"} className="h-10">
+                        <SubmitButton disabled={member.status === "expired"} className="h-10" pendingLabel="Validation...">
                           <CheckCircle2 size={18} />
                           Valider
-                        </Button>
+                        </SubmitButton>
                       </form>
                     </div>
                   </div>

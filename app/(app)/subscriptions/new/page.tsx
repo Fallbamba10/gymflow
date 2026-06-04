@@ -3,7 +3,7 @@ import { ArrowLeft, CheckCircle2, CreditCard } from "lucide-react";
 import { AppShell } from "@/components/app-shell";
 import { FormField } from "@/components/form-field";
 import { PageHeader } from "@/components/page-header";
-import { Button } from "@/components/ui/button";
+import { SubmitButton } from "@/components/submit-button";
 import { createSubscriptionType } from "@/app/(app)/subscriptions/actions";
 
 type NewSubscriptionTypePageProps = {
@@ -72,14 +72,13 @@ export default async function NewSubscriptionTypePage({
             <Link href="/subscriptions" className="inline-flex h-11 items-center justify-center rounded-md border border-line bg-white px-4 text-sm font-semibold">
               Annuler
             </Link>
-            <Button type="submit" variant="accent" className="h-11">
+            <SubmitButton type="submit" variant="accent" className="h-11" pendingLabel="Creation...">
               <CheckCircle2 size={18} />
               Creer la formule
-            </Button>
+            </SubmitButton>
           </div>
         </form>
       </div>
     </AppShell>
   );
 }
-

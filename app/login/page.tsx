@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { AuthCard } from "@/components/auth-card";
 import { EnvWarning } from "@/components/env-warning";
-import { Button } from "@/components/ui/button";
+import { SubmitButton } from "@/components/submit-button";
 import { signIn } from "@/app/auth/actions";
 import { hasSupabaseEnv } from "@/lib/supabase/env";
 
@@ -47,9 +47,9 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
             required
           />
         </label>
-        <Button className="h-11 w-full" disabled={!enabled}>
+        <SubmitButton className="h-11 w-full" disabled={!enabled} pendingLabel="Connexion...">
           Se connecter
-        </Button>
+        </SubmitButton>
       </form>
 
       <p className="mt-5 text-center text-sm text-neutral-500">
@@ -61,4 +61,3 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
     </AuthCard>
   );
 }
-

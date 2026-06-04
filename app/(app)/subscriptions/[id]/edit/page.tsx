@@ -4,7 +4,7 @@ import { ArrowLeft, CheckCircle2, CreditCard, Trash2 } from "lucide-react";
 import { AppShell } from "@/components/app-shell";
 import { FormField } from "@/components/form-field";
 import { PageHeader } from "@/components/page-header";
-import { Button } from "@/components/ui/button";
+import { SubmitButton } from "@/components/submit-button";
 import {
   deactivateSubscriptionType,
   updateSubscriptionType,
@@ -110,10 +110,10 @@ export default async function EditSubscriptionTypePage({
             <Link href="/subscriptions" className="inline-flex h-11 items-center justify-center rounded-md border border-line bg-white px-4 text-sm font-semibold">
               Annuler
             </Link>
-            <Button type="submit" variant="accent" className="h-11">
+            <SubmitButton type="submit" variant="accent" className="h-11" pendingLabel="Enregistrement...">
               <CheckCircle2 size={18} />
               Enregistrer
-            </Button>
+            </SubmitButton>
           </div>
         </form>
 
@@ -132,15 +132,16 @@ export default async function EditSubscriptionTypePage({
 
           <form action={deactivateSubscriptionType} className="mt-5">
             <input type="hidden" name="subscription_type_id" value={subscriptionType.id} />
-            <Button
+            <SubmitButton
               type="submit"
               variant="secondary"
               className="h-11 w-full border-red-200 text-danger hover:bg-red-50"
               disabled={!subscriptionType.active}
+              pendingLabel="Desactivation..."
             >
               <Trash2 size={18} />
               {subscriptionType.active ? "Desactiver la formule" : "Deja desactivee"}
-            </Button>
+            </SubmitButton>
           </form>
         </aside>
       </div>

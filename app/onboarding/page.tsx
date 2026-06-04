@@ -1,6 +1,6 @@
 import { AuthCard } from "@/components/auth-card";
 import { EnvWarning } from "@/components/env-warning";
-import { Button } from "@/components/ui/button";
+import { SubmitButton } from "@/components/submit-button";
 import { createGym } from "@/app/auth/actions";
 import { hasSupabaseEnv } from "@/lib/supabase/env";
 
@@ -61,11 +61,10 @@ export default async function OnboardingPage({ searchParams }: OnboardingPagePro
             <option value="USD">USD</option>
           </select>
         </label>
-        <Button variant="accent" className="h-11 w-full" disabled={!enabled}>
+        <SubmitButton variant="accent" className="h-11 w-full" disabled={!enabled} pendingLabel="Configuration...">
           Terminer la configuration
-        </Button>
+        </SubmitButton>
       </form>
     </AuthCard>
   );
 }
-

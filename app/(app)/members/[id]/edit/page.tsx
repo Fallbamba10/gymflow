@@ -4,7 +4,7 @@ import { ArrowLeft, CheckCircle2, UserPen } from "lucide-react";
 import { AppShell } from "@/components/app-shell";
 import { FormField } from "@/components/form-field";
 import { PageHeader } from "@/components/page-header";
-import { Button } from "@/components/ui/button";
+import { SubmitButton } from "@/components/submit-button";
 import { updateMember } from "@/app/(app)/members/actions";
 import { getCurrentGym, getMemberDetail } from "@/lib/supabase/queries";
 
@@ -96,14 +96,13 @@ export default async function EditMemberPage({
             <Link href={`/members/${member.id}`} className="inline-flex h-11 items-center justify-center rounded-md border border-line bg-white px-4 text-sm font-semibold">
               Annuler
             </Link>
-            <Button type="submit" variant="accent" className="h-11">
+            <SubmitButton type="submit" variant="accent" className="h-11" pendingLabel="Enregistrement...">
               <CheckCircle2 size={18} />
               Enregistrer
-            </Button>
+            </SubmitButton>
           </div>
         </form>
       </div>
     </AppShell>
   );
 }
-

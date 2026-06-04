@@ -4,7 +4,7 @@ import { Archive, ArrowLeft, CalendarClock, CheckCircle2, Phone, RotateCcw, User
 import { AppShell } from "@/components/app-shell";
 import { PageHeader } from "@/components/page-header";
 import { StatusBadge } from "@/components/status-badge";
-import { Button } from "@/components/ui/button";
+import { SubmitButton } from "@/components/submit-button";
 import { performMemberCheckin } from "@/app/(app)/checkin/actions";
 import { archiveMember, renewMemberSubscription } from "@/app/(app)/members/actions";
 import { formatCurrency } from "@/lib/demo-data";
@@ -119,10 +119,10 @@ export default async function MemberDetailPage({
                 </Link>
                 <form action={performMemberCheckin}>
                   <input type="hidden" name="member_id" value={member.id} />
-                  <Button disabled={status.tone === "expired"} className="h-11">
+                  <SubmitButton disabled={status.tone === "expired"} className="h-11" pendingLabel="Pointage...">
                     <UserCheck size={18} />
                     Pointer
-                  </Button>
+                  </SubmitButton>
                 </form>
               </div>
             </div>
@@ -242,19 +242,29 @@ export default async function MemberDetailPage({
               </p>
             </div>
 
-            <Button type="submit" variant="accent" className="h-11 w-full" disabled={subscriptionTypes.length === 0}>
+            <SubmitButton
+              type="submit"
+              variant="accent"
+              className="h-11 w-full"
+              disabled={subscriptionTypes.length === 0}
+              pendingLabel="Renouvellement..."
+            >
               <CheckCircle2 size={18} />
               Renouveler maintenant
-            </Button>
+            </SubmitButton>
           </form>
 
           <div className="mt-6 border-t border-line pt-5">
             <form action={archiveMember}>
               <input type="hidden" name="member_id" value={member.id} />
-              <button className="inline-flex h-10 w-full items-center justify-center gap-2 rounded-md border border-red-200 bg-red-50 px-4 text-sm font-semibold text-danger hover:bg-red-100">
+              <SubmitButton
+                variant="secondary"
+                className="h-10 w-full border-red-200 bg-red-50 text-danger hover:bg-red-100"
+                pendingLabel="Archivage..."
+              >
                 <Archive size={17} />
                 Archiver le membre
-              </button>
+              </SubmitButton>
             </form>
           </div>
         </aside>

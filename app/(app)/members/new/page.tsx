@@ -3,7 +3,7 @@ import { ArrowLeft, CheckCircle2, UserPlus } from "lucide-react";
 import { AppShell } from "@/components/app-shell";
 import { FormField } from "@/components/form-field";
 import { PageHeader } from "@/components/page-header";
-import { Button } from "@/components/ui/button";
+import { SubmitButton } from "@/components/submit-button";
 import { createMember } from "@/app/(app)/members/actions";
 import { formatCurrency } from "@/lib/demo-data";
 import { getCurrentGym, getSubscriptionTypes } from "@/lib/supabase/queries";
@@ -88,10 +88,16 @@ export default async function NewMemberPage({ searchParams }: NewMemberPageProps
             <Link href="/members" className="inline-flex h-11 items-center justify-center rounded-md border border-line bg-white px-4 text-sm font-semibold">
               Annuler
             </Link>
-            <Button type="submit" variant="accent" className="h-11" disabled={subscriptionTypes.length === 0}>
+            <SubmitButton
+              type="submit"
+              variant="accent"
+              className="h-11"
+              disabled={subscriptionTypes.length === 0}
+              pendingLabel="Creation..."
+            >
               <CheckCircle2 size={18} />
               Creer le membre
-            </Button>
+            </SubmitButton>
           </div>
         </form>
 
@@ -112,4 +118,3 @@ export default async function NewMemberPage({ searchParams }: NewMemberPageProps
     </AppShell>
   );
 }
-
