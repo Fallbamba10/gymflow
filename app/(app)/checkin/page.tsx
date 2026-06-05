@@ -2,9 +2,10 @@ import { CheckCircle2, Search } from "lucide-react";
 import { AppShell } from "@/components/app-shell";
 import { PageHeader } from "@/components/page-header";
 import { StatusBadge } from "@/components/status-badge";
+import { StaffPinFields } from "@/components/staff-pin-fields";
 import { SubmitButton } from "@/components/submit-button";
 import { performMemberCheckin } from "@/app/(app)/checkin/actions";
-import { getCheckinCandidates, getCurrentGym, getTodayCheckins } from "@/lib/supabase/queries";
+import { getCheckinCandidates, getCurrentGym, getGymStaff, getTodayCheckins } from "@/lib/supabase/queries";
 
 type CheckinPageProps = {
   searchParams: Promise<{
@@ -40,6 +41,7 @@ export default async function CheckinPage({ searchParams }: CheckinPageProps) {
     );
   });
   const checkins = gym ? await getTodayCheckins(gym.id) : [];
+  const staff = gym ? await getGymStaff(gym.id) : [];
 
   return (
     <AppShell>
@@ -97,10 +99,13 @@ export default async function CheckinPage({ searchParams }: CheckinPageProps) {
                       </div>
                       <form action={performMemberCheckin}>
                         <input type="hidden" name="member_id" value={member.id} />
-                        <SubmitButton disabled={member.status === "expired"} className="h-10" pendingLabel="Validation...">
-                          <CheckCircle2 size={18} />
-                          Valider
-                        </SubmitButton>
+                        <div className="space-y-3">
+                          <StaffPinFields staff={staff} />
+                          <SubmitButton disabled={member.status === "expired"} className="h-10 w-full md:w-auto" pendingLabel="Validation...">
+                            <CheckCircle2 size={18} />
+                            Valider
+                          </SubmitButton>
+                        </div>
                       </form>
                     </div>
                   </div>

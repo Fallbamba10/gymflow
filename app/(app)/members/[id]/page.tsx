@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { Archive, ArrowLeft, Banknote, CalendarClock, CheckCircle2, Phone, RotateCcw, UserCheck, UserPen } from "lucide-react";
 import { AppShell } from "@/components/app-shell";
 import { PageHeader } from "@/components/page-header";
+import { StaffPinFields } from "@/components/staff-pin-fields";
 import { StatusBadge } from "@/components/status-badge";
 import { SubmitButton } from "@/components/submit-button";
 import { performMemberCheckin } from "@/app/(app)/checkin/actions";
@@ -10,6 +11,7 @@ import { archiveMember, renewMemberSubscription } from "@/app/(app)/members/acti
 import { formatCurrency } from "@/lib/demo-data";
 import {
   getCurrentGym,
+  getGymStaff,
   getMemberCheckins,
   getMemberDetail,
   getMemberPayments,
@@ -82,12 +84,13 @@ export default async function MemberDetailPage({
     notFound();
   }
 
-  const [member, subscriptionTypes, subscriptions, checkins, payments] = await Promise.all([
+  const [member, subscriptionTypes, subscriptions, checkins, payments, staff] = await Promise.all([
     getMemberDetail(gym.id, id),
     getSubscriptionTypes(gym.id),
     getMemberSubscriptions(gym.id, id),
     getMemberCheckins(gym.id, id),
     getMemberPayments(gym.id, id),
+    getGymStaff(gym.id),
   ]);
 
   if (!member) {
@@ -139,10 +142,13 @@ export default async function MemberDetailPage({
                 </Link>
                 <form action={performMemberCheckin}>
                   <input type="hidden" name="member_id" value={member.id} />
-                  <SubmitButton disabled={status.tone === "expired"} className="h-11" pendingLabel="Pointage...">
-                    <UserCheck size={18} />
-                    Pointer
-                  </SubmitButton>
+                  <div className="space-y-3">
+                    <StaffPinFields staff={staff} />
+                    <SubmitButton disabled={status.tone === "expired"} className="h-11 w-full sm:w-auto" pendingLabel="Pointage...">
+                      <UserCheck size={18} />
+                      Pointer
+                    </SubmitButton>
+                  </div>
                 </form>
               </div>
             </div>
@@ -307,6 +313,14 @@ export default async function MemberDetailPage({
               <p className="mt-1 text-neutral-500">
                 L&apos;ancien abonnement actif sera marque expire.
               </p>
+            </div>
+
+            <div className="rounded-md border border-line bg-white p-4">
+              <p className="text-sm font-semibold">Employe responsable</p>
+              <p className="mt-1 text-sm text-neutral-500">Selectionne un employe PIN si le renouvellement est encaisse par l&apos;equipe terrain.</p>
+              <div className="mt-4">
+                <StaffPinFields staff={staff} />
+              </div>
             </div>
 
             <SubmitButton

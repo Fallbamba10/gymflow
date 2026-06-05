@@ -3,9 +3,10 @@ import { ArrowLeft, Banknote, CheckCircle2 } from "lucide-react";
 import { AppShell } from "@/components/app-shell";
 import { FormField } from "@/components/form-field";
 import { PageHeader } from "@/components/page-header";
+import { StaffPinFields } from "@/components/staff-pin-fields";
 import { SubmitButton } from "@/components/submit-button";
 import { createManualPayment } from "@/app/(app)/payments/actions";
-import { getCurrentGym, getMembers } from "@/lib/supabase/queries";
+import { getCurrentGym, getGymStaff, getMembers } from "@/lib/supabase/queries";
 
 type NewPaymentPageProps = {
   searchParams: Promise<{
@@ -17,6 +18,7 @@ export default async function NewPaymentPage({ searchParams }: NewPaymentPagePro
   const params = await searchParams;
   const gym = await getCurrentGym();
   const members = gym ? await getMembers(gym.id) : [];
+  const staff = gym ? await getGymStaff(gym.id) : [];
 
   return (
     <AppShell>
@@ -100,6 +102,14 @@ export default async function NewPaymentPage({ searchParams }: NewPaymentPagePro
                 placeholder="Frais inscription, vente boisson, ajustement caisse..."
               />
             </FormField>
+          </div>
+
+          <div className="mt-5 rounded-md border border-line bg-white p-4">
+            <p className="text-sm font-semibold">Employe responsable</p>
+            <p className="mt-1 text-sm text-neutral-500">Selectionne un employe PIN si l&apos;encaissement est fait par l&apos;equipe terrain.</p>
+            <div className="mt-4">
+              <StaffPinFields staff={staff} />
+            </div>
           </div>
 
           <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:justify-end">
