@@ -214,7 +214,9 @@ export default async function MemberDetailPage({
                       <p className="font-semibold">
                         {payment.kind === "subscription" ? "Abonnement" : "Ajustement"}
                       </p>
-                      <p className="mt-1 text-neutral-500">{payment.plan ?? payment.notes ?? "Paiement manuel"}</p>
+                      <p className="mt-1 text-neutral-500">
+                        {payment.plan ?? payment.notes ?? "Paiement manuel"}{payment.staff_name ? ` · ${payment.staff_name}` : ""}
+                      </p>
                     </div>
                     <p className="text-neutral-600">{formatDateTime(payment.paid_at)}</p>
                     <p>{methodLabels[payment.method]}</p>
@@ -238,7 +240,9 @@ export default async function MemberDetailPage({
                   <div key={entry.id} className="flex items-center justify-between p-5 text-sm">
                     <div>
                       <p className="font-semibold">{entry.plan ?? "Abonnement"}</p>
-                      <p className="mt-1 text-neutral-500">Entree validee</p>
+                      <p className="mt-1 text-neutral-500">
+                        Entree validee{entry.staff_name ? ` par ${entry.staff_name}` : ""}
+                      </p>
                     </div>
                     <span className="font-mono font-semibold">{formatTime(entry.checked_in_at)}</span>
                   </div>

@@ -54,6 +54,7 @@ export async function GET(request: Request) {
       membre: payment.member_name,
       formule_ou_note: payment.plan ?? payment.notes ?? "",
       moyen: methodLabels[payment.method],
+      employe: payment.staff_name ?? "",
       type: payment.kind === "subscription" ? "Abonnement" : "Ajustement",
       montant: payment.amount,
     })),

@@ -130,7 +130,9 @@ export default async function CheckinPage({ searchParams }: CheckinPageProps) {
                 <div key={entry.id} className="flex items-center justify-between gap-4 p-5">
                   <div>
                     <p className="font-semibold">{entry.member_name}</p>
-                    <p className="mt-1 text-sm text-neutral-500">{entry.plan ?? "Abonnement"}</p>
+                    <p className="mt-1 text-sm text-neutral-500">
+                      {entry.plan ?? "Abonnement"}{entry.staff_name ? ` · ${entry.staff_name}` : ""}
+                    </p>
                   </div>
                   <div className="text-right">
                     <p className="font-mono text-sm font-semibold">{formatTime(entry.checked_in_at)}</p>

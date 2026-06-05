@@ -77,6 +77,7 @@ export type TodayCheckin = {
   checked_in_at: string;
   member_name: string;
   plan: string | null;
+  staff_name: string | null;
 };
 
 export type MemberDetail = MemberRecord & {
@@ -99,6 +100,7 @@ export type MemberCheckin = {
   id: string;
   checked_in_at: string;
   plan: string | null;
+  staff_name: string | null;
 };
 
 export type MemberPayment = {
@@ -109,6 +111,7 @@ export type MemberPayment = {
   paid_at: string;
   notes: string | null;
   plan: string | null;
+  staff_name: string | null;
 };
 
 export type DashboardAlert = {
@@ -133,6 +136,7 @@ export type DashboardRecentPayment = {
   member_id: string | null;
   member_name: string;
   plan: string | null;
+  staff_name: string | null;
 };
 
 export type DashboardTopPlan = {
@@ -165,6 +169,7 @@ export type PaymentRecord = {
   member_id: string | null;
   member_name: string;
   plan: string | null;
+  staff_name: string | null;
 };
 
 export type PaymentsData = {
@@ -400,7 +405,7 @@ export async function getTodayCheckins(gymId: string): Promise<TodayCheckin[]> {
 
   const { data, error } = await supabase
     .from("checkins")
-    .select("id, checked_in_at, members(full_name), subscriptions(subscription_types(name))")
+    .select("id, checked_in_at, members(full_name), subscriptions(subscription_types(name)), gym_staff(full_name)")
     .eq("gym_id", gymId)
     .gte("checked_in_at", today.toISOString())
     .order("checked_in_at", { ascending: false });
@@ -417,12 +422,16 @@ export async function getTodayCheckins(gymId: string): Promise<TodayCheckin[]> {
     const subscriptionType = Array.isArray(subscription?.subscription_types)
       ? subscription?.subscription_types[0]
       : subscription?.subscription_types;
+    const staff = Array.isArray(checkin.gym_staff)
+      ? checkin.gym_staff[0]
+      : checkin.gym_staff;
 
     return {
       id: checkin.id,
       checked_in_at: checkin.checked_in_at,
       member_name: member?.full_name ?? "Membre",
       plan: subscriptionType?.name ?? null,
+      staff_name: staff?.full_name ?? null,
     };
   });
 }
@@ -514,7 +523,7 @@ export async function getMemberCheckins(
   const supabase = await createClient();
   const { data, error } = await supabase
     .from("checkins")
-    .select("id, checked_in_at, subscriptions(subscription_types(name))")
+    .select("id, checked_in_at, subscriptions(subscription_types(name)), gym_staff(full_name)")
     .eq("gym_id", gymId)
     .eq("member_id", memberId)
     .order("checked_in_at", { ascending: false })
@@ -531,11 +540,15 @@ export async function getMemberCheckins(
     const subscriptionType = Array.isArray(subscription?.subscription_types)
       ? subscription?.subscription_types[0]
       : subscription?.subscription_types;
+    const staff = Array.isArray(checkin.gym_staff)
+      ? checkin.gym_staff[0]
+      : checkin.gym_staff;
 
     return {
       id: checkin.id,
       checked_in_at: checkin.checked_in_at,
       plan: subscriptionType?.name ?? null,
+      staff_name: staff?.full_name ?? null,
     };
   });
 }
@@ -547,7 +560,7 @@ export async function getMemberPayments(
   const supabase = await createClient();
   const { data, error } = await supabase
     .from("payments")
-    .select("id, amount, method, kind, paid_at, notes, subscriptions(subscription_types(name))")
+    .select("id, amount, method, kind, paid_at, notes, subscriptions(subscription_types(name)), gym_staff(full_name)")
     .eq("gym_id", gymId)
     .eq("member_id", memberId)
     .order("paid_at", { ascending: false })
@@ -564,6 +577,9 @@ export async function getMemberPayments(
     const subscriptionType = Array.isArray(subscription?.subscription_types)
       ? subscription?.subscription_types[0]
       : subscription?.subscription_types;
+    const staff = Array.isArray(payment.gym_staff)
+      ? payment.gym_staff[0]
+      : payment.gym_staff;
 
     return {
       id: payment.id,
@@ -573,6 +589,7 @@ export async function getMemberPayments(
       paid_at: payment.paid_at,
       notes: payment.notes,
       plan: subscriptionType?.name ?? null,
+      staff_name: staff?.full_name ?? null,
     };
   });
 }
@@ -599,7 +616,7 @@ export async function getDashboardData(gymId: string): Promise<DashboardData> {
       .gte("paid_at", sevenDaysAgo.toISOString()),
     supabase
       .from("payments")
-      .select("id, amount, method, paid_at, member_id, members(full_name), subscriptions(subscription_types(name))")
+      .select("id, amount, method, paid_at, member_id, members(full_name), subscriptions(subscription_types(name)), gym_staff(full_name)")
       .eq("gym_id", gymId)
       .order("paid_at", { ascending: false })
       .limit(6),
@@ -705,6 +722,9 @@ export async function getDashboardData(gymId: string): Promise<DashboardData> {
     const subscriptionType = Array.isArray(subscription?.subscription_types)
       ? subscription?.subscription_types[0]
       : subscription?.subscription_types;
+    const staff = Array.isArray(payment.gym_staff)
+      ? payment.gym_staff[0]
+      : payment.gym_staff;
 
     return {
       id: payment.id,
@@ -714,6 +734,7 @@ export async function getDashboardData(gymId: string): Promise<DashboardData> {
       member_id: payment.member_id,
       member_name: member?.full_name ?? "Membre supprime",
       plan: subscriptionType?.name ?? null,
+      staff_name: staff?.full_name ?? null,
     };
   });
 
@@ -782,7 +803,7 @@ export async function getPaymentsData(
 
   let request = supabase
     .from("payments")
-    .select("id, amount, method, kind, paid_at, notes, member_id, members(full_name), subscriptions(subscription_types(name))")
+    .select("id, amount, method, kind, paid_at, notes, member_id, members(full_name), subscriptions(subscription_types(name)), gym_staff(full_name)")
     .eq("gym_id", gymId)
     .order("paid_at", { ascending: false })
     .limit(200);
@@ -821,6 +842,9 @@ export async function getPaymentsData(
       ? subscription?.subscription_types[0]
       : subscription?.subscription_types;
     const paymentMethod = normalizePaymentMethod(payment.method);
+    const staff = Array.isArray(payment.gym_staff)
+      ? payment.gym_staff[0]
+      : payment.gym_staff;
 
     return {
       id: payment.id,
@@ -832,12 +856,13 @@ export async function getPaymentsData(
       member_id: payment.member_id,
       member_name: member?.full_name ?? "Membre supprime",
       plan: subscriptionType?.name ?? null,
+      staff_name: staff?.full_name ?? null,
     };
   });
 
   const filteredPayments = query
     ? payments.filter((payment) => {
-        const haystack = `${payment.member_name} ${payment.plan ?? ""} ${payment.method}`.toLowerCase();
+        const haystack = `${payment.member_name} ${payment.plan ?? ""} ${payment.method} ${payment.staff_name ?? ""}`.toLowerCase();
         return haystack.includes(query);
       })
     : payments;

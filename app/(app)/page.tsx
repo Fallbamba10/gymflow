@@ -171,7 +171,9 @@ export default async function Home() {
                         <span className="rounded-md bg-paper px-2 py-1 text-sm font-semibold">{formatTime(entry.checked_in_at)}</span>
                         <div>
                           <p className="text-sm font-semibold">{entry.member_name}</p>
-                          <p className="text-xs text-neutral-500">{entry.plan ?? "Abonnement"}</p>
+                          <p className="text-xs text-neutral-500">
+                            {entry.plan ?? "Abonnement"}{entry.staff_name ? ` · ${entry.staff_name}` : ""}
+                          </p>
                         </div>
                       </div>
                       <span className="text-xs font-semibold text-mint">Valide</span>
@@ -236,7 +238,9 @@ export default async function Home() {
                     ) : (
                       <p className="font-semibold">{payment.member_name}</p>
                     )}
-                    <p className="mt-1 text-xs text-neutral-500">{payment.plan ?? "Paiement manuel"}</p>
+                    <p className="mt-1 text-xs text-neutral-500">
+                      {payment.plan ?? "Paiement manuel"}{payment.staff_name ? ` · ${payment.staff_name}` : ""}
+                    </p>
                   </div>
                   <p className="text-neutral-600">{formatTime(payment.paid_at)}</p>
                   <p className="font-semibold md:text-right">{formatCurrency(payment.amount)}</p>
