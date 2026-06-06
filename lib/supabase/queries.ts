@@ -1,5 +1,28 @@
 import { createClient } from "@/lib/supabase/server";
 
+type RelationRow = {
+  full_name?: string | null;
+  name?: string | null;
+  subscription_types?: RelationRow | RelationRow[] | null;
+};
+
+type QueryRow = Record<string, unknown>;
+
+function getRelation(value: unknown): RelationRow | null {
+  if (!value) return null;
+  return Array.isArray(value)
+    ? (value[0] as RelationRow | undefined) ?? null
+    : (value as RelationRow);
+}
+
+function asString(value: unknown) {
+  return typeof value === "string" ? value : "";
+}
+
+function asNullableString(value: unknown) {
+  return typeof value === "string" ? value : null;
+}
+
 export type CurrentGym = {
   id: string;
   name: string;
@@ -403,32 +426,40 @@ export async function getTodayCheckins(gymId: string): Promise<TodayCheckin[]> {
   const today = new Date();
   today.setHours(0, 0, 0, 0);
 
-  const { data, error } = await supabase
+  const checkinsResult = await supabase
     .from("checkins")
     .select("id, checked_in_at, members(full_name), subscriptions(subscription_types(name)), gym_staff(full_name)")
     .eq("gym_id", gymId)
     .gte("checked_in_at", today.toISOString())
     .order("checked_in_at", { ascending: false });
+  let data = checkinsResult.data as QueryRow[] | null;
+  let error = checkinsResult.error;
+
+  if (error && isStaffAttributionUnavailable(error.message)) {
+    const fallback = await supabase
+      .from("checkins")
+      .select("id, checked_in_at, members(full_name), subscriptions(subscription_types(name))")
+      .eq("gym_id", gymId)
+      .gte("checked_in_at", today.toISOString())
+      .order("checked_in_at", { ascending: false });
+
+    data = fallback.data as QueryRow[] | null;
+    error = fallback.error;
+  }
 
   if (error) {
     throw new Error(error.message);
   }
 
   return (data ?? []).map((checkin) => {
-    const member = Array.isArray(checkin.members) ? checkin.members[0] : checkin.members;
-    const subscription = Array.isArray(checkin.subscriptions)
-      ? checkin.subscriptions[0]
-      : checkin.subscriptions;
-    const subscriptionType = Array.isArray(subscription?.subscription_types)
-      ? subscription?.subscription_types[0]
-      : subscription?.subscription_types;
-    const staff = Array.isArray(checkin.gym_staff)
-      ? checkin.gym_staff[0]
-      : checkin.gym_staff;
+    const member = getRelation(checkin.members);
+    const subscription = getRelation(checkin.subscriptions);
+    const subscriptionType = getRelation(subscription?.subscription_types);
+    const staff = getRelation(checkin.gym_staff);
 
     return {
-      id: checkin.id,
-      checked_in_at: checkin.checked_in_at,
+      id: asString(checkin.id),
+      checked_in_at: asString(checkin.checked_in_at),
       member_name: member?.full_name ?? "Membre",
       plan: subscriptionType?.name ?? null,
       staff_name: staff?.full_name ?? null,
@@ -521,32 +552,41 @@ export async function getMemberCheckins(
   memberId: string,
 ): Promise<MemberCheckin[]> {
   const supabase = await createClient();
-  const { data, error } = await supabase
+  const checkinsResult = await supabase
     .from("checkins")
     .select("id, checked_in_at, subscriptions(subscription_types(name)), gym_staff(full_name)")
     .eq("gym_id", gymId)
     .eq("member_id", memberId)
     .order("checked_in_at", { ascending: false })
     .limit(10);
+  let data = checkinsResult.data as QueryRow[] | null;
+  let error = checkinsResult.error;
+
+  if (error && isStaffAttributionUnavailable(error.message)) {
+    const fallback = await supabase
+      .from("checkins")
+      .select("id, checked_in_at, subscriptions(subscription_types(name))")
+      .eq("gym_id", gymId)
+      .eq("member_id", memberId)
+      .order("checked_in_at", { ascending: false })
+      .limit(10);
+
+    data = fallback.data as QueryRow[] | null;
+    error = fallback.error;
+  }
 
   if (error) {
     throw new Error(error.message);
   }
 
   return (data ?? []).map((checkin) => {
-    const subscription = Array.isArray(checkin.subscriptions)
-      ? checkin.subscriptions[0]
-      : checkin.subscriptions;
-    const subscriptionType = Array.isArray(subscription?.subscription_types)
-      ? subscription?.subscription_types[0]
-      : subscription?.subscription_types;
-    const staff = Array.isArray(checkin.gym_staff)
-      ? checkin.gym_staff[0]
-      : checkin.gym_staff;
+    const subscription = getRelation(checkin.subscriptions);
+    const subscriptionType = getRelation(subscription?.subscription_types);
+    const staff = getRelation(checkin.gym_staff);
 
     return {
-      id: checkin.id,
-      checked_in_at: checkin.checked_in_at,
+      id: asString(checkin.id),
+      checked_in_at: asString(checkin.checked_in_at),
       plan: subscriptionType?.name ?? null,
       staff_name: staff?.full_name ?? null,
     };
@@ -558,36 +598,45 @@ export async function getMemberPayments(
   memberId: string,
 ): Promise<MemberPayment[]> {
   const supabase = await createClient();
-  const { data, error } = await supabase
+  const paymentsResult = await supabase
     .from("payments")
     .select("id, amount, method, kind, paid_at, notes, subscriptions(subscription_types(name)), gym_staff(full_name)")
     .eq("gym_id", gymId)
     .eq("member_id", memberId)
     .order("paid_at", { ascending: false })
     .limit(20);
+  let data = paymentsResult.data as QueryRow[] | null;
+  let error = paymentsResult.error;
+
+  if (error && isStaffAttributionUnavailable(error.message)) {
+    const fallback = await supabase
+      .from("payments")
+      .select("id, amount, method, kind, paid_at, notes, subscriptions(subscription_types(name))")
+      .eq("gym_id", gymId)
+      .eq("member_id", memberId)
+      .order("paid_at", { ascending: false })
+      .limit(20);
+
+    data = fallback.data as QueryRow[] | null;
+    error = fallback.error;
+  }
 
   if (error) {
     throw new Error(error.message);
   }
 
   return (data ?? []).map((payment) => {
-    const subscription = Array.isArray(payment.subscriptions)
-      ? payment.subscriptions[0]
-      : payment.subscriptions;
-    const subscriptionType = Array.isArray(subscription?.subscription_types)
-      ? subscription?.subscription_types[0]
-      : subscription?.subscription_types;
-    const staff = Array.isArray(payment.gym_staff)
-      ? payment.gym_staff[0]
-      : payment.gym_staff;
+    const subscription = getRelation(payment.subscriptions);
+    const subscriptionType = getRelation(subscription?.subscription_types);
+    const staff = getRelation(payment.gym_staff);
 
     return {
-      id: payment.id,
+      id: asString(payment.id),
       amount: Number(payment.amount ?? 0),
       method: normalizePaymentMethod(payment.method),
-      kind: payment.kind,
-      paid_at: payment.paid_at,
-      notes: payment.notes,
+      kind: normalizePaymentKind(payment.kind),
+      paid_at: asString(payment.paid_at),
+      notes: asNullableString(payment.notes),
       plan: subscriptionType?.name ?? null,
       staff_name: staff?.full_name ?? null,
     };
@@ -601,7 +650,7 @@ export async function getDashboardData(gymId: string): Promise<DashboardData> {
   const sevenDaysAgo = new Date(today);
   sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 6);
 
-  const [members, checkinsResult, paymentsResult, weekPaymentsResult, recentPaymentsResult] = await Promise.all([
+  const [members, checkinsResult, paymentsResult, weekPaymentsResult, recentPaymentsInitialResult] = await Promise.all([
     getMembers(gymId),
     getTodayCheckins(gymId),
     supabase
@@ -621,6 +670,19 @@ export async function getDashboardData(gymId: string): Promise<DashboardData> {
       .order("paid_at", { ascending: false })
       .limit(6),
   ]);
+  let recentPaymentsData = recentPaymentsInitialResult.data as QueryRow[] | null;
+  let recentPaymentsError = recentPaymentsInitialResult.error;
+
+  if (recentPaymentsError && isStaffAttributionUnavailable(recentPaymentsError.message)) {
+    const fallback = await supabase
+      .from("payments")
+      .select("id, amount, method, paid_at, member_id, members(full_name), subscriptions(subscription_types(name))")
+      .eq("gym_id", gymId)
+      .order("paid_at", { ascending: false })
+      .limit(6);
+    recentPaymentsData = fallback.data as QueryRow[] | null;
+    recentPaymentsError = fallback.error;
+  }
 
   if (paymentsResult.error) {
     throw new Error(paymentsResult.error.message);
@@ -628,8 +690,8 @@ export async function getDashboardData(gymId: string): Promise<DashboardData> {
   if (weekPaymentsResult.error) {
     throw new Error(weekPaymentsResult.error.message);
   }
-  if (recentPaymentsResult.error) {
-    throw new Error(recentPaymentsResult.error.message);
+  if (recentPaymentsError) {
+    throw new Error(recentPaymentsError.message);
   }
 
   const alerts: DashboardAlert[] = [];
@@ -714,24 +776,18 @@ export async function getDashboardData(gymId: string): Promise<DashboardData> {
     amount,
   }));
 
-  const recentPayments = (recentPaymentsResult.data ?? []).map((payment) => {
-    const member = Array.isArray(payment.members) ? payment.members[0] : payment.members;
-    const subscription = Array.isArray(payment.subscriptions)
-      ? payment.subscriptions[0]
-      : payment.subscriptions;
-    const subscriptionType = Array.isArray(subscription?.subscription_types)
-      ? subscription?.subscription_types[0]
-      : subscription?.subscription_types;
-    const staff = Array.isArray(payment.gym_staff)
-      ? payment.gym_staff[0]
-      : payment.gym_staff;
+  const recentPayments = (recentPaymentsData ?? []).map((payment) => {
+    const member = getRelation(payment.members);
+    const subscription = getRelation(payment.subscriptions);
+    const subscriptionType = getRelation(subscription?.subscription_types);
+    const staff = getRelation(payment.gym_staff);
 
     return {
-      id: payment.id,
+      id: asString(payment.id),
       amount: Number(payment.amount ?? 0),
       method: normalizePaymentMethod(payment.method),
-      paid_at: payment.paid_at,
-      member_id: payment.member_id,
+      paid_at: asString(payment.paid_at),
+      member_id: asNullableString(payment.member_id),
       member_name: member?.full_name ?? "Membre supprime",
       plan: subscriptionType?.name ?? null,
       staff_name: staff?.full_name ?? null,
@@ -786,6 +842,18 @@ function normalizePaymentMethod(method: unknown): PaymentMethod {
   return "other";
 }
 
+function normalizePaymentKind(kind: unknown): "subscription" | "manual_adjustment" {
+  return kind === "manual_adjustment" ? "manual_adjustment" : "subscription";
+}
+
+function isStaffAttributionUnavailable(message: string) {
+  return (
+    message.includes("gym_staff") ||
+    message.includes("staff_id") ||
+    message.includes("relationship")
+  );
+}
+
 export async function getPaymentsData(
   gymId: string,
   filters?: {
@@ -816,7 +884,7 @@ export async function getPaymentsData(
     request = request.eq("method", method);
   }
 
-  const [{ data, error }, todayResult] = await Promise.all([
+  const [paymentsInitialResult, todayResult] = await Promise.all([
     request,
     supabase
       .from("payments")
@@ -824,6 +892,29 @@ export async function getPaymentsData(
       .eq("gym_id", gymId)
       .gte("paid_at", today.toISOString()),
   ]);
+  let data = paymentsInitialResult.data as QueryRow[] | null;
+  let error = paymentsInitialResult.error;
+
+  if (error && isStaffAttributionUnavailable(error.message)) {
+    let fallbackRequest = supabase
+      .from("payments")
+      .select("id, amount, method, kind, paid_at, notes, member_id, members(full_name), subscriptions(subscription_types(name))")
+      .eq("gym_id", gymId)
+      .order("paid_at", { ascending: false })
+      .limit(200);
+
+    if (period !== "all") {
+      fallbackRequest = fallbackRequest.gte("paid_at", getPeriodStart(period).toISOString());
+    }
+
+    if (method !== "all") {
+      fallbackRequest = fallbackRequest.eq("method", method);
+    }
+
+    const fallback = await fallbackRequest;
+    data = fallback.data as QueryRow[] | null;
+    error = fallback.error;
+  }
 
   if (error) {
     throw new Error(error.message);
@@ -834,26 +925,20 @@ export async function getPaymentsData(
   }
 
   const payments = (data ?? []).map((payment) => {
-    const member = Array.isArray(payment.members) ? payment.members[0] : payment.members;
-    const subscription = Array.isArray(payment.subscriptions)
-      ? payment.subscriptions[0]
-      : payment.subscriptions;
-    const subscriptionType = Array.isArray(subscription?.subscription_types)
-      ? subscription?.subscription_types[0]
-      : subscription?.subscription_types;
+    const member = getRelation(payment.members);
+    const subscription = getRelation(payment.subscriptions);
+    const subscriptionType = getRelation(subscription?.subscription_types);
     const paymentMethod = normalizePaymentMethod(payment.method);
-    const staff = Array.isArray(payment.gym_staff)
-      ? payment.gym_staff[0]
-      : payment.gym_staff;
+    const staff = getRelation(payment.gym_staff);
 
     return {
-      id: payment.id,
+      id: asString(payment.id),
       amount: Number(payment.amount ?? 0),
       method: paymentMethod,
-      kind: payment.kind,
-      paid_at: payment.paid_at,
-      notes: payment.notes,
-      member_id: payment.member_id,
+      kind: normalizePaymentKind(payment.kind),
+      paid_at: asString(payment.paid_at),
+      notes: asNullableString(payment.notes),
+      member_id: asNullableString(payment.member_id),
       member_name: member?.full_name ?? "Membre supprime",
       plan: subscriptionType?.name ?? null,
       staff_name: staff?.full_name ?? null,
