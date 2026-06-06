@@ -11,6 +11,9 @@ function getString(formData: FormData, key: string) {
 }
 
 function translateCheckinError(message: string) {
+  if (message.includes("already_checked_in")) {
+    return "Membre deja pointe aujourd'hui";
+  }
   if (message.includes("no_active_subscription")) {
     return "Aucun abonnement actif";
   }
@@ -25,8 +28,10 @@ function translateCheckinError(message: string) {
 
 export async function performMemberCheckin(formData: FormData) {
   const memberId = getString(formData, "member_id");
+  const currentQuery = getString(formData, "current_q");
   const staffId = getString(formData, "staff_id");
   const staffPin = getString(formData, "staff_pin");
+  const querySuffix = currentQuery ? `&q=${encodeURIComponent(currentQuery)}` : "";
 
   if (!memberId) {
     redirect("/checkin?error=Membre invalide");
@@ -41,6 +46,25 @@ export async function performMemberCheckin(formData: FormData) {
   const {
     data: { user },
   } = await supabase.auth.getUser();
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  const { data: existingCheckin, error: existingCheckinError } = await supabase
+    .from("checkins")
+    .select("id")
+    .eq("gym_id", gym.id)
+    .eq("member_id", memberId)
+    .gte("checked_in_at", today.toISOString())
+    .limit(1)
+    .maybeSingle();
+
+  if (existingCheckinError) {
+    redirect(`/checkin?error=${encodeURIComponent(existingCheckinError.message)}${querySuffix}`);
+  }
+
+  if (existingCheckin) {
+    redirect(`/checkin?error=${encodeURIComponent("Membre deja pointe aujourd'hui")}${querySuffix}`);
+  }
 
   const { error } = staffId
     ? await supabase.rpc("perform_checkin_with_staff_pin", {
@@ -57,10 +81,10 @@ export async function performMemberCheckin(formData: FormData) {
       });
 
   if (error) {
-    redirect(`/checkin?error=${encodeURIComponent(translateCheckinError(error.message))}`);
+    redirect(`/checkin?error=${encodeURIComponent(translateCheckinError(error.message))}${querySuffix}`);
   }
 
   revalidatePath("/checkin");
   revalidatePath("/members");
-  redirect("/checkin?success=Entree validee");
+  redirect(`/checkin?success=Entree validee${querySuffix}`);
 }

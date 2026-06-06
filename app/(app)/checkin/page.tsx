@@ -1,4 +1,4 @@
-import { CheckCircle2, Search } from "lucide-react";
+import { Activity, AlertTriangle, CheckCircle2, Clock3, Search, Users } from "lucide-react";
 import { AppShell } from "@/components/app-shell";
 import { PageHeader } from "@/components/page-header";
 import { StatusBadge } from "@/components/status-badge";
@@ -42,6 +42,40 @@ export default async function CheckinPage({ searchParams }: CheckinPageProps) {
   });
   const checkins = gym ? await getTodayCheckins(gym.id) : [];
   const staff = gym ? await getGymStaff(gym.id) : [];
+  const checkedInMemberIds = new Set(checkins.map((entry) => entry.member_id).filter(Boolean));
+  const activeCandidates = allCandidates.filter((member) => member.status === "active").length;
+  const warningCandidates = allCandidates.filter((member) => member.status === "warning").length;
+  const expiredCandidates = allCandidates.filter((member) => member.status === "expired").length;
+  const sortedCandidates = [...candidates].sort((a, b) => {
+    const aChecked = checkedInMemberIds.has(a.id);
+    const bChecked = checkedInMemberIds.has(b.id);
+    if (aChecked !== bChecked) return aChecked ? 1 : -1;
+    if (a.status !== b.status) {
+      const order = { active: 0, warning: 1, expired: 2 };
+      return order[a.status] - order[b.status];
+    }
+    return a.full_name.localeCompare(b.full_name);
+  });
+  const stats = [
+    {
+      label: "Entrees du jour",
+      value: String(checkins.length),
+      detail: "pointages valides",
+      icon: Activity,
+    },
+    {
+      label: "Membres pointables",
+      value: String(activeCandidates + warningCandidates),
+      detail: `${warningCandidates} a surveiller`,
+      icon: Users,
+    },
+    {
+      label: "Non pointables",
+      value: String(expiredCandidates),
+      detail: "abonnement expire",
+      icon: AlertTriangle,
+    },
+  ];
 
   return (
     <AppShell>
@@ -51,7 +85,25 @@ export default async function CheckinPage({ searchParams }: CheckinPageProps) {
       />
 
       <div className="grid gap-6 px-4 py-6 md:px-8 xl:grid-cols-[1fr_420px]">
-        <section className="rounded-md border border-line bg-white shadow-soft">
+        <section className="space-y-6">
+          <div className="grid gap-4 md:grid-cols-3">
+            {stats.map((stat) => (
+              <article key={stat.label} className="rounded-md border border-line bg-white p-5 shadow-soft">
+                <div className="flex items-start justify-between gap-4">
+                  <div>
+                    <p className="text-sm font-medium text-neutral-500">{stat.label}</p>
+                    <p className="mt-3 text-2xl font-semibold">{stat.value}</p>
+                    <p className="mt-1 text-sm text-neutral-500">{stat.detail}</p>
+                  </div>
+                  <div className="flex size-10 items-center justify-center rounded-md bg-paper text-ink">
+                    <stat.icon size={20} />
+                  </div>
+                </div>
+              </article>
+            ))}
+          </div>
+
+          <div className="rounded-md border border-line bg-white shadow-soft">
           <div className="border-b border-line p-5">
             <h2 className="text-lg font-semibold">Rechercher un membre</h2>
             <p className="mt-1 text-sm text-neutral-500">Recherche par nom, telephone ou numero membre.</p>
@@ -84,38 +136,50 @@ export default async function CheckinPage({ searchParams }: CheckinPageProps) {
             ) : null}
 
             <div className="mt-5 space-y-3">
-              {candidates.length > 0 ? (
-                candidates.map((member) => (
+              {sortedCandidates.length > 0 ? (
+                sortedCandidates.map((member) => {
+                  const alreadyCheckedIn = checkedInMemberIds.has(member.id);
+
+                  return (
                   <div key={member.id} className="rounded-md border border-line p-4">
                     <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
                       <div>
-                        <div className="flex items-center gap-3">
+                        <div className="flex flex-wrap items-center gap-3">
                           <p className="font-semibold">{member.full_name}</p>
                           <StatusBadge tone={member.status}>{member.status_label}</StatusBadge>
+                          {alreadyCheckedIn ? (
+                            <StatusBadge tone="neutral">Deja pointe</StatusBadge>
+                          ) : null}
                         </div>
                         <p className="mt-1 text-sm text-neutral-500">
                           {String(member.member_number).padStart(6, "0")} · {member.plan ?? "Sans formule"} · expire le {formatDate(member.expires_at)}
                         </p>
+                        <p className="mt-1 text-xs text-neutral-500">
+                          {member.sessions_left === null ? "Seances illimitees" : `${member.sessions_left} seance${member.sessions_left > 1 ? "s" : ""} restante${member.sessions_left > 1 ? "s" : ""}`}
+                        </p>
                       </div>
                       <form action={performMemberCheckin}>
                         <input type="hidden" name="member_id" value={member.id} />
+                        <input type="hidden" name="current_q" value={params.q ?? ""} />
                         <div className="space-y-3">
                           <StaffPinFields staff={staff} />
-                          <SubmitButton disabled={member.status === "expired"} className="h-10 w-full md:w-auto" pendingLabel="Validation...">
+                          <SubmitButton disabled={member.status === "expired" || alreadyCheckedIn} className="h-10 w-full md:w-auto" pendingLabel="Validation...">
                             <CheckCircle2 size={18} />
-                            Valider
+                            {alreadyCheckedIn ? "Deja valide" : "Valider"}
                           </SubmitButton>
                         </div>
                       </form>
                     </div>
                   </div>
-                ))
+                  );
+                })
               ) : (
                 <p className="rounded-md border border-line bg-paper p-4 text-sm text-neutral-500">
                   Aucun membre trouve. Ajuste la recherche ou ajoute un membre avec un abonnement actif.
                 </p>
               )}
             </div>
+          </div>
           </div>
         </section>
 
@@ -136,7 +200,10 @@ export default async function CheckinPage({ searchParams }: CheckinPageProps) {
                   </div>
                   <div className="text-right">
                     <p className="font-mono text-sm font-semibold">{formatTime(entry.checked_in_at)}</p>
-                    <p className="mt-1 text-xs text-mint">Valide</p>
+                    <p className="mt-1 inline-flex items-center gap-1 text-xs font-semibold text-mint">
+                      <Clock3 size={12} />
+                      Valide
+                    </p>
                   </div>
                 </div>
               ))

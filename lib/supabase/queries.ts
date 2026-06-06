@@ -97,6 +97,7 @@ export type CheckinCandidate = {
 
 export type TodayCheckin = {
   id: string;
+  member_id: string | null;
   checked_in_at: string;
   member_name: string;
   plan: string | null;
@@ -436,7 +437,7 @@ export async function getTodayCheckins(gymId: string): Promise<TodayCheckin[]> {
 
   const checkinsResult = await supabase
     .from("checkins")
-    .select("id, checked_in_at, members(full_name), subscriptions(subscription_types(name)), gym_staff(full_name)")
+    .select("id, member_id, checked_in_at, members(full_name), subscriptions(subscription_types(name)), gym_staff(full_name)")
     .eq("gym_id", gymId)
     .gte("checked_in_at", today.toISOString())
     .order("checked_in_at", { ascending: false });
@@ -446,7 +447,7 @@ export async function getTodayCheckins(gymId: string): Promise<TodayCheckin[]> {
   if (error && isStaffAttributionUnavailable(error.message)) {
     const fallback = await supabase
       .from("checkins")
-      .select("id, checked_in_at, members(full_name), subscriptions(subscription_types(name))")
+      .select("id, member_id, checked_in_at, members(full_name), subscriptions(subscription_types(name))")
       .eq("gym_id", gymId)
       .gte("checked_in_at", today.toISOString())
       .order("checked_in_at", { ascending: false });
@@ -467,6 +468,7 @@ export async function getTodayCheckins(gymId: string): Promise<TodayCheckin[]> {
 
     return {
       id: asString(checkin.id),
+      member_id: asNullableString(checkin.member_id),
       checked_in_at: asString(checkin.checked_in_at),
       member_name: member?.full_name ?? "Membre",
       plan: subscriptionType?.name ?? null,
