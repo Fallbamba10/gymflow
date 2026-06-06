@@ -1,5 +1,7 @@
 -- Run this after supabase/schema.sql to enable staff management.
 
+create extension if not exists pgcrypto with schema extensions;
+
 create or replace function public.add_gym_user_by_email(
   target_gym_id uuid,
   target_email text,
@@ -78,7 +80,7 @@ create or replace function public.create_gym_staff_with_pin(
 returns public.gym_staff
 language plpgsql
 security definer
-set search_path = public
+set search_path = public, extensions
 as $$
 declare
   staff_member public.gym_staff%rowtype;
@@ -128,7 +130,7 @@ create or replace function public.verify_gym_staff_pin(
 returns public.gym_staff
 language plpgsql
 security definer
-set search_path = public
+set search_path = public, extensions
 as $$
 declare
   staff_member public.gym_staff%rowtype;
