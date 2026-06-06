@@ -7,7 +7,7 @@ import { StaffPinFields } from "@/components/staff-pin-fields";
 import { StatusBadge } from "@/components/status-badge";
 import { SubmitButton } from "@/components/submit-button";
 import { performMemberCheckin } from "@/app/(app)/checkin/actions";
-import { archiveMember, renewMemberSubscription } from "@/app/(app)/members/actions";
+import { archiveMember, renewMemberSubscription, restoreMember } from "@/app/(app)/members/actions";
 import { formatCurrency } from "@/lib/demo-data";
 import {
   getCurrentGym,
@@ -60,6 +60,10 @@ const methodLabels: Record<PaymentMethod, string> = {
 };
 
 function getStatus(member: Awaited<ReturnType<typeof getMemberDetail>>) {
+  if (member?.archived_at) {
+    return { tone: "neutral" as const, label: "Archive" };
+  }
+
   const subscription = member?.active_subscription;
   if (!subscription) {
     return { tone: "expired" as const, label: "Aucun abonnement" };
@@ -99,6 +103,7 @@ export default async function MemberDetailPage({
 
   const status = getStatus(member);
   const activeSubscription = member.active_subscription;
+  const isArchived = Boolean(member.archived_at);
   const totalPaid = payments.reduce((sum, payment) => sum + payment.amount, 0);
   const lastPayment = payments[0] ?? null;
 
@@ -144,7 +149,7 @@ export default async function MemberDetailPage({
                   <input type="hidden" name="member_id" value={member.id} />
                   <div className="space-y-3">
                     <StaffPinFields staff={staff} />
-                    <SubmitButton disabled={status.tone === "expired"} className="h-11 w-full sm:w-auto" pendingLabel="Pointage...">
+                    <SubmitButton disabled={status.tone === "expired" || isArchived} className="h-11 w-full sm:w-auto" pendingLabel="Pointage...">
                       <UserCheck size={18} />
                       Pointer
                     </SubmitButton>
@@ -161,6 +166,11 @@ export default async function MemberDetailPage({
             {query.error ? (
               <div className="mt-5 rounded-md border border-red-200 bg-red-50 px-4 py-3 text-sm font-semibold text-danger">
                 {query.error}
+              </div>
+            ) : null}
+            {isArchived ? (
+              <div className="mt-5 rounded-md border border-neutral-200 bg-neutral-50 px-4 py-3 text-sm font-semibold text-neutral-700">
+                Ce membre est archive depuis le {formatDate(member.archived_at)}. Restaure-le pour reprendre les pointages et renouvellements.
               </div>
             ) : null}
 
@@ -331,7 +341,7 @@ export default async function MemberDetailPage({
               type="submit"
               variant="accent"
               className="h-11 w-full"
-              disabled={subscriptionTypes.length === 0}
+              disabled={subscriptionTypes.length === 0 || isArchived}
               pendingLabel="Renouvellement..."
             >
               <CheckCircle2 size={18} />
@@ -340,17 +350,31 @@ export default async function MemberDetailPage({
           </form>
 
           <div className="mt-6 border-t border-line pt-5">
-            <form action={archiveMember}>
-              <input type="hidden" name="member_id" value={member.id} />
-              <SubmitButton
-                variant="secondary"
-                className="h-10 w-full border-red-200 bg-red-50 text-danger hover:bg-red-100"
-                pendingLabel="Archivage..."
-              >
-                <Archive size={17} />
-                Archiver le membre
-              </SubmitButton>
-            </form>
+            {isArchived ? (
+              <form action={restoreMember}>
+                <input type="hidden" name="member_id" value={member.id} />
+                <SubmitButton
+                  variant="secondary"
+                  className="h-10 w-full border-emerald-200 bg-emerald-50 text-mint hover:bg-emerald-100"
+                  pendingLabel="Restauration..."
+                >
+                  <RotateCcw size={17} />
+                  Restaurer le membre
+                </SubmitButton>
+              </form>
+            ) : (
+              <form action={archiveMember}>
+                <input type="hidden" name="member_id" value={member.id} />
+                <SubmitButton
+                  variant="secondary"
+                  className="h-10 w-full border-red-200 bg-red-50 text-danger hover:bg-red-100"
+                  pendingLabel="Archivage..."
+                >
+                  <Archive size={17} />
+                  Archiver le membre
+                </SubmitButton>
+              </form>
+            )}
           </div>
         </aside>
       </div>

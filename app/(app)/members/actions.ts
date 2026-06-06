@@ -294,3 +294,31 @@ export async function archiveMember(formData: FormData) {
   revalidatePath("/");
   redirect("/members?success=Membre archive");
 }
+
+export async function restoreMember(formData: FormData) {
+  const gym = await getCurrentGym();
+  if (!gym) {
+    redirect("/onboarding");
+  }
+
+  const memberId = getString(formData, "member_id");
+  if (!memberId) {
+    redirect("/members?error=Membre invalide");
+  }
+
+  const supabase = await createClient();
+  const { error } = await supabase
+    .from("members")
+    .update({ archived_at: null })
+    .eq("gym_id", gym.id)
+    .eq("id", memberId);
+
+  if (error) {
+    redirect(`/members/${memberId}?error=${encodeURIComponent(error.message)}`);
+  }
+
+  revalidatePath(`/members/${memberId}`);
+  revalidatePath("/members");
+  revalidatePath("/");
+  redirect(`/members/${memberId}?success=Membre restaure`);
+}

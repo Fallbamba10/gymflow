@@ -6,6 +6,10 @@ import { StatusBadge } from "@/components/status-badge";
 import { getCurrentGym, getMembers } from "@/lib/supabase/queries";
 
 function getMemberStatus(member: Awaited<ReturnType<typeof getMembers>>[number]) {
+  if (member.archived_at) {
+    return { tone: "neutral" as const, label: "Archive" };
+  }
+
   const subscription = member.active_subscription;
   if (!subscription) {
     return { tone: "expired" as const, label: "Aucun abonnement" };
@@ -33,8 +37,10 @@ function getMemberStatus(member: Awaited<ReturnType<typeof getMembers>>[number])
 
 type MembersPageProps = {
   searchParams: Promise<{
+    error?: string;
     q?: string;
     status?: string;
+    success?: string;
   }>;
 };
 
@@ -43,7 +49,7 @@ export default async function MembersPage({ searchParams }: MembersPageProps) {
   const query = params.q?.trim().toLowerCase() ?? "";
   const selectedStatus = params.status ?? "all";
   const gym = await getCurrentGym();
-  const allMembers = gym ? await getMembers(gym.id) : [];
+  const allMembers = gym ? await getMembers(gym.id, { includeArchived: selectedStatus === "archived" }) : [];
   const members = allMembers.filter((member) => {
     const status = getMemberStatus(member);
     const matchesQuery =
@@ -54,16 +60,22 @@ export default async function MembersPage({ searchParams }: MembersPageProps) {
     const matchesStatus =
       selectedStatus === "all" ||
       (selectedStatus === "active" && status.tone === "active") ||
-      (selectedStatus === "warning" && status.tone === "warning") ||
-      (selectedStatus === "expired" && status.tone === "expired");
+      (selectedStatus === "renewal" && (status.tone === "warning" || status.tone === "expired")) ||
+      (selectedStatus === "expired" && status.tone === "expired") ||
+      (selectedStatus === "archived" && Boolean(member.archived_at));
 
     return matchesQuery && matchesStatus;
   });
+  const renewalCount = allMembers.filter((member) => {
+    const status = getMemberStatus(member);
+    return status.tone === "warning" || status.tone === "expired";
+  }).length;
   const filters = [
     { label: "Tous", value: "all" },
     { label: "Actifs", value: "active" },
-    { label: "A renouveler", value: "warning" },
+    { label: `A renouveler (${renewalCount})`, value: "renewal" },
     { label: "Expires", value: "expired" },
+    { label: "Archives", value: "archived" },
   ];
 
   return (
@@ -86,6 +98,18 @@ export default async function MembersPage({ searchParams }: MembersPageProps) {
       />
 
       <div className="px-4 py-6 md:px-8">
+        {params.success ? (
+          <div className="mb-5 rounded-md border border-emerald-200 bg-emerald-50 p-4 text-sm font-semibold text-mint">
+            {params.success}
+          </div>
+        ) : null}
+
+        {params.error ? (
+          <div className="mb-5 rounded-md border border-red-200 bg-red-50 p-4 text-sm font-semibold text-danger">
+            {params.error}
+          </div>
+        ) : null}
+
         <form className="mb-4 grid gap-3 xl:grid-cols-[1fr_auto]" action="/members">
           <div className="relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-400" size={18} />
@@ -118,12 +142,13 @@ export default async function MembersPage({ searchParams }: MembersPageProps) {
 
         <div className="overflow-x-auto rounded-md border border-line bg-white shadow-soft">
           <div className="min-w-[920px]">
-            <div className="grid grid-cols-[0.8fr_1.4fr_1fr_1fr_0.9fr_0.9fr] border-b border-line bg-neutral-50 px-4 py-3 text-xs font-semibold uppercase text-neutral-500">
+            <div className="grid grid-cols-[0.8fr_1.4fr_1fr_1fr_0.9fr_0.9fr_0.9fr] border-b border-line bg-neutral-50 px-4 py-3 text-xs font-semibold uppercase text-neutral-500">
               <span>Numero</span>
               <span>Membre</span>
               <span>Telephone</span>
               <span>Formule</span>
               <span>Seances</span>
+              <span>Expiration</span>
               <span>Statut</span>
             </div>
             {members.length > 0 ? (
@@ -134,13 +159,14 @@ export default async function MembersPage({ searchParams }: MembersPageProps) {
                   <Link
                     key={member.id}
                     href={`/members/${member.id}`}
-                    className="grid grid-cols-[0.8fr_1.4fr_1fr_1fr_0.9fr_0.9fr] items-center border-b border-line px-4 py-4 text-sm transition last:border-b-0 hover:bg-neutral-50"
+                    className="grid grid-cols-[0.8fr_1.4fr_1fr_1fr_0.9fr_0.9fr_0.9fr] items-center border-b border-line px-4 py-4 text-sm transition last:border-b-0 hover:bg-neutral-50"
                   >
                     <span className="font-mono text-neutral-500">{String(member.member_number).padStart(6, "0")}</span>
                     <span className="font-semibold">{member.full_name}</span>
                     <span className="text-neutral-600">{member.phone ?? "-"}</span>
                     <span>{subscription?.subscription_types?.name ?? "-"}</span>
                     <span>{subscription?.sessions_left ?? "Illimite"}</span>
+                    <span>{subscription?.expires_at ? new Intl.DateTimeFormat("fr-FR").format(new Date(subscription.expires_at)) : "-"}</span>
                     <StatusBadge tone={status.tone}>{status.label}</StatusBadge>
                   </Link>
                 );

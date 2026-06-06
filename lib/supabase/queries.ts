@@ -321,14 +321,22 @@ export async function getSubscriptionType(
   return data;
 }
 
-export async function getMembers(gymId: string): Promise<MemberRecord[]> {
+export async function getMembers(
+  gymId: string,
+  options?: { includeArchived?: boolean },
+): Promise<MemberRecord[]> {
   const supabase = await createClient();
-  const { data: members, error } = await supabase
+  let request = supabase
     .from("members")
     .select("id, member_number, full_name, phone, created_at, archived_at")
     .eq("gym_id", gymId)
-    .is("archived_at", null)
     .order("created_at", { ascending: false });
+
+  if (!options?.includeArchived) {
+    request = request.is("archived_at", null);
+  }
+
+  const { data: members, error } = await request;
 
   if (error) {
     throw new Error(error.message);
