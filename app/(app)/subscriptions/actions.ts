@@ -119,3 +119,30 @@ export async function deactivateSubscriptionType(formData: FormData) {
   revalidatePath("/subscriptions");
   redirect("/subscriptions?success=Formule desactivee");
 }
+
+export async function activateSubscriptionType(formData: FormData) {
+  const gym = await getCurrentGym();
+  if (!gym) {
+    redirect("/onboarding");
+  }
+
+  const subscriptionTypeId = getString(formData, "subscription_type_id");
+  if (!subscriptionTypeId) {
+    redirect("/subscriptions?error=Formule introuvable");
+  }
+
+  const supabase = await createClient();
+  const { error } = await supabase
+    .from("subscription_types")
+    .update({ active: true })
+    .eq("gym_id", gym.id)
+    .eq("id", subscriptionTypeId);
+
+  if (error) {
+    redirect(`/subscriptions/${subscriptionTypeId}/edit?error=${encodeURIComponent(error.message)}`);
+  }
+
+  revalidatePath("/subscriptions");
+  revalidatePath(`/subscriptions/${subscriptionTypeId}/edit`);
+  redirect("/subscriptions?success=Formule reactivee");
+}

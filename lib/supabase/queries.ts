@@ -65,6 +65,14 @@ export type SubscriptionTypeRecord = {
   created_at: string;
 };
 
+export type SubscriptionTypeStats = {
+  subscription_type_id: string;
+  sales_count: number;
+  revenue: number;
+  active_subscriptions: number;
+  latest_sale_at: string | null;
+};
+
 export type MemberRecord = {
   id: string;
   member_number: number;
@@ -287,20 +295,73 @@ export async function getGymStaff(gymId: string): Promise<GymStaffRecord[]> {
   return data ?? [];
 }
 
-export async function getSubscriptionTypes(gymId: string): Promise<SubscriptionTypeRecord[]> {
+export async function getSubscriptionTypes(
+  gymId: string,
+  options?: { includeInactive?: boolean },
+): Promise<SubscriptionTypeRecord[]> {
   const supabase = await createClient();
-  const { data, error } = await supabase
+  let request = supabase
     .from("subscription_types")
     .select("id, name, duration_days, sessions, price, active, created_at")
     .eq("gym_id", gymId)
-    .eq("active", true)
     .order("created_at", { ascending: false });
+
+  if (!options?.includeInactive) {
+    request = request.eq("active", true);
+  }
+
+  const { data, error } = await request;
 
   if (error) {
     throw new Error(error.message);
   }
 
   return data ?? [];
+}
+
+export async function getSubscriptionTypeStats(
+  gymId: string,
+): Promise<Record<string, SubscriptionTypeStats>> {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("subscriptions")
+    .select("subscription_type_id, price_paid, status, created_at")
+    .eq("gym_id", gymId);
+
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  const stats: Record<string, SubscriptionTypeStats> = {};
+  for (const subscription of data ?? []) {
+    const typeId = subscription.subscription_type_id;
+    if (!typeId) continue;
+
+    const current = stats[typeId] ?? {
+      subscription_type_id: typeId,
+      sales_count: 0,
+      revenue: 0,
+      active_subscriptions: 0,
+      latest_sale_at: null,
+    };
+
+    const createdAt = typeof subscription.created_at === "string" ? subscription.created_at : null;
+    stats[typeId] = {
+      ...current,
+      sales_count: current.sales_count + 1,
+      revenue: current.revenue + Number(subscription.price_paid ?? 0),
+      active_subscriptions:
+        subscription.status === "active"
+          ? current.active_subscriptions + 1
+          : current.active_subscriptions,
+      latest_sale_at:
+        createdAt && (!current.latest_sale_at || createdAt > current.latest_sale_at)
+          ? createdAt
+          : current.latest_sale_at,
+    };
+  }
+
+  return stats;
 }
 
 export async function getSubscriptionType(

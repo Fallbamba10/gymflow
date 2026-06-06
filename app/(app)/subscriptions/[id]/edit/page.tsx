@@ -1,11 +1,12 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ArrowLeft, CheckCircle2, CreditCard, Trash2 } from "lucide-react";
+import { ArrowLeft, CheckCircle2, CreditCard, RotateCcw, Trash2 } from "lucide-react";
 import { AppShell } from "@/components/app-shell";
 import { FormField } from "@/components/form-field";
 import { PageHeader } from "@/components/page-header";
 import { SubmitButton } from "@/components/submit-button";
 import {
+  activateSubscriptionType,
   deactivateSubscriptionType,
   updateSubscriptionType,
 } from "@/app/(app)/subscriptions/actions";
@@ -119,30 +120,48 @@ export default async function EditSubscriptionTypePage({
 
         <aside className="rounded-md border border-line bg-white p-5 shadow-soft">
           <div className="flex items-start gap-3">
-            <div className="flex size-10 items-center justify-center rounded-md bg-red-50 text-danger">
-              <Trash2 size={20} />
+            <div className={`flex size-10 items-center justify-center rounded-md ${subscriptionType.active ? "bg-red-50 text-danger" : "bg-emerald-50 text-mint"}`}>
+              {subscriptionType.active ? <Trash2 size={20} /> : <RotateCcw size={20} />}
             </div>
             <div>
-              <h2 className="text-lg font-semibold">Desactiver</h2>
+              <h2 className="text-lg font-semibold">
+                {subscriptionType.active ? "Desactiver" : "Reactiver"}
+              </h2>
               <p className="mt-1 text-sm text-neutral-500">
-                La formule ne sera plus proposee lors de l&apos;ajout ou du renouvellement d&apos;un membre.
+                {subscriptionType.active
+                  ? "La formule ne sera plus proposee lors de l'ajout ou du renouvellement d'un membre."
+                  : "La formule redeviendra disponible pour les nouvelles ventes et renouvellements."}
               </p>
             </div>
           </div>
 
-          <form action={deactivateSubscriptionType} className="mt-5">
-            <input type="hidden" name="subscription_type_id" value={subscriptionType.id} />
-            <SubmitButton
-              type="submit"
-              variant="secondary"
-              className="h-11 w-full border-red-200 text-danger hover:bg-red-50"
-              disabled={!subscriptionType.active}
-              pendingLabel="Desactivation..."
-            >
-              <Trash2 size={18} />
-              {subscriptionType.active ? "Desactiver la formule" : "Deja desactivee"}
-            </SubmitButton>
-          </form>
+          {subscriptionType.active ? (
+            <form action={deactivateSubscriptionType} className="mt-5">
+              <input type="hidden" name="subscription_type_id" value={subscriptionType.id} />
+              <SubmitButton
+                type="submit"
+                variant="secondary"
+                className="h-11 w-full border-red-200 text-danger hover:bg-red-50"
+                pendingLabel="Desactivation..."
+              >
+                <Trash2 size={18} />
+                Desactiver la formule
+              </SubmitButton>
+            </form>
+          ) : (
+            <form action={activateSubscriptionType} className="mt-5">
+              <input type="hidden" name="subscription_type_id" value={subscriptionType.id} />
+              <SubmitButton
+                type="submit"
+                variant="secondary"
+                className="h-11 w-full border-emerald-200 text-mint hover:bg-emerald-50"
+                pendingLabel="Reactivation..."
+              >
+                <RotateCcw size={18} />
+                Reactiver la formule
+              </SubmitButton>
+            </form>
+          )}
         </aside>
       </div>
     </AppShell>
