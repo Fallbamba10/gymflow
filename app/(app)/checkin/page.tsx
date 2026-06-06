@@ -1,4 +1,4 @@
-import { Activity, AlertTriangle, CheckCircle2, Clock3, Search, Users } from "lucide-react";
+import { Activity, AlertTriangle, CheckCircle2, Clock3, Repeat2, Search, Sparkles, Users } from "lucide-react";
 import { AppShell } from "@/components/app-shell";
 import { PageHeader } from "@/components/page-header";
 import { StatusBadge } from "@/components/status-badge";
@@ -42,14 +42,23 @@ export default async function CheckinPage({ searchParams }: CheckinPageProps) {
   });
   const checkins = gym ? await getTodayCheckins(gym.id) : [];
   const staff = gym ? await getGymStaff(gym.id) : [];
-  const checkedInMemberIds = new Set(checkins.map((entry) => entry.member_id).filter(Boolean));
+  const checkinsByMember = new Map<string, { count: number; lastTime: string }>();
+  for (const entry of checkins) {
+    if (!entry.member_id) continue;
+    const current = checkinsByMember.get(entry.member_id);
+    checkinsByMember.set(entry.member_id, {
+      count: (current?.count ?? 0) + 1,
+      lastTime: current?.lastTime ?? entry.checked_in_at,
+    });
+  }
   const activeCandidates = allCandidates.filter((member) => member.status === "active").length;
   const warningCandidates = allCandidates.filter((member) => member.status === "warning").length;
   const expiredCandidates = allCandidates.filter((member) => member.status === "expired").length;
+  const repeatVisits = Array.from(checkinsByMember.values()).filter((visit) => visit.count > 1).length;
   const sortedCandidates = [...candidates].sort((a, b) => {
-    const aChecked = checkedInMemberIds.has(a.id);
-    const bChecked = checkedInMemberIds.has(b.id);
-    if (aChecked !== bChecked) return aChecked ? 1 : -1;
+    const aVisit = checkinsByMember.get(a.id);
+    const bVisit = checkinsByMember.get(b.id);
+    if (Boolean(aVisit) !== Boolean(bVisit)) return aVisit ? 1 : -1;
     if (a.status !== b.status) {
       const order = { active: 0, warning: 1, expired: 2 };
       return order[a.status] - order[b.status];
@@ -60,7 +69,7 @@ export default async function CheckinPage({ searchParams }: CheckinPageProps) {
     {
       label: "Entrees du jour",
       value: String(checkins.length),
-      detail: "pointages valides",
+      detail: `${checkinsByMember.size} membre${checkinsByMember.size > 1 ? "s" : ""}`,
       icon: Activity,
     },
     {
@@ -68,6 +77,12 @@ export default async function CheckinPage({ searchParams }: CheckinPageProps) {
       value: String(activeCandidates + warningCandidates),
       detail: `${warningCandidates} a surveiller`,
       icon: Users,
+    },
+    {
+      label: "Retours journee",
+      value: String(repeatVisits),
+      detail: "matin + soir",
+      icon: Repeat2,
     },
     {
       label: "Non pointables",
@@ -86,7 +101,7 @@ export default async function CheckinPage({ searchParams }: CheckinPageProps) {
 
       <div className="grid gap-6 px-4 py-6 md:px-8 xl:grid-cols-[1fr_420px]">
         <section className="space-y-6">
-          <div className="grid gap-4 md:grid-cols-3">
+          <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
             {stats.map((stat) => (
               <article key={stat.label} className="rounded-md border border-line bg-white p-5 shadow-soft">
                 <div className="flex items-start justify-between gap-4">
@@ -105,8 +120,16 @@ export default async function CheckinPage({ searchParams }: CheckinPageProps) {
 
           <div className="rounded-md border border-line bg-white shadow-soft">
           <div className="border-b border-line p-5">
-            <h2 className="text-lg font-semibold">Rechercher un membre</h2>
-            <p className="mt-1 text-sm text-neutral-500">Recherche par nom, telephone ou numero membre.</p>
+            <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+              <div>
+                <h2 className="text-lg font-semibold">Pointage membre</h2>
+                <p className="mt-1 text-sm text-neutral-500">Recherche rapide et passages multiples dans la journee.</p>
+              </div>
+              <div className="inline-flex items-center gap-2 rounded-md bg-paper px-3 py-2 text-sm font-semibold text-neutral-700">
+                <Sparkles size={16} />
+                Mode comptoir
+              </div>
+            </div>
           </div>
           <div className="p-5">
             <form className="flex flex-col gap-3 sm:flex-row" action="/checkin">
@@ -138,17 +161,19 @@ export default async function CheckinPage({ searchParams }: CheckinPageProps) {
             <div className="mt-5 space-y-3">
               {sortedCandidates.length > 0 ? (
                 sortedCandidates.map((member) => {
-                  const alreadyCheckedIn = checkedInMemberIds.has(member.id);
+                  const visit = checkinsByMember.get(member.id);
 
                   return (
-                  <div key={member.id} className="rounded-md border border-line p-4">
+                  <div key={member.id} className={`rounded-md border p-4 transition ${visit ? "border-mint/30 bg-emerald-50/40" : "border-line bg-white"}`}>
                     <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-                      <div>
+                      <div className="min-w-0">
                         <div className="flex flex-wrap items-center gap-3">
                           <p className="font-semibold">{member.full_name}</p>
                           <StatusBadge tone={member.status}>{member.status_label}</StatusBadge>
-                          {alreadyCheckedIn ? (
-                            <StatusBadge tone="neutral">Deja pointe</StatusBadge>
+                          {visit ? (
+                            <StatusBadge tone="neutral">
+                              {visit.count} passage{visit.count > 1 ? "s" : ""} aujourd&apos;hui
+                            </StatusBadge>
                           ) : null}
                         </div>
                         <p className="mt-1 text-sm text-neutral-500">
@@ -156,6 +181,7 @@ export default async function CheckinPage({ searchParams }: CheckinPageProps) {
                         </p>
                         <p className="mt-1 text-xs text-neutral-500">
                           {member.sessions_left === null ? "Seances illimitees" : `${member.sessions_left} seance${member.sessions_left > 1 ? "s" : ""} restante${member.sessions_left > 1 ? "s" : ""}`}
+                          {visit ? ` · dernier passage ${formatTime(visit.lastTime)}` : ""}
                         </p>
                       </div>
                       <form action={performMemberCheckin}>
@@ -163,9 +189,9 @@ export default async function CheckinPage({ searchParams }: CheckinPageProps) {
                         <input type="hidden" name="current_q" value={params.q ?? ""} />
                         <div className="space-y-3">
                           <StaffPinFields staff={staff} />
-                          <SubmitButton disabled={member.status === "expired" || alreadyCheckedIn} className="h-10 w-full md:w-auto" pendingLabel="Validation...">
-                            <CheckCircle2 size={18} />
-                            {alreadyCheckedIn ? "Deja valide" : "Valider"}
+                          <SubmitButton disabled={member.status === "expired"} className="h-10 w-full md:w-auto" pendingLabel="Validation...">
+                            {visit ? <Repeat2 size={18} /> : <CheckCircle2 size={18} />}
+                            {visit ? "Pointer encore" : "Valider"}
                           </SubmitButton>
                         </div>
                       </form>
@@ -183,22 +209,33 @@ export default async function CheckinPage({ searchParams }: CheckinPageProps) {
           </div>
         </section>
 
-        <aside className="rounded-md border border-line bg-white shadow-soft">
+        <aside className="rounded-md border border-line bg-white shadow-soft xl:sticky xl:top-6 xl:self-start">
           <div className="border-b border-line p-5">
             <h2 className="text-lg font-semibold">Journal du jour</h2>
             <p className="mt-1 text-sm text-neutral-500">Dernieres entrees validees.</p>
           </div>
           <div className="divide-y divide-line">
             {checkins.length > 0 ? (
-              checkins.slice(0, 12).map((entry) => (
+              checkins.slice(0, 12).map((entry, index, visibleEntries) => {
+                const previousSameMember = visibleEntries
+                  .slice(index + 1)
+                  .filter((item) => item.member_id && item.member_id === entry.member_id).length;
+                const visitNumber = previousSameMember + 1;
+
+                return (
                 <div key={entry.id} className="flex items-center justify-between gap-4 p-5">
-                  <div>
-                    <p className="font-semibold">{entry.member_name}</p>
+                  <div className="min-w-0">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <p className="font-semibold">{entry.member_name}</p>
+                      {visitNumber > 1 ? (
+                        <StatusBadge tone="neutral">Passage {visitNumber}</StatusBadge>
+                      ) : null}
+                    </div>
                     <p className="mt-1 text-sm text-neutral-500">
                       {entry.plan ?? "Abonnement"}{entry.staff_name ? ` · ${entry.staff_name}` : ""}
                     </p>
                   </div>
-                  <div className="text-right">
+                  <div className="shrink-0 text-right">
                     <p className="font-mono text-sm font-semibold">{formatTime(entry.checked_in_at)}</p>
                     <p className="mt-1 inline-flex items-center gap-1 text-xs font-semibold text-mint">
                       <Clock3 size={12} />
@@ -206,7 +243,8 @@ export default async function CheckinPage({ searchParams }: CheckinPageProps) {
                     </p>
                   </div>
                 </div>
-              ))
+                );
+              })
             ) : (
               <p className="p-5 text-sm text-neutral-500">Aucune entree aujourd&apos;hui.</p>
             )}

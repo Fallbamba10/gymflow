@@ -11,9 +11,6 @@ function getString(formData: FormData, key: string) {
 }
 
 function translateCheckinError(message: string) {
-  if (message.includes("already_checked_in")) {
-    return "Membre deja pointe aujourd'hui";
-  }
   if (message.includes("no_active_subscription")) {
     return "Aucun abonnement actif";
   }
@@ -46,25 +43,6 @@ export async function performMemberCheckin(formData: FormData) {
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-
-  const { data: existingCheckin, error: existingCheckinError } = await supabase
-    .from("checkins")
-    .select("id")
-    .eq("gym_id", gym.id)
-    .eq("member_id", memberId)
-    .gte("checked_in_at", today.toISOString())
-    .limit(1)
-    .maybeSingle();
-
-  if (existingCheckinError) {
-    redirect(`/checkin?error=${encodeURIComponent(existingCheckinError.message)}${querySuffix}`);
-  }
-
-  if (existingCheckin) {
-    redirect(`/checkin?error=${encodeURIComponent("Membre deja pointe aujourd'hui")}${querySuffix}`);
-  }
 
   const { error } = staffId
     ? await supabase.rpc("perform_checkin_with_staff_pin", {
