@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Banknote, CalendarDays, CreditCard, Download, Plus, Search, WalletCards } from "lucide-react";
+import { Banknote, CalendarDays, CreditCard, Download, Plus, ReceiptText, Search, TrendingUp, WalletCards } from "lucide-react";
 import { AppShell } from "@/components/app-shell";
 import { PageHeader } from "@/components/page-header";
 import { StatusBadge } from "@/components/status-badge";
@@ -33,6 +33,14 @@ const methodLabels: Record<PaymentMethod, string> = {
   orange_money: "Orange Money",
   card: "Carte",
   other: "Autre",
+};
+
+const methodAccent: Record<PaymentMethod, string> = {
+  cash: "bg-ink",
+  wave: "bg-sky-500",
+  orange_money: "bg-orange-500",
+  card: "bg-violet-500",
+  other: "bg-neutral-400",
 };
 
 function formatDateTime(value: string) {
@@ -112,6 +120,27 @@ export default async function PaymentsPage({ searchParams }: PaymentsPageProps) 
       icon: CreditCard,
     },
   ];
+  const averagePayment = paymentsData.count > 0 ? paymentsData.total / paymentsData.count : 0;
+  const manualPayments = paymentsData.payments.filter((payment) => payment.kind === "manual_adjustment");
+  const subscriptionPayments = paymentsData.payments.filter((payment) => payment.kind === "subscription");
+  const manualTotal = manualPayments.reduce((sum, payment) => sum + payment.amount, 0);
+  const subscriptionTotal = subscriptionPayments.reduce((sum, payment) => sum + payment.amount, 0);
+  const bestMethod = methodOptions
+    .filter((option): option is { label: string; value: PaymentMethod } => option.value !== "all")
+    .map((option) => ({
+      label: option.label,
+      value: option.value,
+      amount: paymentsData.methodTotals[option.value],
+    }))
+    .sort((a, b) => b.amount - a.amount)[0];
+  const methodBreakdown = methodOptions
+    .filter((option): option is { label: string; value: PaymentMethod } => option.value !== "all")
+    .map((option) => ({
+      label: option.label,
+      value: option.value,
+      amount: paymentsData.methodTotals[option.value],
+      share: paymentsData.total > 0 ? (paymentsData.methodTotals[option.value] / paymentsData.total) * 100 : 0,
+    }));
   const exportHref = `/payments/export?period=${period}&method=${method}${query ? `&q=${encodeURIComponent(query)}` : ""}`;
 
   return (
@@ -161,6 +190,77 @@ export default async function PaymentsPage({ searchParams }: PaymentsPageProps) 
               </div>
             </article>
           ))}
+        </section>
+
+        <section className="mt-6 grid gap-4 xl:grid-cols-[1fr_1.3fr]">
+          <div className="rounded-md border border-line bg-white p-5 shadow-soft">
+            <div className="flex items-center justify-between gap-4">
+              <div>
+                <h2 className="text-lg font-semibold">Synthese caisse</h2>
+                <p className="mt-1 text-sm text-neutral-500">Lecture rapide du filtre actif.</p>
+              </div>
+              <TrendingUp className="text-mint" size={22} />
+            </div>
+            <div className="mt-5 grid gap-3 sm:grid-cols-3">
+              <div className="rounded-md border border-line bg-paper p-4">
+                <p className="text-xs font-semibold uppercase text-neutral-500">Panier moyen</p>
+                <p className="mt-2 text-lg font-semibold">{formatCurrency(averagePayment)}</p>
+              </div>
+              <div className="rounded-md border border-line bg-paper p-4">
+                <p className="text-xs font-semibold uppercase text-neutral-500">Meilleur moyen</p>
+                <p className="mt-2 text-lg font-semibold">{bestMethod?.amount ? bestMethod.label : "-"}</p>
+              </div>
+              <div className="rounded-md border border-line bg-paper p-4">
+                <p className="text-xs font-semibold uppercase text-neutral-500">Ajustements</p>
+                <p className="mt-2 text-lg font-semibold">{formatCurrency(manualTotal)}</p>
+              </div>
+            </div>
+            <div className="mt-4 grid gap-3 sm:grid-cols-2">
+              <div className="rounded-md border border-line p-4">
+                <div className="flex items-center gap-2 text-sm font-semibold">
+                  <ReceiptText size={17} />
+                  Abonnements
+                </div>
+                <p className="mt-2 text-xl font-semibold">{formatCurrency(subscriptionTotal)}</p>
+                <p className="mt-1 text-xs text-neutral-500">{subscriptionPayments.length} encaissement{subscriptionPayments.length > 1 ? "s" : ""}</p>
+              </div>
+              <div className="rounded-md border border-line p-4">
+                <div className="flex items-center gap-2 text-sm font-semibold">
+                  <Banknote size={17} />
+                  Paiements manuels
+                </div>
+                <p className="mt-2 text-xl font-semibold">{formatCurrency(manualTotal)}</p>
+                <p className="mt-1 text-xs text-neutral-500">{manualPayments.length} encaissement{manualPayments.length > 1 ? "s" : ""}</p>
+              </div>
+            </div>
+          </div>
+
+          <div className="rounded-md border border-line bg-white p-5 shadow-soft">
+            <div className="flex items-center justify-between gap-4">
+              <div>
+                <h2 className="text-lg font-semibold">Repartition moyens</h2>
+                <p className="mt-1 text-sm text-neutral-500">Part de chaque moyen sur le filtre actif.</p>
+              </div>
+              <WalletCards className="text-mint" size={22} />
+            </div>
+            <div className="mt-5 space-y-4">
+              {methodBreakdown.map((item) => (
+                <div key={item.value}>
+                  <div className="mb-2 flex items-center justify-between gap-4 text-sm">
+                    <span className="font-semibold">{item.label}</span>
+                    <span className="text-neutral-600">{formatCurrency(item.amount)}</span>
+                  </div>
+                  <div className="h-3 overflow-hidden rounded-md bg-paper">
+                    <div
+                      className={`h-full rounded-md ${methodAccent[item.value]}`}
+                      style={{ width: `${Math.max(item.share, item.amount > 0 ? 3 : 0)}%` }}
+                    />
+                  </div>
+                  <p className="mt-1 text-xs text-neutral-500">{item.share.toFixed(1)}%</p>
+                </div>
+              ))}
+            </div>
+          </div>
         </section>
 
         <section className="mt-6 rounded-md border border-line bg-white shadow-soft">
