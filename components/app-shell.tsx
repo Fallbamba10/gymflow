@@ -11,9 +11,9 @@ import { cn } from "@/lib/utils";
 
 const navItems = [
   { label: "Dashboard", href: "/", icon: LayoutDashboard },
-  { label: "Membres", href: "/members", icon: Users },
+  { label: "Membres", href: "/members", icon: Users, adminOnly: true },
   { label: "Abonnements", href: "/subscriptions", icon: CreditCard, adminOnly: true },
-  { label: "Caisse", href: "/payments", icon: Banknote },
+  { label: "Caisse", href: "/payments", icon: Banknote, adminOnly: true },
   { label: "Pointage", href: "/checkin", icon: UserCheck },
   { label: "Equipe", href: "/team", icon: UsersRound, adminOnly: true },
   { label: "Parametres", href: "/settings", icon: Settings, adminOnly: true },
@@ -66,7 +66,10 @@ export function AppShell({ children }: { children: React.ReactNode }) {
     setMobileMenuOpen(false);
   }, [pathname]);
 
-  const visibleNavItems = navItems.filter((item) => !item.adminOnly || role === "admin");
+  const visibleNavItems = navItems.filter((item) => {
+    if (!role) return item.href === "/" || item.href === "/checkin";
+    return !item.adminOnly || role === "admin";
+  });
   const roleLabel = role === "admin" ? "Admin" : role === "operator" ? "Operateur" : null;
 
   return (

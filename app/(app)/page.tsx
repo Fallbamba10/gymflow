@@ -8,19 +8,21 @@ import {
   CheckCircle2,
   Clock3,
   CreditCard,
+  DoorOpen,
   Gauge,
   Plus,
   ReceiptText,
   ShieldCheck,
   TrendingUp,
   UserPlus,
+  UserCheck,
   Users,
 } from "lucide-react";
 import { AppShell } from "@/components/app-shell";
 import { PageHeader } from "@/components/page-header";
 import { StatusBadge } from "@/components/status-badge";
 import { formatCurrency } from "@/lib/demo-data";
-import { getCurrentGym, getDashboardData } from "@/lib/supabase/queries";
+import { getCurrentGym, getDashboardData, getTodayCheckins } from "@/lib/supabase/queries";
 
 function formatTime(value: string) {
   return new Intl.DateTimeFormat("fr-FR", {
@@ -35,6 +37,117 @@ function plural(count: number, singular: string, pluralValue = `${singular}s`) {
 
 export default async function Home() {
   const gym = await getCurrentGym();
+
+  if (gym?.role === "operator") {
+    const checkins = await getTodayCheckins(gym.id);
+    const memberCheckins = checkins.filter((entry) => entry.member_id);
+    const walkInCheckins = checkins.filter((entry) => !entry.member_id);
+
+    return (
+      <AppShell>
+        <PageHeader
+          title="Espace employe"
+          eyebrow={new Intl.DateTimeFormat("fr-FR", { dateStyle: "full" }).format(new Date())}
+          actions={
+            <Link href="/checkin" className="inline-flex h-11 items-center justify-center gap-2 rounded-md bg-mint px-4 text-sm font-semibold text-white shadow-sm transition hover:bg-emerald-700">
+              <UserCheck size={18} />
+              Ouvrir pointage
+            </Link>
+          }
+        />
+
+        <div className="px-4 py-6 md:px-8">
+          <section className="rounded-md border border-neutral-900 bg-ink p-5 text-white shadow-soft md:p-6">
+            <div className="grid gap-6 xl:grid-cols-[1fr_0.75fr] xl:items-end">
+              <div>
+                <div className="inline-flex items-center gap-2 rounded-md border border-white/15 bg-white/10 px-3 py-1 text-xs font-semibold uppercase tracking-[0.08em] text-white/70">
+                  <ShieldCheck size={14} />
+                  Session employe
+                </div>
+                <h2 className="mt-4 text-2xl font-semibold md:text-3xl">Pointage rapide pour {gym.name}</h2>
+                <p className="mt-2 max-w-2xl text-sm leading-6 text-white/65">
+                  Valide les membres abonnes et les seances simples sans ouvrir les outils de gestion.
+                </p>
+              </div>
+
+              <div className="grid gap-4 sm:grid-cols-3">
+                <div className="border-l border-white/15 pl-4">
+                  <p className="text-xs font-medium uppercase tracking-[0.08em] text-white/45">Entrees</p>
+                  <p className="mt-2 text-xl font-semibold">{checkins.length}</p>
+                </div>
+                <div className="border-l border-white/15 pl-4">
+                  <p className="text-xs font-medium uppercase tracking-[0.08em] text-white/45">Abonnes</p>
+                  <p className="mt-2 text-xl font-semibold">{memberCheckins.length}</p>
+                </div>
+                <div className="border-l border-white/15 pl-4">
+                  <p className="text-xs font-medium uppercase tracking-[0.08em] text-white/45">Seances</p>
+                  <p className="mt-2 text-xl font-semibold">{walkInCheckins.length}</p>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <section className="mt-5 grid gap-4 md:grid-cols-2">
+            <Link href="/checkin" className="group rounded-md border border-line bg-white p-5 shadow-soft transition hover:border-mint/50 hover:shadow-md">
+              <div className="flex items-start justify-between gap-4">
+                <div>
+                  <div className="flex size-12 items-center justify-center rounded-md bg-mint text-white">
+                    <DoorOpen size={24} />
+                  </div>
+                  <h2 className="mt-5 text-xl font-semibold">Encaisser une seance</h2>
+                  <p className="mt-2 text-sm leading-6 text-neutral-500">Prix libre, mode de paiement, entree validee directement.</p>
+                </div>
+                <ArrowRight className="text-neutral-400 transition group-hover:text-mint" size={20} />
+              </div>
+            </Link>
+
+            <Link href="/checkin" className="group rounded-md border border-line bg-white p-5 shadow-soft transition hover:border-mint/50 hover:shadow-md">
+              <div className="flex items-start justify-between gap-4">
+                <div>
+                  <div className="flex size-12 items-center justify-center rounded-md bg-ink text-white">
+                    <CheckCircle2 size={24} />
+                  </div>
+                  <h2 className="mt-5 text-xl font-semibold">Pointer un membre</h2>
+                  <p className="mt-2 text-sm leading-6 text-neutral-500">Recherche par nom, telephone ou numero de membre.</p>
+                </div>
+                <ArrowRight className="text-neutral-400 transition group-hover:text-mint" size={20} />
+              </div>
+            </Link>
+          </section>
+
+          <section className="mt-6 rounded-md border border-line bg-white shadow-soft">
+            <div className="flex items-center justify-between border-b border-line p-5">
+              <div>
+                <h2 className="text-lg font-semibold">Journal du jour</h2>
+                <p className="mt-1 text-sm text-neutral-500">Dernieres entrees validees pendant la session.</p>
+              </div>
+              <Clock3 className="text-mint" size={22} />
+            </div>
+            <div className="divide-y divide-line">
+              {checkins.length > 0 ? (
+                checkins.slice(0, 10).map((entry) => (
+                  <div key={entry.id} className="grid gap-3 p-5 text-sm sm:grid-cols-[84px_1fr_auto] sm:items-center">
+                    <div className="inline-flex h-9 w-fit items-center gap-2 rounded-md bg-paper px-3 font-semibold text-neutral-700">
+                      <Clock3 size={15} />
+                      {formatTime(entry.checked_in_at)}
+                    </div>
+                    <div className="min-w-0">
+                      <p className="truncate font-semibold">{entry.member_name}</p>
+                      <p className="mt-1 truncate text-xs text-neutral-500">{entry.plan ?? "Abonnement"}</p>
+                    </div>
+                    <span className="text-xs font-semibold text-mint">Valide</span>
+                  </div>
+                ))
+              ) : (
+                <p className="p-5 text-sm text-neutral-500">Aucune entree aujourd&apos;hui.</p>
+              )}
+            </div>
+          </section>
+        </div>
+      </AppShell>
+    );
+  }
+
   const dashboard = gym
     ? await getDashboardData(gym.id)
     : {
