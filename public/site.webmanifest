@@ -1,0 +1,17 @@
+{
+  "name": "GymFlow",
+  "short_name": "GymFlow",
+  "description": "Gestion simple des salles de sport",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#F7F7F2",
+  "theme_color": "#171717",
+  "icons": [
+    {
+      "src": "/icon.svg",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

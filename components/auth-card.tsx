@@ -1,4 +1,4 @@
-import { Dumbbell } from "lucide-react";
+import { BrandMark } from "@/components/brand-mark";
 
 type AuthCardProps = {
   title: string;
@@ -11,9 +11,7 @@ export function AuthCard({ title, subtitle, children }: AuthCardProps) {
     <main className="flex min-h-screen items-center justify-center bg-paper px-4 py-10 text-ink">
       <section className="w-full max-w-md rounded-md border border-line bg-white p-6 shadow-soft">
         <div className="flex items-center gap-3">
-          <div className="flex size-10 items-center justify-center rounded-md bg-ink text-white">
-            <Dumbbell size={20} />
-          </div>
+          <BrandMark />
           <div>
             <p className="text-lg font-semibold leading-none">GymFlow</p>
             <p className="mt-1 text-sm text-neutral-500">Gestion de salle</p>
@@ -30,4 +28,3 @@ export function AuthCard({ title, subtitle, children }: AuthCardProps) {
     </main>
   );
 }
-

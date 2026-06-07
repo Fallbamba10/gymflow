@@ -4,11 +4,11 @@ import {
   Banknote,
   CheckCircle2,
   ClipboardList,
-  Dumbbell,
   ShieldCheck,
   Smartphone,
   Users,
 } from "lucide-react";
+import { BrandMark } from "@/components/brand-mark";
 import { formatCurrency } from "@/lib/demo-data";
 
 const features = [
@@ -52,9 +52,7 @@ export default function SitePage() {
       >
         <header className="relative z-10 flex items-center justify-between px-4 py-5 md:px-8">
           <Link href="/site" className="flex items-center gap-3 text-white">
-            <span className="flex size-10 items-center justify-center rounded-md bg-white text-ink">
-              <Dumbbell size={20} />
-            </span>
+            <BrandMark inverse />
             <span className="text-lg font-semibold">GymFlow</span>
           </Link>
           <div className="flex items-center gap-2">

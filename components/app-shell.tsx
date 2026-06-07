@@ -3,8 +3,9 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
-import { Banknote, CreditCard, Dumbbell, LayoutDashboard, LogOut, Menu, Settings, UserCheck, Users, UsersRound, X } from "lucide-react";
+import { Banknote, CreditCard, LayoutDashboard, LogOut, Menu, Settings, UserCheck, Users, UsersRound, X } from "lucide-react";
 import { signOut } from "@/app/auth/actions";
+import { BrandMark } from "@/components/brand-mark";
 import { createClient } from "@/lib/supabase/client";
 import { cn } from "@/lib/utils";
 
@@ -73,9 +74,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       <header className="sticky top-0 z-30 border-b border-line bg-white/95 px-4 py-3 backdrop-blur lg:hidden">
         <div className="flex items-center justify-between gap-3">
           <Link href="/" className="flex min-w-0 items-center gap-3">
-            <div className="flex size-10 shrink-0 items-center justify-center rounded-md bg-ink text-white">
-              <Dumbbell size={20} />
-            </div>
+            <BrandMark />
             <div className="min-w-0">
               <p className="text-base font-semibold leading-none">GymFlow</p>
               <p className="mt-1 truncate text-sm text-neutral-500">{gymName}</p>
@@ -124,9 +123,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
       <aside className="fixed inset-y-0 left-0 hidden w-64 border-r border-line bg-white px-5 py-6 lg:block">
         <Link href="/" className="flex items-center gap-3">
-          <div className="flex size-10 items-center justify-center rounded-md bg-ink text-white">
-            <Dumbbell size={20} />
-          </div>
+          <BrandMark />
           <div>
             <p className="text-lg font-semibold leading-none">GymFlow</p>
             <p className="mt-1 text-sm text-neutral-500">{gymName}</p>

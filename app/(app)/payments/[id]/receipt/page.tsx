@@ -1,7 +1,8 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ArrowLeft, Dumbbell, ReceiptText } from "lucide-react";
+import { ArrowLeft, ReceiptText } from "lucide-react";
 import { AppShell } from "@/components/app-shell";
+import { BrandMark } from "@/components/brand-mark";
 import { PageHeader } from "@/components/page-header";
 import { PrintButton } from "@/components/print-button";
 import { StatusBadge } from "@/components/status-badge";
@@ -79,9 +80,7 @@ export default async function PaymentReceiptPage({ params }: ReceiptPageProps) {
         <article className="mx-auto max-w-3xl rounded-md border border-line bg-white p-6 shadow-soft print:max-w-none print:border-0 print:p-0 print:shadow-none">
           <div className="flex flex-col gap-6 border-b border-line pb-6 sm:flex-row sm:items-start sm:justify-between">
             <div className="flex items-center gap-4">
-              <div className="flex size-14 items-center justify-center rounded-md bg-ink text-white">
-                <Dumbbell size={26} />
-              </div>
+              <BrandMark className="size-14" />
               <div>
                 <h2 className="text-2xl font-semibold">{settings.name}</h2>
                 <p className="mt-1 text-sm text-neutral-500">{settings.phone ?? "Telephone non renseigne"}</p>
