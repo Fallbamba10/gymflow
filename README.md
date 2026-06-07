@@ -4,20 +4,25 @@ GymFlow est une plateforme SaaS de gestion de salles de sport, pensee pour les p
 
 Le produit remplace la gestion papier par une interface simple pour suivre les membres, les abonnements, les entrees, les paiements et les revenus.
 
-## Vision MVP
+## Version actuelle
 
-La premiere version doit prouver une chose: un gerant peut gerer sa salle au quotidien sans cahier papier.
+La version actuelle permet a un gerant de piloter une salle sans cahier papier, avec des flux prets pour un test terrain.
 
-Le MVP couvre:
+GymFlow couvre:
 
 - creation de compte et creation d'une salle;
 - gestion des membres;
-- creation de formules d'abonnement;
+- archivage et restauration des membres;
+- creation, desactivation et reactivation des formules d'abonnement;
 - attribution et renouvellement d'abonnements;
-- pointage rapide des membres;
+- pointage rapide des membres, y compris plusieurs passages dans la meme journee;
 - decompte automatique des seances;
 - alertes visuelles pour abonnements expires ou presque termines;
-- tableau de bord simple pour les revenus et entrees du jour.
+- caisse, paiements manuels, exports CSV et recus imprimables;
+- employes terrain avec PIN;
+- roles admin / operateur;
+- exports de sauvegarde;
+- page vitrine publique par salle.
 
 ## Stack cible
 
@@ -32,4 +37,23 @@ Le MVP couvre:
 - [Perimetre MVP](docs/mvp.md)
 - [Parcours utilisateur](docs/user-flows.md)
 - [Schema Supabase initial](supabase/schema.sql)
+- [Configuration Supabase](docs/supabase-setup.md)
+- [Deploiement Vercel](docs/deploy-vercel.md)
+- [Checklist lancement](docs/launch-checklist.md)
 
+## Scripts utiles
+
+```bash
+npm run dev
+npm run typecheck
+npm run lint
+npm run build
+```
+
+## SQL Supabase a executer
+
+Dans Supabase SQL Editor, executer dans cet ordre:
+
+1. `supabase/schema.sql`
+2. `supabase/team-management.sql`
+3. `supabase/public-pages.sql`

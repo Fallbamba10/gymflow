@@ -50,4 +50,17 @@ Apres deploiement:
 4. Creer une formule.
 5. Creer un membre.
 6. Tester le pointage.
+7. Tester un paiement et ouvrir son recu.
+8. Tester `/settings/export`.
+9. Ouvrir la vitrine publique depuis `Parametres` -> `Vitrine salle`.
 
+## 6. Domaine final
+
+Quand le domaine est pret:
+
+1. Ajouter le domaine dans Vercel.
+2. Mettre a jour `NEXT_PUBLIC_SITE_URL`.
+3. Mettre a jour Supabase Auth:
+   - Site URL;
+   - Redirect URLs.
+4. Redeployer.
