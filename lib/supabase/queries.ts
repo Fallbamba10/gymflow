@@ -130,6 +130,7 @@ export type TodayCheckin = {
   checked_in_at: string;
   member_name: string;
   plan: string | null;
+  notes: string | null;
   staff_name: string | null;
 };
 
@@ -540,7 +541,7 @@ export async function getTodayCheckins(gymId: string): Promise<TodayCheckin[]> {
 
   const checkinsResult = await supabase
     .from("checkins")
-    .select("id, member_id, checked_in_at, members(full_name), subscriptions(subscription_types(name)), gym_staff(full_name)")
+    .select("id, member_id, checked_in_at, notes, members(full_name), subscriptions(subscription_types(name)), gym_staff(full_name)")
     .eq("gym_id", gymId)
     .gte("checked_in_at", today.toISOString())
     .order("checked_in_at", { ascending: false });
@@ -550,7 +551,7 @@ export async function getTodayCheckins(gymId: string): Promise<TodayCheckin[]> {
   if (error && isStaffAttributionUnavailable(error.message)) {
     const fallback = await supabase
       .from("checkins")
-      .select("id, member_id, checked_in_at, members(full_name), subscriptions(subscription_types(name))")
+      .select("id, member_id, checked_in_at, notes, members(full_name), subscriptions(subscription_types(name))")
       .eq("gym_id", gymId)
       .gte("checked_in_at", today.toISOString())
       .order("checked_in_at", { ascending: false });
@@ -568,13 +569,16 @@ export async function getTodayCheckins(gymId: string): Promise<TodayCheckin[]> {
     const subscription = getRelation(checkin.subscriptions);
     const subscriptionType = getRelation(subscription?.subscription_types);
     const staff = getRelation(checkin.gym_staff);
+    const notes = asNullableString(checkin.notes);
+    const walkInName = notes?.replace(/^Seance simple\s*-\s*/i, "").trim();
 
     return {
       id: asString(checkin.id),
       member_id: asNullableString(checkin.member_id),
       checked_in_at: asString(checkin.checked_in_at),
-      member_name: member?.full_name ?? "Membre",
-      plan: subscriptionType?.name ?? null,
+      member_name: member?.full_name ?? walkInName ?? "Client seance",
+      plan: subscriptionType?.name ?? (member ? null : "Seance simple"),
+      notes,
       staff_name: staff?.full_name ?? null,
     };
   });
