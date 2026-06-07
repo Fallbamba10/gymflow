@@ -18,11 +18,10 @@ import {
 import { AppShell } from "@/components/app-shell";
 import { FormField } from "@/components/form-field";
 import { PageHeader } from "@/components/page-header";
-import { StaffPinFields } from "@/components/staff-pin-fields";
 import { StatusBadge } from "@/components/status-badge";
 import { SubmitButton } from "@/components/submit-button";
 import { performMemberCheckin, performWalkInCheckin } from "@/app/(app)/checkin/actions";
-import { getCheckinCandidates, getCurrentGym, getGymStaff, getTodayCheckins } from "@/lib/supabase/queries";
+import { getCheckinCandidates, getCurrentGym, getTodayCheckins } from "@/lib/supabase/queries";
 
 type CheckinPageProps = {
   searchParams: Promise<{
@@ -66,7 +65,6 @@ export default async function CheckinPage({ searchParams }: CheckinPageProps) {
     );
   });
   const checkins = gym ? await getTodayCheckins(gym.id) : [];
-  const staff = gym ? await getGymStaff(gym.id) : [];
   const memberCheckins = checkins.filter((entry) => entry.member_id);
   const walkInCheckins = checkins.filter((entry) => !entry.member_id);
   const checkinsByMember = new Map<string, { count: number; lastTime: string }>();
@@ -238,12 +236,9 @@ export default async function CheckinPage({ searchParams }: CheckinPageProps) {
                       <UserCheck size={20} />
                     </div>
                     <div>
-                      <p className="text-sm font-semibold">Employe responsable</p>
-                      <p className="mt-1 text-sm leading-5 text-neutral-500">PIN facultatif si le compte connecte encaisse.</p>
+                      <p className="text-sm font-semibold">Session connectee</p>
+                      <p className="mt-1 text-sm leading-5 text-neutral-500">Le proprietaire ou l&apos;employe connecte valide directement.</p>
                     </div>
-                  </div>
-                  <div className="mt-4">
-                    <StaffPinFields staff={staff} />
                   </div>
                   <SubmitButton
                     type="submit"
@@ -332,7 +327,6 @@ export default async function CheckinPage({ searchParams }: CheckinPageProps) {
                               <input type="hidden" name="member_id" value={member.id} />
                               <input type="hidden" name="current_q" value={params.q ?? ""} />
                               <div className="space-y-3">
-                                <StaffPinFields staff={staff} />
                                 <SubmitButton
                                   disabled={member.status === "expired"}
                                   variant={visit ? "primary" : "accent"}
