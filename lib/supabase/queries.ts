@@ -1101,6 +1101,8 @@ export async function getPaymentsData(
     const subscriptionType = getRelation(subscription?.subscription_types);
     const paymentMethod = normalizePaymentMethod(payment.method);
     const staff = getRelation(payment.gym_staff);
+    const notes = asNullableString(payment.notes);
+    const walkInName = notes?.replace(/^Seance simple\s*-\s*/i, "").trim();
 
     return {
       id: asString(payment.id),
@@ -1108,9 +1110,9 @@ export async function getPaymentsData(
       method: paymentMethod,
       kind: normalizePaymentKind(payment.kind),
       paid_at: asString(payment.paid_at),
-      notes: asNullableString(payment.notes),
+      notes,
       member_id: asNullableString(payment.member_id),
-      member_name: member?.full_name ?? "Membre supprime",
+      member_name: member?.full_name ?? walkInName ?? "Client comptoir",
       plan: subscriptionType?.name ?? null,
       staff_name: staff?.full_name ?? null,
     };

@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Banknote, CalendarDays, CreditCard, Download, Plus, ReceiptText, Search, TrendingUp, WalletCards } from "lucide-react";
+import { Banknote, CalendarDays, CreditCard, Download, Plus, ReceiptText, Search, ShieldCheck, TrendingUp, WalletCards } from "lucide-react";
 import { AppShell } from "@/components/app-shell";
 import { PageHeader } from "@/components/page-header";
 import { StatusBadge } from "@/components/status-badge";
@@ -142,6 +142,15 @@ export default async function PaymentsPage({ searchParams }: PaymentsPageProps) 
       share: paymentsData.total > 0 ? (paymentsData.methodTotals[option.value] / paymentsData.total) * 100 : 0,
     }));
   const exportHref = `/payments/export?period=${period}&method=${method}${query ? `&q=${encodeURIComponent(query)}` : ""}`;
+  const periodCounts = periodOptions.map((option) => ({
+    ...option,
+    active: period === option.value,
+  }));
+  const methodCounts = methodOptions.map((option) => ({
+    ...option,
+    amount: option.value === "all" ? paymentsData.total : paymentsData.methodTotals[option.value],
+    active: method === option.value,
+  }));
 
   return (
     <AppShell>
@@ -175,16 +184,46 @@ export default async function PaymentsPage({ searchParams }: PaymentsPageProps) 
           </div>
         ) : null}
 
-        <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+        <section className="rounded-md border border-neutral-900 bg-ink p-5 text-white shadow-soft md:p-6">
+          <div className="grid gap-6 xl:grid-cols-[1fr_0.9fr] xl:items-end">
+            <div>
+              <div className="inline-flex items-center gap-2 rounded-md border border-white/15 bg-white/10 px-3 py-1 text-xs font-semibold uppercase tracking-[0.08em] text-white/70">
+                <ShieldCheck size={14} />
+                Caisse gerant
+              </div>
+              <h2 className="mt-4 text-2xl font-semibold md:text-3xl">Controle clair des encaissements</h2>
+              <p className="mt-2 max-w-2xl text-sm leading-6 text-white/65">
+                Totaux, moyens de paiement et recus restent au meme endroit pour cloturer la journee sans friction.
+              </p>
+            </div>
+
+            <div className="grid gap-4 sm:grid-cols-3">
+              <div className="border-l border-white/15 pl-4">
+                <p className="text-xs font-medium uppercase tracking-[0.08em] text-white/45">Filtre actif</p>
+                <p className="mt-2 text-xl font-semibold">{formatCurrency(paymentsData.total)}</p>
+              </div>
+              <div className="border-l border-white/15 pl-4">
+                <p className="text-xs font-medium uppercase tracking-[0.08em] text-white/45">Aujourd&apos;hui</p>
+                <p className="mt-2 text-xl font-semibold">{formatCurrency(paymentsData.todayTotal)}</p>
+              </div>
+              <div className="border-l border-white/15 pl-4">
+                <p className="text-xs font-medium uppercase tracking-[0.08em] text-white/45">Paiements</p>
+                <p className="mt-2 text-xl font-semibold">{paymentsData.count}</p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section className="mt-5 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
           {stats.map((stat) => (
             <article key={stat.label} className="rounded-md border border-line bg-white p-5 shadow-soft">
               <div className="flex items-start justify-between gap-4">
-                <div>
+                <div className="min-w-0">
                   <p className="text-sm font-medium text-neutral-500">{stat.label}</p>
                   <p className="mt-3 text-2xl font-semibold">{stat.value}</p>
-                  <p className="mt-1 text-sm text-neutral-500">{stat.detail}</p>
+                  <p className="mt-1 text-sm leading-5 text-neutral-500">{stat.detail}</p>
                 </div>
-                <div className="flex size-10 items-center justify-center rounded-md bg-paper text-ink">
+                <div className="flex size-10 shrink-0 items-center justify-center rounded-md bg-paper text-ink">
                   <stat.icon size={20} />
                 </div>
               </div>
@@ -289,12 +328,12 @@ export default async function PaymentsPage({ searchParams }: PaymentsPageProps) 
             </div>
 
             <div className="mt-5 flex flex-wrap gap-2">
-              {periodOptions.map((option) => (
+              {periodCounts.map((option) => (
                 <Link
                   key={option.value}
                   href={`/payments?period=${option.value}&method=${method}${query ? `&q=${encodeURIComponent(query)}` : ""}`}
-                  className={`inline-flex h-9 items-center rounded-md px-3 text-sm font-semibold ${
-                    period === option.value ? "bg-ink text-white" : "border border-line bg-white text-neutral-600"
+                  className={`inline-flex h-10 items-center rounded-md px-3 text-sm font-semibold shadow-sm transition ${
+                    option.active ? "bg-ink text-white" : "border border-line bg-white text-neutral-600 hover:bg-neutral-50"
                   }`}
                 >
                   {option.label}
@@ -303,15 +342,18 @@ export default async function PaymentsPage({ searchParams }: PaymentsPageProps) 
             </div>
 
             <div className="mt-3 flex flex-wrap gap-2">
-              {methodOptions.map((option) => (
+              {methodCounts.map((option) => (
                 <Link
                   key={option.value}
                   href={`/payments?period=${period}&method=${option.value}${query ? `&q=${encodeURIComponent(query)}` : ""}`}
-                  className={`inline-flex h-9 items-center rounded-md px-3 text-sm font-semibold ${
-                    method === option.value ? "bg-mint text-white" : "border border-line bg-white text-neutral-600"
+                  className={`inline-flex h-10 items-center gap-2 rounded-md px-3 text-sm font-semibold shadow-sm transition ${
+                    option.active ? "bg-mint text-white" : "border border-line bg-white text-neutral-600 hover:bg-neutral-50"
                   }`}
                 >
                   {option.label}
+                  <span className={`rounded-md px-2 py-0.5 text-xs ${option.active ? "bg-white/15 text-white" : "bg-paper text-neutral-500"}`}>
+                    {formatCurrency(option.amount)}
+                  </span>
                 </Link>
               ))}
             </div>
@@ -319,7 +361,7 @@ export default async function PaymentsPage({ searchParams }: PaymentsPageProps) 
 
           <div className="overflow-x-auto">
             <div className="min-w-[920px]">
-              <div className="grid grid-cols-[1fr_1.2fr_1fr_0.9fr_0.9fr_0.9fr_0.9fr_0.7fr] border-b border-line bg-neutral-50 px-4 py-3 text-xs font-semibold uppercase text-neutral-500">
+              <div className="grid grid-cols-[1fr_1.2fr_1fr_0.9fr_0.9fr_0.9fr_0.9fr_0.7fr] border-b border-line bg-neutral-50 px-4 py-3 text-xs font-semibold uppercase tracking-[0.04em] text-neutral-500">
                 <span>Date</span>
                 <span>Membre</span>
                 <span>Formule</span>
@@ -333,19 +375,19 @@ export default async function PaymentsPage({ searchParams }: PaymentsPageProps) 
                 paymentsData.payments.map((payment) => (
                   <div
                     key={payment.id}
-                    className="grid grid-cols-[1fr_1.2fr_1fr_0.9fr_0.9fr_0.9fr_0.9fr_0.7fr] items-center border-b border-line px-4 py-4 text-sm last:border-b-0"
+                    className="grid grid-cols-[1fr_1.2fr_1fr_0.9fr_0.9fr_0.9fr_0.9fr_0.7fr] items-center border-b border-line px-4 py-4 text-sm transition last:border-b-0 hover:bg-neutral-50"
                   >
                     <span className="text-neutral-600">{formatDateTime(payment.paid_at)}</span>
-                    <span className="font-semibold">
+                    <span className="min-w-0 font-semibold">
                       {payment.member_id ? (
-                        <Link href={`/members/${payment.member_id}`} className="transition hover:text-mint">
+                        <Link href={`/members/${payment.member_id}`} className="block truncate transition hover:text-mint">
                           {payment.member_name}
                         </Link>
                       ) : (
-                        payment.member_name
+                        <span className="block truncate">{payment.member_name}</span>
                       )}
                     </span>
-                    <span>{payment.plan ?? payment.notes ?? "-"}</span>
+                    <span className="truncate">{payment.plan ?? payment.notes ?? "-"}</span>
                     <span>{methodLabels[payment.method]}</span>
                     <span>{payment.staff_name ?? "-"}</span>
                     <span>
@@ -357,8 +399,9 @@ export default async function PaymentsPage({ searchParams }: PaymentsPageProps) 
                     <span className="text-right">
                       <Link
                         href={`/payments/${payment.id}/receipt`}
-                        className="inline-flex h-9 items-center justify-center rounded-md border border-line bg-white px-3 text-xs font-semibold transition hover:bg-neutral-50"
+                        className="inline-flex h-9 items-center justify-center gap-2 rounded-md border border-line bg-white px-3 text-xs font-semibold transition hover:bg-neutral-50"
                       >
+                        <ReceiptText size={14} />
                         Recu
                       </Link>
                     </span>
