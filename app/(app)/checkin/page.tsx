@@ -131,15 +131,15 @@ export default async function CheckinPage({ searchParams }: CheckinPageProps) {
 
       <div className="px-4 py-6 md:px-8">
         <section className="rounded-md border border-neutral-900 bg-ink p-5 text-white shadow-soft md:p-6">
-          <div className="grid gap-6 xl:grid-cols-[1fr_0.9fr] xl:items-end">
+          <div className="grid gap-6 xl:grid-cols-[1fr_0.72fr] xl:items-end">
             <div>
               <div className="inline-flex items-center gap-2 rounded-md border border-white/15 bg-white/10 px-3 py-1 text-xs font-semibold uppercase tracking-[0.08em] text-white/70">
                 <ShieldCheck size={14} />
-                Comptoir premium
+                Pointage comptoir
               </div>
-              <h2 className="mt-4 text-2xl font-semibold md:text-3xl">Valider une entree sans ralentir la salle</h2>
+              <h2 className="mt-4 text-2xl font-semibold md:text-3xl">Une entree, un bouton, zero confusion</h2>
               <p className="mt-2 max-w-2xl text-sm leading-6 text-white/65">
-                Membres abonnes, retours matin/soir et clients a la seance sont traites depuis le meme poste.
+                Choisis une seance simple ou cherche un membre abonne. Le journal se met a jour aussitot.
               </p>
             </div>
 
@@ -177,22 +177,22 @@ export default async function CheckinPage({ searchParams }: CheckinPageProps) {
           ))}
         </section>
 
-        <div className="mt-6 grid gap-6 xl:grid-cols-[1fr_420px]">
+        <div className="mt-6 grid gap-6 xl:grid-cols-[1fr_400px]">
           <section className="space-y-6">
             <form action={performWalkInCheckin} className="rounded-md border border-line bg-white shadow-soft">
               <div className="flex flex-col gap-3 border-b border-line p-5 md:flex-row md:items-center md:justify-between">
                 <div>
-                  <h2 className="text-lg font-semibold">Seance simple</h2>
-                  <p className="mt-1 text-sm text-neutral-500">Pour les clients qui paient une seance, s&apos;entrainent, puis repartent.</p>
+                  <h2 className="text-xl font-semibold">Client sans abonnement</h2>
+                  <p className="mt-1 text-sm text-neutral-500">Encaisse une seance puis valide l&apos;entree.</p>
                 </div>
-                <div className="inline-flex w-fit items-center gap-2 rounded-md bg-emerald-50 px-3 py-2 text-sm font-semibold text-mint">
+                <div className="inline-flex w-fit items-center gap-2 rounded-md bg-ink px-3 py-2 text-sm font-semibold text-white">
                   <Banknote size={16} />
-                  Encaissement + entree
+                  Seance simple
                 </div>
               </div>
 
-              <div className="grid gap-5 p-5 lg:grid-cols-[1fr_1fr]">
-                <div className="grid gap-5 sm:grid-cols-2">
+              <div className="grid gap-5 p-5 lg:grid-cols-[1fr_360px]">
+                <div className="grid gap-4 sm:grid-cols-2">
                   <FormField label="Prix de la seance">
                     <div className="relative">
                       <Wallet className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-400" size={18} />
@@ -200,7 +200,7 @@ export default async function CheckinPage({ searchParams }: CheckinPageProps) {
                         name="amount"
                         type="number"
                         min="1"
-                        className="h-12 w-full rounded-md border border-line bg-paper pl-10 pr-3 outline-none focus:border-mint"
+                        className="h-14 w-full rounded-md border border-line bg-paper pl-10 pr-3 text-lg font-semibold outline-none focus:border-mint"
                         placeholder="Ex: 3000"
                         required
                       />
@@ -210,7 +210,7 @@ export default async function CheckinPage({ searchParams }: CheckinPageProps) {
                   <FormField label="Mode de paiement">
                     <select
                       name="method"
-                      className="h-12 w-full rounded-md border border-line bg-paper px-3 outline-none focus:border-mint"
+                      className="h-14 w-full rounded-md border border-line bg-paper px-3 text-base font-semibold outline-none focus:border-mint"
                       defaultValue="cash"
                     >
                       {paymentMethods.map((method) => (
@@ -239,15 +239,23 @@ export default async function CheckinPage({ searchParams }: CheckinPageProps) {
                     </div>
                     <div>
                       <p className="text-sm font-semibold">Employe responsable</p>
-                      <p className="mt-1 text-sm leading-5 text-neutral-500">Le PIN attribue la vente et l&apos;entree a la bonne personne.</p>
+                      <p className="mt-1 text-sm leading-5 text-neutral-500">PIN facultatif si le compte connecte encaisse.</p>
                     </div>
                   </div>
                   <div className="mt-4">
                     <StaffPinFields staff={staff} />
                   </div>
-                  <SubmitButton type="submit" variant="accent" className="mt-4 h-11 w-full" pendingLabel="Encaissement...">
-                    <DoorOpen size={18} />
-                    Encaisser et pointer
+                  <SubmitButton
+                    type="submit"
+                    variant="accent"
+                    className="mt-4 h-14 w-full justify-between px-5 text-base shadow-[0_14px_30px_rgba(30,138,106,0.25)]"
+                    pendingLabel="Encaissement..."
+                  >
+                    <span className="inline-flex items-center gap-2">
+                      <DoorOpen size={20} />
+                      Encaisser la seance
+                    </span>
+                    <CheckCircle2 size={18} />
                   </SubmitButton>
                 </div>
               </div>
@@ -257,12 +265,12 @@ export default async function CheckinPage({ searchParams }: CheckinPageProps) {
               <div className="border-b border-line p-5">
                 <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
                   <div>
-                    <h2 className="text-lg font-semibold">Pointage membre</h2>
-                    <p className="mt-1 text-sm text-neutral-500">Recherche rapide et passages multiples dans la journee.</p>
+                    <h2 className="text-xl font-semibold">Membre abonne</h2>
+                    <p className="mt-1 text-sm text-neutral-500">Recherche le membre, puis valide son passage.</p>
                   </div>
                   <div className="inline-flex w-fit items-center gap-2 rounded-md bg-paper px-3 py-2 text-sm font-semibold text-neutral-700">
                     <Sparkles size={16} />
-                    Mode comptoir
+                    Abonnement
                   </div>
                 </div>
               </div>
@@ -277,7 +285,8 @@ export default async function CheckinPage({ searchParams }: CheckinPageProps) {
                       defaultValue={params.q ?? ""}
                     />
                   </div>
-                  <button className="h-14 rounded-md bg-ink px-5 text-sm font-semibold text-white">
+                  <button className="inline-flex h-14 items-center justify-center gap-2 rounded-md bg-ink px-5 text-sm font-semibold text-white shadow-sm transition hover:bg-neutral-800">
+                    <Search size={18} />
                     Rechercher
                   </button>
                 </form>
@@ -300,10 +309,10 @@ export default async function CheckinPage({ searchParams }: CheckinPageProps) {
 
                       return (
                         <div key={member.id} className={`rounded-md border p-4 transition ${visit ? "border-mint/30 bg-emerald-50/40" : "border-line bg-white"}`}>
-                          <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+                          <div className="grid gap-4 lg:grid-cols-[1fr_310px] lg:items-center">
                             <div className="min-w-0">
                               <div className="flex flex-wrap items-center gap-3">
-                                <p className="font-semibold">{member.full_name}</p>
+                                <p className="text-base font-semibold">{member.full_name}</p>
                                 <StatusBadge tone={member.status}>{member.status_label}</StatusBadge>
                                 {visit ? (
                                   <StatusBadge tone="neutral">
@@ -324,9 +333,17 @@ export default async function CheckinPage({ searchParams }: CheckinPageProps) {
                               <input type="hidden" name="current_q" value={params.q ?? ""} />
                               <div className="space-y-3">
                                 <StaffPinFields staff={staff} />
-                                <SubmitButton disabled={member.status === "expired"} className="h-10 w-full md:w-auto" pendingLabel="Validation...">
-                                  {visit ? <Repeat2 size={18} /> : <CheckCircle2 size={18} />}
-                                  {visit ? "Pointer encore" : "Valider"}
+                                <SubmitButton
+                                  disabled={member.status === "expired"}
+                                  variant={visit ? "primary" : "accent"}
+                                  className="h-14 w-full justify-between px-5 text-base shadow-[0_12px_26px_rgba(23,23,23,0.12)]"
+                                  pendingLabel="Validation..."
+                                >
+                                  <span className="inline-flex items-center gap-2">
+                                    {visit ? <Repeat2 size={20} /> : <CheckCircle2 size={20} />}
+                                    {visit ? "Pointer encore" : "Pointer le membre"}
+                                  </span>
+                                  <CheckCircle2 size={18} />
                                 </SubmitButton>
                               </div>
                             </form>
