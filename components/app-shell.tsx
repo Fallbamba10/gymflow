@@ -11,11 +11,11 @@ import { cn } from "@/lib/utils";
 const navItems = [
   { label: "Dashboard", href: "/", icon: LayoutDashboard },
   { label: "Membres", href: "/members", icon: Users },
-  { label: "Abonnements", href: "/subscriptions", icon: CreditCard },
+  { label: "Abonnements", href: "/subscriptions", icon: CreditCard, adminOnly: true },
   { label: "Caisse", href: "/payments", icon: Banknote },
   { label: "Pointage", href: "/checkin", icon: UserCheck },
-  { label: "Equipe", href: "/team", icon: UsersRound },
-  { label: "Parametres", href: "/settings", icon: Settings },
+  { label: "Equipe", href: "/team", icon: UsersRound, adminOnly: true },
+  { label: "Parametres", href: "/settings", icon: Settings, adminOnly: true },
 ];
 
 export function AppShell({ children }: { children: React.ReactNode }) {
@@ -65,6 +65,9 @@ export function AppShell({ children }: { children: React.ReactNode }) {
     setMobileMenuOpen(false);
   }, [pathname]);
 
+  const visibleNavItems = navItems.filter((item) => !item.adminOnly || role === "admin");
+  const roleLabel = role === "admin" ? "Admin" : role === "operator" ? "Operateur" : null;
+
   return (
     <main className="min-h-screen bg-paper text-ink">
       <header className="sticky top-0 z-30 border-b border-line bg-white/95 px-4 py-3 backdrop-blur lg:hidden">
@@ -92,7 +95,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       {mobileMenuOpen ? (
         <div className="fixed inset-x-0 top-[65px] z-30 border-b border-line bg-white px-4 py-4 shadow-soft lg:hidden">
           <nav className="grid gap-2">
-            {navItems.map((item) => {
+            {visibleNavItems.map((item) => {
               const active =
                 pathname === item.href || (item.href !== "/" && pathname.startsWith(`${item.href}/`));
               return (
@@ -127,12 +130,12 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           <div>
             <p className="text-lg font-semibold leading-none">GymFlow</p>
             <p className="mt-1 text-sm text-neutral-500">{gymName}</p>
-            {role ? <p className="mt-0.5 text-xs font-medium text-mint">{role}</p> : null}
+            {roleLabel ? <p className="mt-0.5 text-xs font-medium text-mint">{roleLabel}</p> : null}
           </div>
         </Link>
 
         <nav className="mt-10 space-y-1">
-          {navItems.map((item) => {
+          {visibleNavItems.map((item) => {
             const active =
               pathname === item.href || (item.href !== "/" && pathname.startsWith(`${item.href}/`));
             return (

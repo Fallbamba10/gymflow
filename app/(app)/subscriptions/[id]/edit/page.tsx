@@ -10,7 +10,8 @@ import {
   deactivateSubscriptionType,
   updateSubscriptionType,
 } from "@/app/(app)/subscriptions/actions";
-import { getCurrentGym, getSubscriptionType } from "@/lib/supabase/queries";
+import { requireAdminGym } from "@/lib/supabase/guards";
+import { getSubscriptionType } from "@/lib/supabase/queries";
 
 type EditSubscriptionTypePageProps = {
   params: Promise<{
@@ -26,8 +27,8 @@ export default async function EditSubscriptionTypePage({
   searchParams,
 }: EditSubscriptionTypePageProps) {
   const [{ id }, query] = await Promise.all([params, searchParams]);
-  const gym = await getCurrentGym();
-  const subscriptionType = gym ? await getSubscriptionType(gym.id, id) : null;
+  const gym = await requireAdminGym();
+  const subscriptionType = await getSubscriptionType(gym.id, id);
 
   if (!subscriptionType) {
     notFound();

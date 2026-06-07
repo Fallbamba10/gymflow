@@ -2,7 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
-import { getCurrentGym } from "@/lib/supabase/queries";
+import { requireAdminGym } from "@/lib/supabase/guards";
 import { createClient } from "@/lib/supabase/server";
 
 function getString(formData: FormData, key: string) {
@@ -19,10 +19,7 @@ function getCurrency(value: string) {
 }
 
 export async function updateGymSettings(formData: FormData) {
-  const gym = await getCurrentGym();
-  if (!gym) {
-    redirect("/onboarding");
-  }
+  const gym = await requireAdminGym();
 
   const name = getString(formData, "name");
   const phone = getString(formData, "phone");

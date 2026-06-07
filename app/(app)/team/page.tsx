@@ -1,4 +1,3 @@
-import { notFound } from "next/navigation";
 import { KeyRound, ShieldCheck, UserPlus, UsersRound } from "lucide-react";
 import { AppShell } from "@/components/app-shell";
 import { FormField } from "@/components/form-field";
@@ -13,7 +12,8 @@ import {
   updateGymStaffRole,
   updateGymUserRole,
 } from "@/app/(app)/team/actions";
-import { getCurrentGym, getGymStaff, getGymUsers } from "@/lib/supabase/queries";
+import { requireAdminGym } from "@/lib/supabase/guards";
+import { getGymStaff, getGymUsers } from "@/lib/supabase/queries";
 
 type TeamPageProps = {
   searchParams: Promise<{
@@ -32,10 +32,7 @@ function formatRole(role: "admin" | "operator") {
 
 export default async function TeamPage({ searchParams }: TeamPageProps) {
   const params = await searchParams;
-  const gym = await getCurrentGym();
-  if (!gym) {
-    notFound();
-  }
+  const gym = await requireAdminGym();
 
   const [team, staff] = await Promise.all([
     getGymUsers(gym.id),

@@ -2,7 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
-import { getCurrentGym } from "@/lib/supabase/queries";
+import { requireAdminGym } from "@/lib/supabase/guards";
 import { createClient } from "@/lib/supabase/server";
 
 function getString(formData: FormData, key: string) {
@@ -31,10 +31,7 @@ function translateTeamError(message: string) {
 }
 
 export async function addGymUser(formData: FormData) {
-  const gym = await getCurrentGym();
-  if (!gym) {
-    redirect("/onboarding");
-  }
+  const gym = await requireAdminGym();
 
   const email = getString(formData, "email");
   const role = getRole(getString(formData, "role"));
@@ -59,10 +56,7 @@ export async function addGymUser(formData: FormData) {
 }
 
 export async function updateGymUserRole(formData: FormData) {
-  const gym = await getCurrentGym();
-  if (!gym) {
-    redirect("/onboarding");
-  }
+  const gym = await requireAdminGym();
 
   const gymUserId = getString(formData, "gym_user_id");
   const role = getRole(getString(formData, "role"));
@@ -87,10 +81,7 @@ export async function updateGymUserRole(formData: FormData) {
 }
 
 export async function deactivateGymUser(formData: FormData) {
-  const gym = await getCurrentGym();
-  if (!gym) {
-    redirect("/onboarding");
-  }
+  const gym = await requireAdminGym();
 
   const gymUserId = getString(formData, "gym_user_id");
   if (!gymUserId) {
@@ -113,10 +104,7 @@ export async function deactivateGymUser(formData: FormData) {
 }
 
 export async function addGymStaff(formData: FormData) {
-  const gym = await getCurrentGym();
-  if (!gym) {
-    redirect("/onboarding");
-  }
+  const gym = await requireAdminGym();
 
   const fullName = getString(formData, "full_name");
   const pin = getString(formData, "pin");
@@ -139,10 +127,7 @@ export async function addGymStaff(formData: FormData) {
 }
 
 export async function updateGymStaffRole(formData: FormData) {
-  const gym = await getCurrentGym();
-  if (!gym) {
-    redirect("/onboarding");
-  }
+  const gym = await requireAdminGym();
 
   const staffId = getString(formData, "staff_id");
   const role = getRole(getString(formData, "role"));
@@ -167,10 +152,7 @@ export async function updateGymStaffRole(formData: FormData) {
 }
 
 export async function deactivateGymStaff(formData: FormData) {
-  const gym = await getCurrentGym();
-  if (!gym) {
-    redirect("/onboarding");
-  }
+  const gym = await requireAdminGym();
 
   const staffId = getString(formData, "staff_id");
   if (!staffId) {

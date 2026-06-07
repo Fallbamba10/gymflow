@@ -7,7 +7,8 @@ import { PageHeader } from "@/components/page-header";
 import { StatusBadge } from "@/components/status-badge";
 import { SubmitButton } from "@/components/submit-button";
 import { updateGymSettings } from "@/app/(app)/settings/actions";
-import { getCurrentGym, getGymSettings } from "@/lib/supabase/queries";
+import { requireAdminGym } from "@/lib/supabase/guards";
+import { getGymSettings } from "@/lib/supabase/queries";
 
 type SettingsPageProps = {
   searchParams: Promise<{
@@ -18,10 +19,7 @@ type SettingsPageProps = {
 
 export default async function SettingsPage({ searchParams }: SettingsPageProps) {
   const params = await searchParams;
-  const gym = await getCurrentGym();
-  if (!gym) {
-    notFound();
-  }
+  const gym = await requireAdminGym();
 
   const settings = await getGymSettings(gym.id);
   if (!settings) {

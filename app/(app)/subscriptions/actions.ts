@@ -3,7 +3,7 @@
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
-import { getCurrentGym } from "@/lib/supabase/queries";
+import { requireAdminGym } from "@/lib/supabase/guards";
 
 function getString(formData: FormData, key: string) {
   const value = formData.get(key);
@@ -16,10 +16,7 @@ function getNumber(formData: FormData, key: string) {
 }
 
 export async function createSubscriptionType(formData: FormData) {
-  const gym = await getCurrentGym();
-  if (!gym) {
-    redirect("/onboarding");
-  }
+  const gym = await requireAdminGym();
 
   const name = getString(formData, "name");
   const price = getNumber(formData, "price");
@@ -53,10 +50,7 @@ export async function createSubscriptionType(formData: FormData) {
 }
 
 export async function updateSubscriptionType(formData: FormData) {
-  const gym = await getCurrentGym();
-  if (!gym) {
-    redirect("/onboarding");
-  }
+  const gym = await requireAdminGym();
 
   const subscriptionTypeId = getString(formData, "subscription_type_id");
   const name = getString(formData, "name");
@@ -95,10 +89,7 @@ export async function updateSubscriptionType(formData: FormData) {
 }
 
 export async function deactivateSubscriptionType(formData: FormData) {
-  const gym = await getCurrentGym();
-  if (!gym) {
-    redirect("/onboarding");
-  }
+  const gym = await requireAdminGym();
 
   const subscriptionTypeId = getString(formData, "subscription_type_id");
   if (!subscriptionTypeId) {
@@ -121,10 +112,7 @@ export async function deactivateSubscriptionType(formData: FormData) {
 }
 
 export async function activateSubscriptionType(formData: FormData) {
-  const gym = await getCurrentGym();
-  if (!gym) {
-    redirect("/onboarding");
-  }
+  const gym = await requireAdminGym();
 
   const subscriptionTypeId = getString(formData, "subscription_type_id");
   if (!subscriptionTypeId) {

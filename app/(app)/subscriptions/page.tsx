@@ -4,7 +4,8 @@ import { AppShell } from "@/components/app-shell";
 import { PageHeader } from "@/components/page-header";
 import { StatusBadge } from "@/components/status-badge";
 import { formatCurrency, formatDuration, formatSessions } from "@/lib/demo-data";
-import { getCurrentGym, getSubscriptionTypeStats, getSubscriptionTypes } from "@/lib/supabase/queries";
+import { requireAdminGym } from "@/lib/supabase/guards";
+import { getSubscriptionTypeStats, getSubscriptionTypes } from "@/lib/supabase/queries";
 
 type SubscriptionsPageProps = {
   searchParams: Promise<{
@@ -17,13 +18,11 @@ type SubscriptionsPageProps = {
 export default async function SubscriptionsPage({ searchParams }: SubscriptionsPageProps) {
   const params = await searchParams;
   const selectedStatus = params.status ?? "active";
-  const gym = await getCurrentGym();
-  const [allSubscriptionTypes, typeStats] = gym
-    ? await Promise.all([
-        getSubscriptionTypes(gym.id, { includeInactive: true }),
-        getSubscriptionTypeStats(gym.id),
-      ])
-    : [[], {}];
+  const gym = await requireAdminGym();
+  const [allSubscriptionTypes, typeStats] = await Promise.all([
+    getSubscriptionTypes(gym.id, { includeInactive: true }),
+    getSubscriptionTypeStats(gym.id),
+  ]);
   const subscriptionTypes = allSubscriptionTypes.filter((type) => {
     if (selectedStatus === "all") return true;
     if (selectedStatus === "inactive") return !type.active;

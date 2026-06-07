@@ -5,6 +5,7 @@ import { FormField } from "@/components/form-field";
 import { PageHeader } from "@/components/page-header";
 import { SubmitButton } from "@/components/submit-button";
 import { createSubscriptionType } from "@/app/(app)/subscriptions/actions";
+import { requireAdminGym } from "@/lib/supabase/guards";
 
 type NewSubscriptionTypePageProps = {
   searchParams: Promise<{
@@ -16,6 +17,7 @@ export default async function NewSubscriptionTypePage({
   searchParams,
 }: NewSubscriptionTypePageProps) {
   const params = await searchParams;
+  await requireAdminGym();
 
   return (
     <AppShell>
