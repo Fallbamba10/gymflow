@@ -53,32 +53,42 @@ export default async function SettingsPage({ searchParams }: SettingsPageProps) 
 
       <div className="grid gap-6 px-4 py-6 md:px-8 xl:grid-cols-[1fr_360px]">
         <section className="space-y-6">
-          <article className="rounded-md border border-line bg-white p-5 shadow-soft">
-            <div className="flex flex-col gap-5 md:flex-row md:items-center md:justify-between">
-              <div className="flex min-w-0 items-center gap-4">
-                <div className="flex size-14 shrink-0 items-center justify-center rounded-md bg-ink text-white">
-                  <Building2 size={24} />
+          <article className="rounded-md border border-neutral-900 bg-ink p-5 text-white shadow-soft md:p-6">
+            <div className="grid gap-6 xl:grid-cols-[1fr_0.8fr] xl:items-end">
+              <div>
+                <div className="inline-flex items-center gap-2 rounded-md border border-white/15 bg-white/10 px-3 py-1 text-xs font-semibold uppercase tracking-[0.08em] text-white/70">
+                  <Building2 size={14} />
+                  Centre de controle
                 </div>
-                <div className="min-w-0">
-                  <div className="flex flex-wrap items-center gap-2">
-                    <h2 className="truncate text-xl font-semibold">{settings.name}</h2>
-                    <StatusBadge tone="active">Espace actif</StatusBadge>
-                  </div>
-                  <div className="mt-2 flex flex-wrap gap-3 text-sm text-neutral-500">
-                    <span className="inline-flex items-center gap-1.5">
-                      <Phone size={15} />
-                      {settings.phone || "Telephone a completer"}
-                    </span>
-                    <span className="inline-flex items-center gap-1.5">
-                      <MapPin size={15} />
-                      {settings.address || "Adresse a completer"}
-                    </span>
-                  </div>
+                <div className="mt-4 flex flex-wrap items-center gap-3">
+                  <h2 className="text-2xl font-semibold md:text-3xl">{settings.name}</h2>
+                  <StatusBadge tone="active">Espace actif</StatusBadge>
+                </div>
+                <div className="mt-3 flex flex-wrap gap-4 text-sm text-white/65">
+                  <span className="inline-flex items-center gap-2">
+                    <Phone size={16} />
+                    {settings.phone || "Telephone a completer"}
+                  </span>
+                  <span className="inline-flex items-center gap-2">
+                    <MapPin size={16} />
+                    {settings.address || "Adresse a completer"}
+                  </span>
                 </div>
               </div>
-              <div className="rounded-md border border-line bg-paper px-4 py-3">
-                <p className="text-xs font-semibold uppercase text-neutral-500">Configuration</p>
-                <p className="mt-1 text-xl font-semibold">{setupPercent}%</p>
+
+              <div className="grid gap-4 sm:grid-cols-3">
+                <div className="border-l border-white/15 pl-4">
+                  <p className="text-xs font-medium uppercase tracking-[0.08em] text-white/45">Configuration</p>
+                  <p className="mt-2 text-xl font-semibold">{setupPercent}%</p>
+                </div>
+                <div className="border-l border-white/15 pl-4">
+                  <p className="text-xs font-medium uppercase tracking-[0.08em] text-white/45">Role</p>
+                  <p className="mt-2 text-xl font-semibold capitalize">{gym.role}</p>
+                </div>
+                <div className="border-l border-white/15 pl-4">
+                  <p className="text-xs font-medium uppercase tracking-[0.08em] text-white/45">Devise</p>
+                  <p className="mt-2 text-xl font-semibold">{settings.currency}</p>
+                </div>
               </div>
             </div>
           </article>
@@ -166,7 +176,7 @@ export default async function SettingsPage({ searchParams }: SettingsPageProps) 
             <div className="mt-5 grid gap-3 md:grid-cols-3">
               <Link
                 href="/members/export"
-                className="flex min-h-28 flex-col justify-between rounded-md border border-line bg-paper p-4 text-sm transition hover:bg-neutral-100"
+                className="flex min-h-32 flex-col justify-between rounded-md border border-line bg-paper p-4 text-sm shadow-sm transition hover:border-mint/40 hover:bg-neutral-100"
               >
                 <Download size={19} />
                 <span>
@@ -176,7 +186,7 @@ export default async function SettingsPage({ searchParams }: SettingsPageProps) 
               </Link>
               <Link
                 href="/payments/export?period=all"
-                className="flex min-h-28 flex-col justify-between rounded-md border border-line bg-paper p-4 text-sm transition hover:bg-neutral-100"
+                className="flex min-h-32 flex-col justify-between rounded-md border border-line bg-paper p-4 text-sm shadow-sm transition hover:border-mint/40 hover:bg-neutral-100"
               >
                 <Download size={19} />
                 <span>
@@ -186,7 +196,7 @@ export default async function SettingsPage({ searchParams }: SettingsPageProps) 
               </Link>
               <Link
                 href="/settings/export"
-                className="flex min-h-28 flex-col justify-between rounded-md border border-line bg-paper p-4 text-sm transition hover:bg-neutral-100"
+                className="flex min-h-32 flex-col justify-between rounded-md border border-line bg-paper p-4 text-sm shadow-sm transition hover:border-mint/40 hover:bg-neutral-100"
               >
                 <DatabaseBackup size={19} />
                 <span>
@@ -202,7 +212,7 @@ export default async function SettingsPage({ searchParams }: SettingsPageProps) 
           </section>
         </section>
 
-        <aside className="space-y-6">
+        <aside className="space-y-6 xl:sticky xl:top-6 xl:self-start">
           <section className="rounded-md border border-line bg-white p-5 shadow-soft">
             <div className="flex items-start gap-3">
               <div className="flex size-10 items-center justify-center rounded-md bg-emerald-50 text-mint">
@@ -241,7 +251,8 @@ export default async function SettingsPage({ searchParams }: SettingsPageProps) 
           </section>
 
           <section className="rounded-md border border-line bg-white p-5 shadow-soft">
-            <h2 className="text-lg font-semibold">Raccourcis</h2>
+            <h2 className="text-lg font-semibold">Liens importants</h2>
+            <p className="mt-1 text-sm text-neutral-500">Acces rapide aux reglages les plus utilises.</p>
             <div className="mt-4 grid gap-2">
               <Link href="/team" className="flex h-11 items-center justify-between rounded-md border border-line px-3 text-sm font-semibold hover:bg-neutral-50">
                 <span className="inline-flex items-center gap-2"><UsersRound size={16} /> Equipe et PIN</span>
