@@ -1,6 +1,3 @@
-import { Search } from "lucide-react";
-import { Button } from "@/components/ui/button";
-
 type PageHeaderProps = {
   title: string;
   eyebrow?: string;
@@ -15,15 +12,8 @@ export function PageHeader({ title, eyebrow, actions }: PageHeaderProps) {
           {eyebrow ? <p className="text-sm font-medium text-mint">{eyebrow}</p> : null}
           <h1 className="mt-1 text-2xl font-semibold md:text-3xl">{title}</h1>
         </div>
-        <div className="flex flex-col gap-2 sm:flex-row">
-          <Button variant="secondary" className="h-11 shadow-sm">
-            <Search size={18} />
-            Rechercher
-          </Button>
-          {actions}
-        </div>
+        {actions ? <div className="flex flex-col gap-2 sm:flex-row">{actions}</div> : null}
       </div>
     </header>
   );
 }
-
