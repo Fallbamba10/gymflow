@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { Archive, ArrowLeft, Banknote, CalendarClock, CheckCircle2, Phone, RotateCcw, UserCheck, UserPen } from "lucide-react";
+import { Archive, ArrowLeft, Banknote, CalendarClock, CheckCircle2, Phone, ReceiptText, RotateCcw, UserCheck, UserPen } from "lucide-react";
 import { AppShell } from "@/components/app-shell";
 import { PageHeader } from "@/components/page-header";
 import { StaffPinFields } from "@/components/staff-pin-fields";
@@ -219,7 +219,7 @@ export default async function MemberDetailPage({
             <div className="divide-y divide-line">
               {payments.length > 0 ? (
                 payments.map((payment) => (
-                  <div key={payment.id} className="grid gap-3 p-5 text-sm md:grid-cols-[1fr_1fr_0.8fr_0.8fr] md:items-center">
+                  <div key={payment.id} className="grid gap-3 p-5 text-sm md:grid-cols-[1fr_1fr_0.8fr_0.8fr_auto] md:items-center">
                     <div>
                       <p className="font-semibold">
                         {payment.kind === "subscription" ? "Abonnement" : "Ajustement"}
@@ -231,6 +231,13 @@ export default async function MemberDetailPage({
                     <p className="text-neutral-600">{formatDateTime(payment.paid_at)}</p>
                     <p>{methodLabels[payment.method]}</p>
                     <p className="font-semibold md:text-right">{formatCurrency(payment.amount)}</p>
+                    <Link
+                      href={`/payments/${payment.id}/receipt`}
+                      className="inline-flex h-9 items-center justify-center gap-2 rounded-md border border-line bg-white px-3 text-xs font-semibold transition hover:bg-neutral-50"
+                    >
+                      <ReceiptText size={15} />
+                      Recu
+                    </Link>
                   </div>
                 ))
               ) : (

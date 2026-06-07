@@ -2,7 +2,11 @@ import { createClient } from "@/lib/supabase/server";
 
 type RelationRow = {
   full_name?: string | null;
+  member_number?: number | null;
   name?: string | null;
+  phone?: string | null;
+  starts_at?: string | null;
+  expires_at?: string | null;
   subscription_types?: RelationRow | RelationRow[] | null;
 };
 
@@ -202,6 +206,14 @@ export type PaymentRecord = {
   member_name: string;
   plan: string | null;
   staff_name: string | null;
+};
+
+export type PaymentReceipt = PaymentRecord & {
+  gym_id: string;
+  member_number: number | null;
+  member_phone: string | null;
+  subscription_starts_at: string | null;
+  subscription_expires_at: string | null;
 };
 
 export type PaymentsData = {
@@ -712,6 +724,60 @@ export async function getMemberPayments(
       staff_name: staff?.full_name ?? null,
     };
   });
+}
+
+export async function getPaymentReceipt(
+  gymId: string,
+  paymentId: string,
+): Promise<PaymentReceipt | null> {
+  const supabase = await createClient();
+  const paymentResult = await supabase
+    .from("payments")
+    .select("id, gym_id, amount, method, kind, paid_at, notes, member_id, members(full_name, member_number, phone), subscriptions(starts_at, expires_at, subscription_types(name)), gym_staff(full_name)")
+    .eq("gym_id", gymId)
+    .eq("id", paymentId)
+    .single();
+  let data = paymentResult.data as QueryRow | null;
+  let error = paymentResult.error;
+
+  if (error && isStaffAttributionUnavailable(error.message)) {
+    const fallback = await supabase
+      .from("payments")
+      .select("id, gym_id, amount, method, kind, paid_at, notes, member_id, members(full_name, member_number, phone), subscriptions(starts_at, expires_at, subscription_types(name))")
+      .eq("gym_id", gymId)
+      .eq("id", paymentId)
+      .single();
+
+    data = fallback.data as QueryRow | null;
+    error = fallback.error;
+  }
+
+  if (error || !data) {
+    return null;
+  }
+
+  const member = getRelation(data.members);
+  const subscription = getRelation(data.subscriptions);
+  const subscriptionType = getRelation(subscription?.subscription_types);
+  const staff = getRelation(data.gym_staff);
+
+  return {
+    id: asString(data.id),
+    gym_id: asString(data.gym_id),
+    amount: Number(data.amount ?? 0),
+    method: normalizePaymentMethod(data.method),
+    kind: normalizePaymentKind(data.kind),
+    paid_at: asString(data.paid_at),
+    notes: asNullableString(data.notes),
+    member_id: asNullableString(data.member_id),
+    member_name: member?.full_name ?? "Client comptoir",
+    member_number: member?.member_number ?? null,
+    member_phone: member?.phone ?? null,
+    plan: subscriptionType?.name ?? null,
+    subscription_starts_at: subscription?.starts_at ?? null,
+    subscription_expires_at: subscription?.expires_at ?? null,
+    staff_name: staff?.full_name ?? null,
+  };
 }
 
 export async function getDashboardData(gymId: string): Promise<DashboardData> {

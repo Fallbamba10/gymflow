@@ -319,7 +319,7 @@ export default async function PaymentsPage({ searchParams }: PaymentsPageProps) 
 
           <div className="overflow-x-auto">
             <div className="min-w-[920px]">
-              <div className="grid grid-cols-[1fr_1.2fr_1fr_0.9fr_0.9fr_0.9fr_0.9fr] border-b border-line bg-neutral-50 px-4 py-3 text-xs font-semibold uppercase text-neutral-500">
+              <div className="grid grid-cols-[1fr_1.2fr_1fr_0.9fr_0.9fr_0.9fr_0.9fr_0.7fr] border-b border-line bg-neutral-50 px-4 py-3 text-xs font-semibold uppercase text-neutral-500">
                 <span>Date</span>
                 <span>Membre</span>
                 <span>Formule</span>
@@ -327,12 +327,13 @@ export default async function PaymentsPage({ searchParams }: PaymentsPageProps) 
                 <span>Employe</span>
                 <span>Type</span>
                 <span className="text-right">Montant</span>
+                <span className="text-right">Recu</span>
               </div>
               {paymentsData.payments.length > 0 ? (
                 paymentsData.payments.map((payment) => (
                   <div
                     key={payment.id}
-                    className="grid grid-cols-[1fr_1.2fr_1fr_0.9fr_0.9fr_0.9fr_0.9fr] items-center border-b border-line px-4 py-4 text-sm last:border-b-0"
+                    className="grid grid-cols-[1fr_1.2fr_1fr_0.9fr_0.9fr_0.9fr_0.9fr_0.7fr] items-center border-b border-line px-4 py-4 text-sm last:border-b-0"
                   >
                     <span className="text-neutral-600">{formatDateTime(payment.paid_at)}</span>
                     <span className="font-semibold">
@@ -353,6 +354,14 @@ export default async function PaymentsPage({ searchParams }: PaymentsPageProps) 
                       </StatusBadge>
                     </span>
                     <span className="text-right font-semibold">{formatCurrency(payment.amount)}</span>
+                    <span className="text-right">
+                      <Link
+                        href={`/payments/${payment.id}/receipt`}
+                        className="inline-flex h-9 items-center justify-center rounded-md border border-line bg-white px-3 text-xs font-semibold transition hover:bg-neutral-50"
+                      >
+                        Recu
+                      </Link>
+                    </span>
                   </div>
                 ))
               ) : (
