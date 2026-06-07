@@ -1,9 +1,8 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { Archive, ArrowLeft, Banknote, CalendarClock, CheckCircle2, Phone, ReceiptText, RotateCcw, UserCheck, UserPen } from "lucide-react";
+import { Archive, ArrowLeft, Banknote, CalendarClock, CheckCircle2, Phone, ReceiptText, RotateCcw, ShieldCheck, UserCheck, UserPen } from "lucide-react";
 import { AppShell } from "@/components/app-shell";
 import { PageHeader } from "@/components/page-header";
-import { StaffPinFields } from "@/components/staff-pin-fields";
 import { StatusBadge } from "@/components/status-badge";
 import { SubmitButton } from "@/components/submit-button";
 import { performMemberCheckin } from "@/app/(app)/checkin/actions";
@@ -11,7 +10,6 @@ import { archiveMember, renewMemberSubscription, restoreMember } from "@/app/(ap
 import { formatCurrency } from "@/lib/demo-data";
 import {
   getCurrentGym,
-  getGymStaff,
   getMemberCheckins,
   getMemberDetail,
   getMemberPayments,
@@ -88,13 +86,12 @@ export default async function MemberDetailPage({
     notFound();
   }
 
-  const [member, subscriptionTypes, subscriptions, checkins, payments, staff] = await Promise.all([
+  const [member, subscriptionTypes, subscriptions, checkins, payments] = await Promise.all([
     getMemberDetail(gym.id, id),
     getSubscriptionTypes(gym.id),
     getMemberSubscriptions(gym.id, id),
     getMemberCheckins(gym.id, id),
     getMemberPayments(gym.id, id),
-    getGymStaff(gym.id),
   ]);
 
   if (!member) {
@@ -106,6 +103,9 @@ export default async function MemberDetailPage({
   const isArchived = Boolean(member.archived_at);
   const totalPaid = payments.reduce((sum, payment) => sum + payment.amount, 0);
   const lastPayment = payments[0] ?? null;
+  const lastCheckin = checkins[0] ?? null;
+  const sessionsText = activeSubscription?.sessions_left ?? "Illimite";
+  const expiresText = formatDate(activeSubscription?.expires_at ?? null);
 
   return (
     <AppShell>
@@ -120,40 +120,41 @@ export default async function MemberDetailPage({
         }
       />
 
-      <div className="grid gap-6 px-4 py-6 md:px-8 xl:grid-cols-[1fr_420px]">
+      <div className="grid gap-6 px-4 py-6 md:px-8 xl:grid-cols-[1fr_400px]">
         <section className="space-y-6">
-          <article className="rounded-md border border-line bg-white p-5 shadow-soft">
-            <div className="flex flex-col gap-5 md:flex-row md:items-start md:justify-between">
+          <article className="rounded-md border border-neutral-900 bg-ink p-5 text-white shadow-soft md:p-6">
+            <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
               <div>
                 <div className="flex flex-wrap items-center gap-3">
-                  <h2 className="text-xl font-semibold">{member.full_name}</h2>
+                  <div className="inline-flex items-center gap-2 rounded-md border border-white/15 bg-white/10 px-3 py-1 text-xs font-semibold uppercase tracking-[0.08em] text-white/70">
+                    <ShieldCheck size={14} />
+                    Fiche membre
+                  </div>
                   <StatusBadge tone={status.tone}>{status.label}</StatusBadge>
                 </div>
-                <div className="mt-3 flex flex-wrap gap-4 text-sm text-neutral-600">
+                <h2 className="mt-4 text-2xl font-semibold md:text-3xl">{member.full_name}</h2>
+                <div className="mt-3 flex flex-wrap gap-4 text-sm text-white/65">
                   <span className="inline-flex items-center gap-2">
                     <Phone size={16} />
                     {member.phone ?? "-"}
                   </span>
                   <span className="inline-flex items-center gap-2">
                     <CalendarClock size={16} />
-                    Expire le {formatDate(activeSubscription?.expires_at ?? null)}
+                    Expire le {expiresText}
                   </span>
                 </div>
               </div>
-              <div className="flex flex-col gap-2 sm:flex-row">
-                <Link href={`/members/${member.id}/edit`} className="inline-flex h-11 items-center justify-center gap-2 rounded-md border border-line bg-white px-4 text-sm font-semibold shadow-sm">
+              <div className="grid gap-3 sm:grid-cols-2 lg:w-[360px]">
+                <Link href={`/members/${member.id}/edit`} className="inline-flex h-12 items-center justify-center gap-2 rounded-md border border-white/15 bg-white/10 px-4 text-sm font-semibold text-white shadow-sm transition hover:bg-white/15">
                   <UserPen size={18} />
                   Modifier
                 </Link>
                 <form action={performMemberCheckin}>
                   <input type="hidden" name="member_id" value={member.id} />
-                  <div className="space-y-3">
-                    <StaffPinFields staff={staff} />
-                    <SubmitButton disabled={status.tone === "expired" || isArchived} className="h-11 w-full sm:w-auto" pendingLabel="Pointage...">
-                      <UserCheck size={18} />
-                      Pointer
-                    </SubmitButton>
-                  </div>
+                  <SubmitButton disabled={status.tone === "expired" || isArchived} variant="accent" className="h-12 w-full" pendingLabel="Pointage...">
+                    <UserCheck size={18} />
+                    Pointer
+                  </SubmitButton>
                 </form>
               </div>
             </div>
@@ -174,18 +175,22 @@ export default async function MemberDetailPage({
               </div>
             ) : null}
 
-            <div className="mt-6 grid gap-3 md:grid-cols-3">
-              <div className="rounded-md bg-paper p-4">
-                <p className="text-xs font-semibold uppercase text-neutral-500">Formule</p>
-                <p className="mt-2 font-semibold">{activeSubscription?.subscription_types?.name ?? "-"}</p>
+            <div className="mt-6 grid gap-3 md:grid-cols-4">
+              <div className="border-l border-white/15 pl-4">
+                <p className="text-xs font-semibold uppercase tracking-[0.08em] text-white/45">Numero</p>
+                <p className="mt-2 font-semibold">{String(member.member_number).padStart(6, "0")}</p>
               </div>
-              <div className="rounded-md bg-paper p-4">
-                <p className="text-xs font-semibold uppercase text-neutral-500">Seances</p>
-                <p className="mt-2 font-semibold">{activeSubscription?.sessions_left ?? "Illimite"}</p>
+              <div className="border-l border-white/15 pl-4">
+                <p className="text-xs font-semibold uppercase tracking-[0.08em] text-white/45">Formule</p>
+                <p className="mt-2 truncate font-semibold">{activeSubscription?.subscription_types?.name ?? "-"}</p>
               </div>
-              <div className="rounded-md bg-paper p-4">
-                <p className="text-xs font-semibold uppercase text-neutral-500">Statut</p>
-                <p className="mt-2 font-semibold">{status.label}</p>
+              <div className="border-l border-white/15 pl-4">
+                <p className="text-xs font-semibold uppercase tracking-[0.08em] text-white/45">Seances</p>
+                <p className="mt-2 font-semibold">{sessionsText}</p>
+              </div>
+              <div className="border-l border-white/15 pl-4">
+                <p className="text-xs font-semibold uppercase tracking-[0.08em] text-white/45">Derniere entree</p>
+                <p className="mt-2 font-semibold">{lastCheckin ? formatTime(lastCheckin.checked_in_at) : "-"}</p>
               </div>
             </div>
           </article>
@@ -219,12 +224,12 @@ export default async function MemberDetailPage({
             <div className="divide-y divide-line">
               {payments.length > 0 ? (
                 payments.map((payment) => (
-                  <div key={payment.id} className="grid gap-3 p-5 text-sm md:grid-cols-[1fr_1fr_0.8fr_0.8fr_auto] md:items-center">
-                    <div>
+                  <div key={payment.id} className="grid gap-3 p-5 text-sm transition hover:bg-neutral-50 md:grid-cols-[1fr_1fr_0.8fr_0.8fr_auto] md:items-center">
+                    <div className="min-w-0">
                       <p className="font-semibold">
                         {payment.kind === "subscription" ? "Abonnement" : "Ajustement"}
                       </p>
-                      <p className="mt-1 text-neutral-500">
+                      <p className="mt-1 truncate text-neutral-500">
                         {payment.plan ?? payment.notes ?? "Paiement manuel"}{payment.staff_name ? ` · ${payment.staff_name}` : ""}
                       </p>
                     </div>
@@ -254,7 +259,7 @@ export default async function MemberDetailPage({
             <div className="divide-y divide-line">
               {checkins.length > 0 ? (
                 checkins.map((entry) => (
-                  <div key={entry.id} className="flex items-center justify-between p-5 text-sm">
+                  <div key={entry.id} className="flex items-center justify-between gap-4 p-5 text-sm transition hover:bg-neutral-50">
                     <div>
                       <p className="font-semibold">{entry.plan ?? "Abonnement"}</p>
                       <p className="mt-1 text-neutral-500">
@@ -277,7 +282,7 @@ export default async function MemberDetailPage({
             </div>
             <div className="divide-y divide-line">
               {subscriptions.map((subscription) => (
-                <div key={subscription.id} className="grid gap-2 p-5 text-sm md:grid-cols-4">
+                <div key={subscription.id} className="grid gap-2 p-5 text-sm transition hover:bg-neutral-50 md:grid-cols-4">
                   <p className="font-semibold">{subscription.subscription_types?.name ?? "Formule"}</p>
                   <p>{formatDate(subscription.starts_at)} - {formatDate(subscription.expires_at)}</p>
                   <p>{subscription.sessions_left ?? "Illimite"} seances</p>
@@ -288,7 +293,7 @@ export default async function MemberDetailPage({
           </article>
         </section>
 
-        <aside className="rounded-md border border-line bg-white p-5 shadow-soft">
+        <aside className="rounded-md border border-line bg-white p-5 shadow-soft xl:sticky xl:top-6 xl:self-start">
           <div className="flex items-center gap-3 border-b border-line pb-5">
             <div className="flex size-10 items-center justify-center rounded-md bg-paper text-ink">
               <RotateCcw size={20} />
@@ -336,18 +341,10 @@ export default async function MemberDetailPage({
               </p>
             </div>
 
-            <div className="rounded-md border border-line bg-white p-4">
-              <p className="text-sm font-semibold">Employe responsable</p>
-              <p className="mt-1 text-sm text-neutral-500">Selectionne un employe PIN si le renouvellement est encaisse par l&apos;equipe terrain.</p>
-              <div className="mt-4">
-                <StaffPinFields staff={staff} />
-              </div>
-            </div>
-
             <SubmitButton
               type="submit"
               variant="accent"
-              className="h-11 w-full"
+              className="h-12 w-full"
               disabled={subscriptionTypes.length === 0 || isArchived}
               pendingLabel="Renouvellement..."
             >
