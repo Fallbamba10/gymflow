@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import { Building2, CheckCircle2, CreditCard, ExternalLink, MapPin, Phone, ShieldCheck, UsersRound } from "lucide-react";
+import { Building2, CheckCircle2, CreditCard, DatabaseBackup, Download, ExternalLink, MapPin, Phone, ShieldCheck, UsersRound } from "lucide-react";
 import { AppShell } from "@/components/app-shell";
 import { FormField } from "@/components/form-field";
 import { PageHeader } from "@/components/page-header";
@@ -151,6 +151,55 @@ export default async function SettingsPage({ searchParams }: SettingsPageProps) 
               </SubmitButton>
             </div>
           </form>
+
+          <section className="rounded-md border border-line bg-white p-5 shadow-soft">
+            <div className="flex items-center gap-3 border-b border-line pb-5">
+              <div className="flex size-10 items-center justify-center rounded-md bg-paper text-ink">
+                <DatabaseBackup size={20} />
+              </div>
+              <div>
+                <h2 className="text-lg font-semibold">Exports et sauvegarde</h2>
+                <p className="mt-1 text-sm text-neutral-500">Recupere les donnees importantes de la salle.</p>
+              </div>
+            </div>
+
+            <div className="mt-5 grid gap-3 md:grid-cols-3">
+              <Link
+                href="/members/export"
+                className="flex min-h-28 flex-col justify-between rounded-md border border-line bg-paper p-4 text-sm transition hover:bg-neutral-100"
+              >
+                <Download size={19} />
+                <span>
+                  <span className="block font-semibold">Membres CSV</span>
+                  <span className="mt-1 block text-neutral-500">Liste exploitable dans Excel.</span>
+                </span>
+              </Link>
+              <Link
+                href="/payments/export?period=all"
+                className="flex min-h-28 flex-col justify-between rounded-md border border-line bg-paper p-4 text-sm transition hover:bg-neutral-100"
+              >
+                <Download size={19} />
+                <span>
+                  <span className="block font-semibold">Caisse CSV</span>
+                  <span className="mt-1 block text-neutral-500">Historique complet des paiements.</span>
+                </span>
+              </Link>
+              <Link
+                href="/settings/export"
+                className="flex min-h-28 flex-col justify-between rounded-md border border-line bg-paper p-4 text-sm transition hover:bg-neutral-100"
+              >
+                <DatabaseBackup size={19} />
+                <span>
+                  <span className="block font-semibold">Sauvegarde JSON</span>
+                  <span className="mt-1 block text-neutral-500">Archive complete sans PIN secrets.</span>
+                </span>
+              </Link>
+            </div>
+
+            <div className="mt-5 rounded-md border border-line bg-paper p-4 text-sm text-neutral-600">
+              Les donnees restent stockees dans Supabase. Ces exports servent de copie locale pour controle, comptabilite ou sauvegarde ponctuelle.
+            </div>
+          </section>
         </section>
 
         <aside className="space-y-6">
