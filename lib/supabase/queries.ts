@@ -77,6 +77,23 @@ export type SubscriptionTypeStats = {
   latest_sale_at: string | null;
 };
 
+export type PublicGymPage = {
+  gym: {
+    id: string;
+    name: string;
+    phone: string | null;
+    address: string | null;
+    currency: string;
+  };
+  plans: Array<{
+    id: string;
+    name: string;
+    duration_days: number;
+    sessions: number | null;
+    price: number;
+  }>;
+};
+
 export type MemberRecord = {
   id: string;
   member_number: number;
@@ -374,6 +391,19 @@ export async function getSubscriptionTypeStats(
   }
 
   return stats;
+}
+
+export async function getPublicGymPage(gymId: string): Promise<PublicGymPage | null> {
+  const supabase = await createClient();
+  const { data, error } = await supabase.rpc("get_public_gym_page", {
+    target_gym_id: gymId,
+  });
+
+  if (error || !data) {
+    return null;
+  }
+
+  return data as PublicGymPage;
 }
 
 export async function getSubscriptionType(

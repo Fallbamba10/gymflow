@@ -255,6 +255,10 @@ export default async function SettingsPage({ searchParams }: SettingsPageProps) 
                 <span className="inline-flex items-center gap-2"><Building2 size={16} /> Page publique</span>
                 <ExternalLink size={15} />
               </Link>
+              <Link href={`/g/${gym.id}`} className="flex h-11 items-center justify-between rounded-md border border-line px-3 text-sm font-semibold hover:bg-neutral-50">
+                <span className="inline-flex items-center gap-2"><ExternalLink size={16} /> Vitrine salle</span>
+                <ExternalLink size={15} />
+              </Link>
             </div>
           </section>
         </aside>
