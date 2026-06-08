@@ -3,12 +3,11 @@ import { ArrowLeft, CheckCircle2, UserPlus } from "lucide-react";
 import { AppShell } from "@/components/app-shell";
 import { FormField } from "@/components/form-field";
 import { PageHeader } from "@/components/page-header";
-import { StaffPinFields } from "@/components/staff-pin-fields";
 import { SubmitButton } from "@/components/submit-button";
 import { createMember } from "@/app/(app)/members/actions";
 import { formatCurrency } from "@/lib/demo-data";
 import { requireAdminGym } from "@/lib/supabase/guards";
-import { getGymStaff, getSubscriptionTypes } from "@/lib/supabase/queries";
+import { getSubscriptionTypes } from "@/lib/supabase/queries";
 
 type NewMemberPageProps = {
   searchParams: Promise<{
@@ -20,7 +19,6 @@ export default async function NewMemberPage({ searchParams }: NewMemberPageProps
   const params = await searchParams;
   const gym = await requireAdminGym();
   const subscriptionTypes = await getSubscriptionTypes(gym.id);
-  const staff = await getGymStaff(gym.id);
 
   return (
     <AppShell>
@@ -86,14 +84,6 @@ export default async function NewMemberPage({ searchParams }: NewMemberPageProps
           <FormField label="Notes internes">
             <textarea name="notes" className="min-h-28 w-full rounded-md border border-line bg-paper p-3 outline-none focus:border-mint" placeholder="Objectif, remarques medicales, preference coach..." />
           </FormField>
-
-          <div className="mt-5 rounded-md border border-line bg-white p-4">
-            <p className="text-sm font-semibold">Employe responsable</p>
-            <p className="mt-1 text-sm text-neutral-500">Selectionne un employe PIN si l&apos;inscription est encaissee par l&apos;equipe terrain.</p>
-            <div className="mt-4">
-              <StaffPinFields staff={staff} />
-            </div>
-          </div>
 
           <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:justify-end">
             <Link href="/members" className="inline-flex h-11 items-center justify-center rounded-md border border-line bg-white px-4 text-sm font-semibold">

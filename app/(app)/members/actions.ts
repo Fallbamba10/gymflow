@@ -21,9 +21,6 @@ function toDateString(date: Date) {
 }
 
 function translateMemberActionError(message: string) {
-  if (message.includes("invalid_staff_pin")) {
-    return "PIN employe invalide";
-  }
   if (message.includes("not_allowed")) {
     return "Action non autorisee";
   }
@@ -38,8 +35,6 @@ export async function createMember(formData: FormData) {
   const notes = getString(formData, "notes");
   const subscriptionTypeId = getString(formData, "subscription_type_id");
   const method = getString(formData, "payment_method") || "cash";
-  const staffId = getString(formData, "staff_id");
-  const staffPin = getString(formData, "staff_pin");
   const startsAtValue = getString(formData, "starts_at");
   const startsAt = startsAtValue ? new Date(startsAtValue) : new Date();
 
@@ -51,21 +46,6 @@ export async function createMember(formData: FormData) {
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  let verifiedStaffId: string | null = null;
-
-  if (staffId) {
-    const { data: staff, error: staffError } = await supabase.rpc("verify_gym_staff_pin", {
-      target_gym_id: gym.id,
-      target_staff_id: staffId,
-      target_pin: staffPin,
-    });
-
-    if (staffError || !staff) {
-      redirect(`/members/new?error=${encodeURIComponent(translateMemberActionError(staffError?.message ?? "PIN employe invalide"))}`);
-    }
-
-    verifiedStaffId = Array.isArray(staff) ? staff[0]?.id ?? null : staff.id;
-  }
 
   const { data: type, error: typeError } = await supabase
     .from("subscription_types")
@@ -121,7 +101,6 @@ export async function createMember(formData: FormData) {
     method,
     amount: type.price,
     operator_id: user?.id,
-    staff_id: verifiedStaffId,
   });
 
   if (paymentError) {
@@ -139,8 +118,6 @@ export async function renewMemberSubscription(formData: FormData) {
   const memberId = getString(formData, "member_id");
   const subscriptionTypeId = getString(formData, "subscription_type_id");
   const method = getString(formData, "payment_method") || "cash";
-  const staffId = getString(formData, "staff_id");
-  const staffPin = getString(formData, "staff_pin");
   const startsAt = new Date();
 
   if (!memberId || !subscriptionTypeId) {
@@ -151,21 +128,6 @@ export async function renewMemberSubscription(formData: FormData) {
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  let verifiedStaffId: string | null = null;
-
-  if (staffId) {
-    const { data: staff, error: staffError } = await supabase.rpc("verify_gym_staff_pin", {
-      target_gym_id: gym.id,
-      target_staff_id: staffId,
-      target_pin: staffPin,
-    });
-
-    if (staffError || !staff) {
-      redirect(`/members/${memberId}?error=${encodeURIComponent(translateMemberActionError(staffError?.message ?? "PIN employe invalide"))}`);
-    }
-
-    verifiedStaffId = Array.isArray(staff) ? staff[0]?.id ?? null : staff.id;
-  }
 
   const { data: type, error: typeError } = await supabase
     .from("subscription_types")
@@ -213,7 +175,6 @@ export async function renewMemberSubscription(formData: FormData) {
     method,
     amount: type.price,
     operator_id: user?.id,
-    staff_id: verifiedStaffId,
   });
 
   if (paymentError) {

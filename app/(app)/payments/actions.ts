@@ -26,9 +26,6 @@ function getPaymentMethod(value: string): PaymentMethod {
 }
 
 function translatePaymentError(message: string) {
-  if (message.includes("invalid_staff_pin")) {
-    return "PIN employe invalide";
-  }
   if (message.includes("not_allowed")) {
     return "Action non autorisee";
   }
@@ -42,8 +39,6 @@ export async function createManualPayment(formData: FormData) {
   const method = getPaymentMethod(getString(formData, "method"));
   const memberId = getString(formData, "member_id");
   const notes = getString(formData, "notes");
-  const staffId = getString(formData, "staff_id");
-  const staffPin = getString(formData, "staff_pin");
 
   if (!Number.isFinite(amount) || amount <= 0) {
     redirect("/payments/new?error=Montant invalide");
@@ -53,21 +48,6 @@ export async function createManualPayment(formData: FormData) {
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  let verifiedStaffId: string | null = null;
-
-  if (staffId) {
-    const { data: staff, error: staffError } = await supabase.rpc("verify_gym_staff_pin", {
-      target_gym_id: gym.id,
-      target_staff_id: staffId,
-      target_pin: staffPin,
-    });
-
-    if (staffError || !staff) {
-      redirect(`/payments/new?error=${encodeURIComponent(translatePaymentError(staffError?.message ?? "PIN employe invalide"))}`);
-    }
-
-    verifiedStaffId = Array.isArray(staff) ? staff[0]?.id ?? null : staff.id;
-  }
 
   const { error } = await supabase.from("payments").insert({
     gym_id: gym.id,
@@ -76,7 +56,6 @@ export async function createManualPayment(formData: FormData) {
     method,
     amount,
     operator_id: user?.id,
-    staff_id: verifiedStaffId,
     notes,
   });
 
