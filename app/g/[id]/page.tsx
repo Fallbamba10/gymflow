@@ -46,7 +46,7 @@ export default async function PublicGymProfilePage({ params }: PublicGymPageProp
             <div className="max-w-4xl py-10">
               <p className="inline-flex items-center gap-2 rounded-md border border-white/20 bg-white/10 px-3 py-2 text-xs font-semibold uppercase tracking-[0.12em] text-white/75">
                 <Sparkles size={14} />
-                Salle partenaire GymFlow
+                Adresse sportive selectionnee
               </p>
               <h1 className="mt-5 max-w-4xl text-5xl font-semibold leading-tight md:text-7xl">
                 {page.gym.name}
@@ -77,25 +77,25 @@ export default async function PublicGymProfilePage({ params }: PublicGymPageProp
             <div className="mb-4 rounded-md border border-white/15 bg-white/95 p-5 text-ink shadow-soft backdrop-blur">
               <div className="flex items-start justify-between gap-4 border-b border-line pb-4">
                 <div>
-                  <p className="text-sm font-semibold text-mint">Accueil membres</p>
-                  <h2 className="mt-1 text-xl font-semibold">Infos rapides</h2>
+                  <p className="text-sm font-semibold text-mint">Accueil prive</p>
+                  <h2 className="mt-1 text-xl font-semibold">Informations</h2>
                 </div>
                 <ShieldCheck className="text-mint" size={23} />
               </div>
               <div className="mt-4 grid gap-3">
                 <div className="rounded-md bg-paper p-4">
-                  <p className="text-xs font-semibold uppercase text-neutral-500">Formules publiees</p>
+                  <p className="text-xs font-semibold uppercase text-neutral-500">Formules disponibles</p>
                   <p className="mt-2 text-lg font-semibold">{page.plans.length}</p>
                 </div>
                 {featuredPlan ? (
                   <div className="rounded-md bg-paper p-4">
-                    <p className="text-xs font-semibold uppercase text-neutral-500">A partir de</p>
+                    <p className="text-xs font-semibold uppercase text-neutral-500">Premier tarif</p>
                     <p className="mt-2 text-lg font-semibold">{formatCurrency(featuredPlan.price)}</p>
                     <p className="mt-1 text-sm text-neutral-500">{featuredPlan.name}</p>
                   </div>
                 ) : null}
                 <div className="rounded-md bg-paper p-4">
-                  <p className="text-xs font-semibold uppercase text-neutral-500">Contact</p>
+                  <p className="text-xs font-semibold uppercase text-neutral-500">Telephone</p>
                   <p className="mt-2 font-semibold">{page.gym.phone ?? "-"}</p>
                 </div>
               </div>
@@ -109,7 +109,7 @@ export default async function PublicGymProfilePage({ params }: PublicGymPageProp
           <div className="grid gap-6 lg:grid-cols-[0.8fr_1.2fr] lg:items-end">
             <div>
               <p className="text-sm font-semibold uppercase text-mint">Formules</p>
-              <h2 className="mt-2 text-3xl font-semibold md:text-4xl">Choisis ton rythme.</h2>
+              <h2 className="mt-2 text-3xl font-semibold md:text-4xl">Trouve la formule qui correspond a ton rythme.</h2>
             </div>
             <p className="text-sm leading-7 text-neutral-600">
               Les prix peuvent changer selon les offres en cours. Appelle la salle pour confirmer les disponibilites avant de te deplacer.
@@ -142,7 +142,7 @@ export default async function PublicGymProfilePage({ params }: PublicGymPageProp
                   </div>
                   {phoneHref ? (
                     <Link href={phoneHref} className={`mt-6 inline-flex h-11 w-full items-center justify-center gap-2 rounded-md text-sm font-semibold transition ${index === 0 ? "bg-mint text-white hover:bg-emerald-700" : "bg-ink text-white hover:bg-neutral-800"}`}>
-                      Appeler pour cette formule
+                      Demander cette formule
                       <ArrowRight size={16} />
                     </Link>
                   ) : null}

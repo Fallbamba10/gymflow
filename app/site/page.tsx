@@ -10,7 +10,6 @@ import {
   Users,
 } from "lucide-react";
 import { BrandMark } from "@/components/brand-mark";
-import { formatCurrency } from "@/lib/demo-data";
 
 const features = [
   {
@@ -33,12 +32,6 @@ const features = [
     description: "Une vue simple pour l'equipe terrain, separee du pilotage gerant.",
     icon: Smartphone,
   },
-];
-
-const activity = [
-  { time: "07:12", name: "Awa Diop", detail: "Mensuel illimite", status: "Entree validee" },
-  { time: "08:04", name: "Client comptoir", detail: "Seance simple", status: formatCurrency(3000) },
-  { time: "18:31", name: "Moussa Fall", detail: "Pack 10 seances", status: "Passage 2" },
 ];
 
 export default function SitePage() {
@@ -93,36 +86,45 @@ export default function SitePage() {
             <div className="mb-4 rounded-md border border-white/18 bg-white/95 p-5 text-ink shadow-soft backdrop-blur">
               <div className="flex items-start justify-between gap-4 border-b border-line pb-4">
                 <div>
-                  <p className="text-sm font-semibold text-mint">Aujourd&apos;hui</p>
-                  <h2 className="mt-1 text-xl font-semibold">Salle Plateau</h2>
+                  <p className="text-sm font-semibold text-mint">Interface signature</p>
+                  <h2 className="mt-1 text-xl font-semibold">Pilotage de salle</h2>
                 </div>
-                <span className="rounded-md bg-emerald-50 px-3 py-1 text-xs font-semibold text-mint">Ouverte</span>
+                <span className="rounded-md bg-ink px-3 py-1 text-xs font-semibold text-white">Premium</span>
               </div>
-              <div className="mt-4 grid gap-3 sm:grid-cols-3">
-                <div className="rounded-md bg-paper p-4">
-                  <p className="text-xs font-semibold uppercase text-neutral-500">Caisse</p>
-                  <p className="mt-2 text-lg font-semibold">{formatCurrency(84500)}</p>
-                </div>
-                <div className="rounded-md bg-paper p-4">
-                  <p className="text-xs font-semibold uppercase text-neutral-500">Entrees</p>
-                  <p className="mt-2 text-lg font-semibold">37</p>
-                </div>
-                <div className="rounded-md bg-paper p-4">
-                  <p className="text-xs font-semibold uppercase text-neutral-500">A traiter</p>
-                  <p className="mt-2 text-lg font-semibold">6</p>
-                </div>
-              </div>
-              <div className="mt-4 divide-y divide-line overflow-hidden rounded-md border border-line">
-                {activity.map((item) => (
-                  <div key={`${item.time}-${item.name}`} className="grid grid-cols-[64px_1fr_auto] items-center gap-3 px-3 py-3 text-sm">
-                    <span className="font-mono text-xs font-semibold text-neutral-500">{item.time}</span>
-                    <span className="min-w-0">
-                      <span className="block truncate font-semibold">{item.name}</span>
-                      <span className="mt-1 block truncate text-xs text-neutral-500">{item.detail}</span>
-                    </span>
-                    <span className="rounded-md bg-paper px-2 py-1 text-xs font-semibold">{item.status}</span>
+
+              <div className="mt-5 space-y-4">
+                <div className="rounded-md border border-line bg-paper p-4">
+                  <div className="flex items-center justify-between gap-4">
+                    <div>
+                      <p className="text-xs font-semibold uppercase tracking-[0.08em] text-neutral-500">Gerant</p>
+                      <p className="mt-2 text-lg font-semibold">Dashboard clair</p>
+                    </div>
+                    <Activity className="text-mint" size={22} />
                   </div>
-                ))}
+                  <div className="mt-4 grid grid-cols-3 gap-2">
+                    <div className="h-2 rounded-full bg-ink" />
+                    <div className="h-2 rounded-full bg-mint" />
+                    <div className="h-2 rounded-full bg-amber" />
+                  </div>
+                </div>
+
+                <div className="grid gap-3 sm:grid-cols-2">
+                  <div className="rounded-md border border-line bg-white p-4">
+                    <CheckCircle2 className="text-mint" size={20} />
+                    <p className="mt-3 text-sm font-semibold">Pointage fluide</p>
+                    <p className="mt-1 text-xs leading-5 text-neutral-500">Abonnes et seances simples au comptoir.</p>
+                  </div>
+                  <div className="rounded-md border border-line bg-white p-4">
+                    <Banknote className="text-mint" size={20} />
+                    <p className="mt-3 text-sm font-semibold">Caisse maitrisee</p>
+                    <p className="mt-1 text-xs leading-5 text-neutral-500">Paiements, recus et exports propres.</p>
+                  </div>
+                </div>
+
+                <div className="rounded-md bg-ink p-4 text-white">
+                  <p className="text-xs font-semibold uppercase tracking-[0.08em] text-white/45">Experience</p>
+                  <p className="mt-2 text-sm font-semibold">Une salle geree avec calme, precision et style.</p>
+                </div>
               </div>
             </div>
           </div>
