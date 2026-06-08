@@ -952,14 +952,15 @@ export async function getDashboardData(gymId: string): Promise<DashboardData> {
     const subscription = getRelation(payment.subscriptions);
     const subscriptionType = getRelation(subscription?.subscription_types);
     const staff = getRelation(payment.gym_staff);
+    const memberId = asNullableString(payment.member_id);
 
     return {
       id: asString(payment.id),
       amount: Number(payment.amount ?? 0),
       method: normalizePaymentMethod(payment.method),
       paid_at: asString(payment.paid_at),
-      member_id: asNullableString(payment.member_id),
-      member_name: member?.full_name ?? "Membre supprime",
+      member_id: memberId,
+      member_name: member?.full_name ?? (memberId ? "Membre supprime" : "Client comptoir"),
       plan: subscriptionType?.name ?? null,
       staff_name: staff?.full_name ?? null,
     };

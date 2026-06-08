@@ -19,59 +19,70 @@
 
 ## 3. Ajout membre
 
-1. L'operateur clique sur ajouter un membre.
+1. Le gerant clique sur ajouter un membre.
 2. Il renseigne nom, telephone et optionnellement des notes.
 3. Il choisit une formule d'abonnement.
 4. GymFlow cree le membre, cree l'abonnement actif et enregistre un paiement.
-5. Si un employe PIN est choisi, GymFlow attribue l'encaissement a cet employe.
+5. L'encaissement est attribue au compte connecte.
 
 ## 4. Check-in
 
-1. L'operateur recherche un membre par nom, telephone ou numero.
-2. GymFlow affiche son statut:
+1. L'employe connecte ouvre l'espace pointage.
+2. Il recherche un membre par nom, telephone ou numero.
+3. GymFlow affiche son statut:
    - actif
    - expire
    - bientot expire
    - seances faibles
-3. L'operateur valide l'entree avec ou sans PIN employe.
-4. GymFlow enregistre le check-in.
-5. Si l'abonnement est a seances, GymFlow decremente `sessions_left`.
-6. Un membre peut etre pointe plusieurs fois dans la meme journee, par exemple matin et soir.
+4. L'employe valide l'entree.
+5. GymFlow enregistre le check-in.
+6. Si l'abonnement est a seances, GymFlow decremente `sessions_left`.
+7. Un membre peut etre pointe plusieurs fois dans la meme journee, par exemple matin et soir.
 
-## 5. Renouvellement
+## 5. Seance simple
 
-1. Le gerant ou l'operateur ouvre la fiche membre.
+1. L'employe connecte ouvre le pointage.
+2. Il saisit le prix de la seance.
+3. Il choisit le mode de paiement.
+4. Il peut ajouter un nom client facultatif.
+5. GymFlow encaisse la seance et valide l'entree dans le journal du jour.
+6. La seance simple apparait aussi dans la caisse.
+
+## 6. Renouvellement
+
+1. Le gerant ouvre la fiche membre.
 2. Il clique sur renouveler.
 3. Il choisit une formule et le mode de paiement.
 4. GymFlow archive implicitement l'ancien abonnement comme historique et cree le nouveau.
-5. Le paiement peut etre attribue a un employe PIN.
+5. Le paiement est attribue au compte connecte.
 
-## 6. Dashboard quotidien
+## 7. Dashboard quotidien
 
-1. Le gerant arrive sur le dashboard.
-2. Il voit les indicateurs du jour:
+1. Le gerant arrive sur le dashboard complet.
+2. Il voit les indicateurs de gestion:
    - revenus
    - entrees
-   - nouveaux membres
+   - membres actifs
    - abonnements a traiter
 3. Il peut ouvrir les alertes pour renouveler rapidement.
+4. Un employe arrive sur un dashboard simplifie, centre sur le pointage.
 
-## 7. Caisse et recus
+## 8. Caisse et recus
 
-1. L'equipe ouvre la caisse.
-2. Elle filtre les paiements par periode, moyen ou recherche.
-3. Elle ajoute un paiement manuel si besoin.
-4. Elle ouvre un recu et l'imprime.
-5. Elle exporte la caisse en CSV.
+1. Le gerant ouvre la caisse.
+2. Il filtre les paiements par periode, moyen ou recherche.
+3. Il ajoute un paiement manuel si besoin.
+4. Il ouvre un recu et l'imprime.
+5. Il exporte la caisse en CSV.
 
-## 8. Equipe et roles
+## 9. Equipe et roles
 
 1. L'admin ajoute des comptes connectes par email ou des employes PIN.
 2. Il choisit le role admin ou operateur.
-3. Les operateurs gardent acces aux flux terrain.
-4. Les admins gardent acces aux zones sensibles: equipe, parametres, abonnements.
+3. Les operateurs voient seulement l'espace employe et le pointage.
+4. Les admins gardent acces aux zones sensibles: membres, caisse, equipe, parametres, abonnements.
 
-## 9. Vitrine publique
+## 10. Vitrine publique
 
 1. L'admin complete telephone et adresse dans les parametres.
 2. Il ouvre le lien `Vitrine salle`.
