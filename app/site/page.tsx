@@ -1,6 +1,7 @@
 import Link from "next/link";
 import {
   Activity,
+  ArrowRight,
   Banknote,
   CheckCircle2,
   ClipboardList,
@@ -13,31 +14,31 @@ import { formatCurrency } from "@/lib/demo-data";
 
 const features = [
   {
-    title: "Membres et abonnements",
-    description: "Crée les membres, renouvelle les formules et garde l'historique au même endroit.",
-    icon: Users,
-  },
-  {
-    title: "Pointage rapide",
-    description: "Valide les entrées en quelques secondes, depuis ordinateur ou téléphone.",
+    title: "Pointage comptoir",
+    description: "Abonnes, passages matin/soir et seances simples depuis le meme ecran.",
     icon: CheckCircle2,
   },
   {
-    title: "Caisse claire",
-    description: "Suis les paiements, les encaissements manuels et les exports CSV.",
+    title: "Caisse propre",
+    description: "Paiements, recus, exports et repartition par moyen sans feuille volante.",
     icon: Banknote,
   },
   {
-    title: "Pilotage quotidien",
-    description: "Visualise les revenus, les alertes et les formules qui fonctionnent le mieux.",
-    icon: Activity,
+    title: "Membres lisibles",
+    description: "Statuts, seances restantes, renouvellements et historique en un coup d'oeil.",
+    icon: Users,
+  },
+  {
+    title: "Espace employe",
+    description: "Une vue simple pour l'equipe terrain, separee du pilotage gerant.",
+    icon: Smartphone,
   },
 ];
 
-const previewMembers = [
-  { name: "Awa Diop", plan: "Mensuel illimite", status: "Actif" },
-  { name: "Moussa Fall", plan: "Pack 10 seances", status: "2 seances" },
-  { name: "Fatou Ndiaye", plan: "Trimestriel", status: "J-2" },
+const activity = [
+  { time: "07:12", name: "Awa Diop", detail: "Mensuel illimite", status: "Entree validee" },
+  { time: "08:04", name: "Client comptoir", detail: "Seance simple", status: formatCurrency(3000) },
+  { time: "18:31", name: "Moussa Fall", detail: "Pack 10 seances", status: "Passage 2" },
 ];
 
 export default function SitePage() {
@@ -47,7 +48,7 @@ export default function SitePage() {
         className="relative min-h-[92vh] overflow-hidden bg-cover bg-center"
         style={{
           backgroundImage:
-            "linear-gradient(90deg, rgba(23,23,23,0.88), rgba(23,23,23,0.62), rgba(23,23,23,0.18)), url('https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?auto=format&fit=crop&w=1800&q=80')",
+            "linear-gradient(90deg, rgba(12,12,12,0.92), rgba(12,12,12,0.62), rgba(12,12,12,0.16)), url('https://images.unsplash.com/photo-1534258936925-c58bed479fcb?auto=format&fit=crop&w=2200&q=85')",
         }}
       >
         <header className="relative z-10 flex items-center justify-between px-4 py-5 md:px-8">
@@ -56,7 +57,7 @@ export default function SitePage() {
             <span className="text-lg font-semibold">GymFlow</span>
           </Link>
           <div className="flex items-center gap-2">
-            <Link href="/login" className="inline-flex h-10 items-center justify-center rounded-md border border-white/40 px-4 text-sm font-semibold text-white transition hover:bg-white/10">
+            <Link href="/login" className="inline-flex h-10 items-center justify-center rounded-md border border-white/35 px-4 text-sm font-semibold text-white transition hover:bg-white/10">
               Connexion
             </Link>
             <Link href="/signup" className="hidden h-10 items-center justify-center rounded-md bg-mint px-4 text-sm font-semibold text-white transition hover:bg-emerald-700 sm:inline-flex">
@@ -65,66 +66,81 @@ export default function SitePage() {
           </div>
         </header>
 
-        <div className="relative z-10 grid min-h-[calc(92vh-80px)] items-center gap-8 px-4 pb-12 md:px-8 lg:grid-cols-[0.95fr_1.05fr]">
-          <div className="max-w-3xl py-12 text-white">
-            <p className="text-sm font-semibold uppercase tracking-[0.18em] text-white/75">Gestion salle de sport</p>
-            <h1 className="mt-5 max-w-4xl text-5xl font-semibold leading-tight md:text-7xl">
-              GymFlow
-            </h1>
-            <p className="mt-6 max-w-2xl text-lg leading-8 text-white/82">
-              Une application simple pour gérer les membres, les abonnements, le pointage et la caisse d&apos;une salle de sport.
-            </p>
-            <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-              <Link href="/signup" className="inline-flex h-12 items-center justify-center rounded-md bg-mint px-5 text-sm font-semibold text-white transition hover:bg-emerald-700">
-                Créer un espace
-              </Link>
-              <Link href="/login" className="inline-flex h-12 items-center justify-center rounded-md border border-white/45 px-5 text-sm font-semibold text-white transition hover:bg-white/10">
-                Se connecter
-              </Link>
+        <div className="relative z-10 flex min-h-[calc(92vh-80px)] flex-col justify-end px-4 pb-10 md:px-8">
+          <div className="grid gap-8 lg:grid-cols-[1fr_430px] lg:items-end">
+            <div className="max-w-4xl py-12 text-white">
+              <p className="inline-flex items-center gap-2 rounded-md border border-white/20 bg-white/10 px-3 py-2 text-xs font-semibold uppercase tracking-[0.12em] text-white/75">
+                <ShieldCheck size={14} />
+                Gestion premium pour salles de sport
+              </p>
+              <h1 className="mt-5 max-w-4xl text-5xl font-semibold leading-tight md:text-7xl">
+                GymFlow
+              </h1>
+              <p className="mt-6 max-w-2xl text-lg leading-8 text-white/82">
+                Une application claire pour piloter les membres, les abonnements, le pointage, les seances simples et la caisse.
+              </p>
+              <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+                <Link href="/signup" className="inline-flex h-12 items-center justify-center gap-2 rounded-md bg-mint px-5 text-sm font-semibold text-white transition hover:bg-emerald-700">
+                  Creer un espace
+                  <ArrowRight size={17} />
+                </Link>
+                <Link href="/login" className="inline-flex h-12 items-center justify-center rounded-md border border-white/45 px-5 text-sm font-semibold text-white transition hover:bg-white/10">
+                  Se connecter
+                </Link>
+              </div>
             </div>
-          </div>
 
-          <div className="mb-8 rounded-md border border-white/18 bg-white/94 p-4 shadow-soft backdrop-blur md:p-5">
-            <div className="flex items-center justify-between border-b border-line pb-4">
-              <div>
-                <p className="text-sm font-semibold text-mint">Tableau de bord</p>
-                <h2 className="mt-1 text-xl font-semibold">Salle Plateau</h2>
-              </div>
-              <span className="rounded-md bg-emerald-50 px-3 py-1 text-xs font-semibold text-mint">En ligne</span>
-            </div>
-            <div className="mt-4 grid gap-3 sm:grid-cols-3">
-              <div className="rounded-md bg-paper p-4">
-                <p className="text-xs font-semibold uppercase text-neutral-500">Revenus</p>
-                <p className="mt-2 text-lg font-semibold">{formatCurrency(84500)}</p>
-              </div>
-              <div className="rounded-md bg-paper p-4">
-                <p className="text-xs font-semibold uppercase text-neutral-500">Entrées</p>
-                <p className="mt-2 text-lg font-semibold">37</p>
-              </div>
-              <div className="rounded-md bg-paper p-4">
-                <p className="text-xs font-semibold uppercase text-neutral-500">Alertes</p>
-                <p className="mt-2 text-lg font-semibold">6</p>
-              </div>
-            </div>
-            <div className="mt-4 overflow-hidden rounded-md border border-line">
-              {previewMembers.map((member) => (
-                <div key={member.name} className="grid grid-cols-[1.1fr_1fr_0.7fr] items-center border-b border-line px-3 py-3 text-sm last:border-b-0">
-                  <span className="font-semibold">{member.name}</span>
-                  <span className="text-neutral-600">{member.plan}</span>
-                  <span className="justify-self-end rounded-md bg-paper px-2 py-1 text-xs font-semibold">{member.status}</span>
+            <div className="mb-4 rounded-md border border-white/18 bg-white/95 p-5 text-ink shadow-soft backdrop-blur">
+              <div className="flex items-start justify-between gap-4 border-b border-line pb-4">
+                <div>
+                  <p className="text-sm font-semibold text-mint">Aujourd&apos;hui</p>
+                  <h2 className="mt-1 text-xl font-semibold">Salle Plateau</h2>
                 </div>
-              ))}
+                <span className="rounded-md bg-emerald-50 px-3 py-1 text-xs font-semibold text-mint">Ouverte</span>
+              </div>
+              <div className="mt-4 grid gap-3 sm:grid-cols-3">
+                <div className="rounded-md bg-paper p-4">
+                  <p className="text-xs font-semibold uppercase text-neutral-500">Caisse</p>
+                  <p className="mt-2 text-lg font-semibold">{formatCurrency(84500)}</p>
+                </div>
+                <div className="rounded-md bg-paper p-4">
+                  <p className="text-xs font-semibold uppercase text-neutral-500">Entrees</p>
+                  <p className="mt-2 text-lg font-semibold">37</p>
+                </div>
+                <div className="rounded-md bg-paper p-4">
+                  <p className="text-xs font-semibold uppercase text-neutral-500">A traiter</p>
+                  <p className="mt-2 text-lg font-semibold">6</p>
+                </div>
+              </div>
+              <div className="mt-4 divide-y divide-line overflow-hidden rounded-md border border-line">
+                {activity.map((item) => (
+                  <div key={`${item.time}-${item.name}`} className="grid grid-cols-[64px_1fr_auto] items-center gap-3 px-3 py-3 text-sm">
+                    <span className="font-mono text-xs font-semibold text-neutral-500">{item.time}</span>
+                    <span className="min-w-0">
+                      <span className="block truncate font-semibold">{item.name}</span>
+                      <span className="mt-1 block truncate text-xs text-neutral-500">{item.detail}</span>
+                    </span>
+                    <span className="rounded-md bg-paper px-2 py-1 text-xs font-semibold">{item.status}</span>
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
         </div>
       </section>
 
-      <section className="px-4 py-14 md:px-8">
+      <section className="px-4 py-16 md:px-8">
         <div className="mx-auto max-w-6xl">
-          <div className="max-w-2xl">
-            <p className="text-sm font-semibold uppercase text-mint">Fonctions clés</p>
-            <h2 className="mt-3 text-3xl font-semibold">Tout ce qu&apos;il faut pour gérer une salle au quotidien.</h2>
+          <div className="grid gap-8 lg:grid-cols-[0.8fr_1.2fr] lg:items-end">
+            <div>
+              <p className="text-sm font-semibold uppercase text-mint">Pourquoi GymFlow</p>
+              <h2 className="mt-3 text-3xl font-semibold md:text-4xl">Moins d&apos;ecrans compliques. Plus de controle au quotidien.</h2>
+            </div>
+            <p className="text-sm leading-7 text-neutral-600">
+              GymFlow se concentre sur les gestes reels d&apos;une salle : accueillir, pointer, encaisser, renouveler, suivre. Le gerant garde les chiffres, l&apos;equipe garde une interface simple.
+            </p>
           </div>
+
           <div className="mt-8 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
             {features.map((feature) => (
               <article key={feature.title} className="rounded-md border border-line bg-white p-5 shadow-soft">
@@ -139,34 +155,45 @@ export default function SitePage() {
         </div>
       </section>
 
-      <section className="border-y border-line bg-white px-4 py-14 md:px-8">
-        <div className="mx-auto grid max-w-6xl gap-8 lg:grid-cols-3">
-          <div className="rounded-md bg-paper p-6">
-            <Smartphone className="text-mint" size={24} />
-            <h3 className="mt-4 text-lg font-semibold">Mobile prêt pour le pointage</h3>
-            <p className="mt-2 text-sm leading-6 text-neutral-600">L&apos;équipe peut pointer les membres directement depuis un téléphone.</p>
-          </div>
-          <div className="rounded-md bg-paper p-6">
-            <ClipboardList className="text-mint" size={24} />
-            <h3 className="mt-4 text-lg font-semibold">Exports propres</h3>
-            <p className="mt-2 text-sm leading-6 text-neutral-600">Les membres et paiements sortent en CSV pour Excel ou Google Sheets.</p>
-          </div>
-          <div className="rounded-md bg-paper p-6">
-            <ShieldCheck className="text-mint" size={24} />
-            <h3 className="mt-4 text-lg font-semibold">Données isolées</h3>
-            <p className="mt-2 text-sm leading-6 text-neutral-600">Chaque salle travaille dans son propre espace avec des accès séparés.</p>
+      <section className="border-y border-line bg-white px-4 py-16 md:px-8">
+        <div className="mx-auto grid max-w-6xl gap-8 lg:grid-cols-[1fr_0.9fr] lg:items-center">
+          <div
+            className="min-h-[420px] rounded-md bg-cover bg-center shadow-soft"
+            style={{
+              backgroundImage:
+                "linear-gradient(180deg, rgba(23,23,23,0.08), rgba(23,23,23,0.46)), url('https://images.unsplash.com/photo-1593079831268-3381b0db4a77?auto=format&fit=crop&w=1600&q=85')",
+            }}
+          />
+          <div>
+            <p className="text-sm font-semibold uppercase text-mint">Terrain</p>
+            <h2 className="mt-3 text-3xl font-semibold">Construit pour les salles qui travaillent vite.</h2>
+            <div className="mt-6 space-y-4">
+              <div className="flex gap-3">
+                <Activity className="mt-1 shrink-0 text-mint" size={20} />
+                <p className="text-sm leading-7 text-neutral-600">Dashboard gerant avec revenus, entrees, alertes et priorites clients.</p>
+              </div>
+              <div className="flex gap-3">
+                <ClipboardList className="mt-1 shrink-0 text-mint" size={20} />
+                <p className="text-sm leading-7 text-neutral-600">Exports propres pour les membres, la caisse et la sauvegarde complete.</p>
+              </div>
+              <div className="flex gap-3">
+                <ShieldCheck className="mt-1 shrink-0 text-mint" size={20} />
+                <p className="text-sm leading-7 text-neutral-600">Roles separes : le proprietaire gere, l&apos;employe pointe.</p>
+              </div>
+            </div>
           </div>
         </div>
       </section>
 
-      <section className="px-4 py-14 md:px-8">
-        <div className="mx-auto flex max-w-6xl flex-col gap-5 rounded-md border border-line bg-ink p-6 text-white md:flex-row md:items-center md:justify-between">
+      <section className="px-4 py-16 md:px-8">
+        <div className="mx-auto flex max-w-6xl flex-col gap-5 rounded-md border border-neutral-900 bg-ink p-6 text-white md:flex-row md:items-center md:justify-between">
           <div>
-            <h2 className="text-2xl font-semibold">Prêt à tester GymFlow ?</h2>
-            <p className="mt-2 text-sm text-white/70">Crée ton espace, configure ta salle et commence avec tes premières formules.</p>
+            <h2 className="text-2xl font-semibold">Pret a lancer ta salle sur GymFlow ?</h2>
+            <p className="mt-2 text-sm text-white/70">Cree ton espace, ajoute tes formules et teste le pointage en quelques minutes.</p>
           </div>
-          <Link href="/signup" className="inline-flex h-11 items-center justify-center rounded-md bg-mint px-5 text-sm font-semibold text-white transition hover:bg-emerald-700">
+          <Link href="/signup" className="inline-flex h-11 items-center justify-center gap-2 rounded-md bg-mint px-5 text-sm font-semibold text-white transition hover:bg-emerald-700">
             Commencer
+            <ArrowRight size={17} />
           </Link>
         </div>
       </section>
