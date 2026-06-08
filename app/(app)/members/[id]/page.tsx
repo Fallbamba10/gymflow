@@ -8,8 +8,8 @@ import { SubmitButton } from "@/components/submit-button";
 import { performMemberCheckin } from "@/app/(app)/checkin/actions";
 import { archiveMember, renewMemberSubscription, restoreMember } from "@/app/(app)/members/actions";
 import { formatCurrency } from "@/lib/demo-data";
+import { requireAdminGym } from "@/lib/supabase/guards";
 import {
-  getCurrentGym,
   getMemberCheckins,
   getMemberDetail,
   getMemberPayments,
@@ -81,10 +81,7 @@ export default async function MemberDetailPage({
 }: MemberDetailPageProps) {
   const { id } = await params;
   const query = await searchParams;
-  const gym = await getCurrentGym();
-  if (!gym) {
-    notFound();
-  }
+  const gym = await requireAdminGym();
 
   const [member, subscriptionTypes, subscriptions, checkins, payments] = await Promise.all([
     getMemberDetail(gym.id, id),

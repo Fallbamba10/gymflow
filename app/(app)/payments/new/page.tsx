@@ -6,7 +6,8 @@ import { PageHeader } from "@/components/page-header";
 import { StaffPinFields } from "@/components/staff-pin-fields";
 import { SubmitButton } from "@/components/submit-button";
 import { createManualPayment } from "@/app/(app)/payments/actions";
-import { getCurrentGym, getGymStaff, getMembers } from "@/lib/supabase/queries";
+import { requireAdminGym } from "@/lib/supabase/guards";
+import { getGymStaff, getMembers } from "@/lib/supabase/queries";
 
 type NewPaymentPageProps = {
   searchParams: Promise<{
@@ -16,9 +17,9 @@ type NewPaymentPageProps = {
 
 export default async function NewPaymentPage({ searchParams }: NewPaymentPageProps) {
   const params = await searchParams;
-  const gym = await getCurrentGym();
-  const members = gym ? await getMembers(gym.id) : [];
-  const staff = gym ? await getGymStaff(gym.id) : [];
+  const gym = await requireAdminGym();
+  const members = await getMembers(gym.id);
+  const staff = await getGymStaff(gym.id);
 
   return (
     <AppShell>

@@ -3,7 +3,7 @@
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
-import { getCurrentGym } from "@/lib/supabase/queries";
+import { requireAdminGym } from "@/lib/supabase/guards";
 
 function getString(formData: FormData, key: string) {
   const value = formData.get(key);
@@ -31,10 +31,7 @@ function translateMemberActionError(message: string) {
 }
 
 export async function createMember(formData: FormData) {
-  const gym = await getCurrentGym();
-  if (!gym) {
-    redirect("/onboarding");
-  }
+  const gym = await requireAdminGym();
 
   const fullName = getString(formData, "full_name");
   const phone = getString(formData, "phone");
@@ -137,10 +134,7 @@ export async function createMember(formData: FormData) {
 }
 
 export async function renewMemberSubscription(formData: FormData) {
-  const gym = await getCurrentGym();
-  if (!gym) {
-    redirect("/onboarding");
-  }
+  const gym = await requireAdminGym();
 
   const memberId = getString(formData, "member_id");
   const subscriptionTypeId = getString(formData, "subscription_type_id");
@@ -233,10 +227,7 @@ export async function renewMemberSubscription(formData: FormData) {
 }
 
 export async function updateMember(formData: FormData) {
-  const gym = await getCurrentGym();
-  if (!gym) {
-    redirect("/onboarding");
-  }
+  const gym = await requireAdminGym();
 
   const memberId = getString(formData, "member_id");
   const fullName = getString(formData, "full_name");
@@ -269,10 +260,7 @@ export async function updateMember(formData: FormData) {
 }
 
 export async function archiveMember(formData: FormData) {
-  const gym = await getCurrentGym();
-  if (!gym) {
-    redirect("/onboarding");
-  }
+  const gym = await requireAdminGym();
 
   const memberId = getString(formData, "member_id");
   if (!memberId) {
@@ -296,10 +284,7 @@ export async function archiveMember(formData: FormData) {
 }
 
 export async function restoreMember(formData: FormData) {
-  const gym = await getCurrentGym();
-  if (!gym) {
-    redirect("/onboarding");
-  }
+  const gym = await requireAdminGym();
 
   const memberId = getString(formData, "member_id");
   if (!memberId) {

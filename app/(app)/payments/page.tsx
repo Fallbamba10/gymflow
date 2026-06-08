@@ -4,8 +4,8 @@ import { AppShell } from "@/components/app-shell";
 import { PageHeader } from "@/components/page-header";
 import { StatusBadge } from "@/components/status-badge";
 import { formatCurrency } from "@/lib/demo-data";
+import { requireAdminGym } from "@/lib/supabase/guards";
 import {
-  getCurrentGym,
   getPaymentsData,
   type PaymentMethod,
   type PaymentsPeriod,
@@ -77,22 +77,8 @@ export default async function PaymentsPage({ searchParams }: PaymentsPageProps) 
   const period = getPeriod(params.period);
   const method = getMethod(params.method);
   const query = params.q ?? "";
-  const gym = await getCurrentGym();
-  const paymentsData = gym
-    ? await getPaymentsData(gym.id, { period, method, query })
-    : {
-        payments: [],
-        total: 0,
-        count: 0,
-        todayTotal: 0,
-        methodTotals: {
-          cash: 0,
-          wave: 0,
-          orange_money: 0,
-          card: 0,
-          other: 0,
-        },
-      };
+  const gym = await requireAdminGym();
+  const paymentsData = await getPaymentsData(gym.id, { period, method, query });
 
   const stats = [
     {

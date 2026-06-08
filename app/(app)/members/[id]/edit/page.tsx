@@ -6,7 +6,8 @@ import { FormField } from "@/components/form-field";
 import { PageHeader } from "@/components/page-header";
 import { SubmitButton } from "@/components/submit-button";
 import { updateMember } from "@/app/(app)/members/actions";
-import { getCurrentGym, getMemberDetail } from "@/lib/supabase/queries";
+import { requireAdminGym } from "@/lib/supabase/guards";
+import { getMemberDetail } from "@/lib/supabase/queries";
 
 type EditMemberPageProps = {
   params: Promise<{
@@ -23,10 +24,7 @@ export default async function EditMemberPage({
 }: EditMemberPageProps) {
   const { id } = await params;
   const query = await searchParams;
-  const gym = await getCurrentGym();
-  if (!gym) {
-    notFound();
-  }
+  const gym = await requireAdminGym();
 
   const member = await getMemberDetail(gym.id, id);
   if (!member) {

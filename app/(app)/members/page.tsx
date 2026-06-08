@@ -3,7 +3,8 @@ import { AlertTriangle, CheckCircle2, Download, Plus, Search, UserRound, Users }
 import { AppShell } from "@/components/app-shell";
 import { PageHeader } from "@/components/page-header";
 import { StatusBadge } from "@/components/status-badge";
-import { getCurrentGym, getMembers } from "@/lib/supabase/queries";
+import { requireAdminGym } from "@/lib/supabase/guards";
+import { getMembers } from "@/lib/supabase/queries";
 
 function getMemberStatus(member: Awaited<ReturnType<typeof getMembers>>[number]) {
   if (member.archived_at) {
@@ -48,8 +49,8 @@ export default async function MembersPage({ searchParams }: MembersPageProps) {
   const params = await searchParams;
   const query = params.q?.trim().toLowerCase() ?? "";
   const selectedStatus = params.status ?? "all";
-  const gym = await getCurrentGym();
-  const allMembers = gym ? await getMembers(gym.id, { includeArchived: true }) : [];
+  const gym = await requireAdminGym();
+  const allMembers = await getMembers(gym.id, { includeArchived: true });
   const visibleActiveMembers = allMembers.filter((member) => !member.archived_at);
   const members = allMembers.filter((member) => {
     const status = getMemberStatus(member);

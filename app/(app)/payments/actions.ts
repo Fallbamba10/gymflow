@@ -2,7 +2,8 @@
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
-import { getCurrentGym, type PaymentMethod } from "@/lib/supabase/queries";
+import { requireAdminGym } from "@/lib/supabase/guards";
+import { type PaymentMethod } from "@/lib/supabase/queries";
 import { createClient } from "@/lib/supabase/server";
 
 function getString(formData: FormData, key: string) {
@@ -35,10 +36,7 @@ function translatePaymentError(message: string) {
 }
 
 export async function createManualPayment(formData: FormData) {
-  const gym = await getCurrentGym();
-  if (!gym) {
-    redirect("/onboarding");
-  }
+  const gym = await requireAdminGym();
 
   const amount = Number(getString(formData, "amount"));
   const method = getPaymentMethod(getString(formData, "method"));

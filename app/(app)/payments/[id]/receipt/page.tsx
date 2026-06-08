@@ -7,8 +7,8 @@ import { PageHeader } from "@/components/page-header";
 import { PrintButton } from "@/components/print-button";
 import { StatusBadge } from "@/components/status-badge";
 import { formatCurrency } from "@/lib/demo-data";
+import { requireAdminGym } from "@/lib/supabase/guards";
 import {
-  getCurrentGym,
   getGymSettings,
   getPaymentReceipt,
   type PaymentMethod,
@@ -46,10 +46,7 @@ function receiptNumber(id: string) {
 
 export default async function PaymentReceiptPage({ params }: ReceiptPageProps) {
   const { id } = await params;
-  const gym = await getCurrentGym();
-  if (!gym) {
-    notFound();
-  }
+  const gym = await requireAdminGym();
 
   const [settings, payment] = await Promise.all([
     getGymSettings(gym.id),

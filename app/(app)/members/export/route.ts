@@ -24,8 +24,8 @@ function getMemberStatus(member: Awaited<ReturnType<typeof getMembers>>[number])
 
 export async function GET() {
   const gym = await getCurrentGym();
-  if (!gym) {
-    return csvResponse("gymflow-membres.csv", toCsv([{ erreur: "Non connecte" }]));
+  if (!gym || gym.role !== "admin") {
+    return csvResponse("gymflow-membres.csv", toCsv([{ erreur: "Export reserve aux admins" }]));
   }
 
   const members = await getMembers(gym.id);

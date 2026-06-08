@@ -7,7 +7,8 @@ import { StaffPinFields } from "@/components/staff-pin-fields";
 import { SubmitButton } from "@/components/submit-button";
 import { createMember } from "@/app/(app)/members/actions";
 import { formatCurrency } from "@/lib/demo-data";
-import { getCurrentGym, getGymStaff, getSubscriptionTypes } from "@/lib/supabase/queries";
+import { requireAdminGym } from "@/lib/supabase/guards";
+import { getGymStaff, getSubscriptionTypes } from "@/lib/supabase/queries";
 
 type NewMemberPageProps = {
   searchParams: Promise<{
@@ -17,9 +18,9 @@ type NewMemberPageProps = {
 
 export default async function NewMemberPage({ searchParams }: NewMemberPageProps) {
   const params = await searchParams;
-  const gym = await getCurrentGym();
-  const subscriptionTypes = gym ? await getSubscriptionTypes(gym.id) : [];
-  const staff = gym ? await getGymStaff(gym.id) : [];
+  const gym = await requireAdminGym();
+  const subscriptionTypes = await getSubscriptionTypes(gym.id);
+  const staff = await getGymStaff(gym.id);
 
   return (
     <AppShell>
