@@ -57,3 +57,4 @@ Dans Supabase SQL Editor, executer dans cet ordre:
 1. `supabase/schema.sql`
 2. `supabase/team-management.sql`
 3. `supabase/public-pages.sql`
+4. `supabase/walk-in-sessions.sql`

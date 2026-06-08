@@ -29,6 +29,7 @@ Dans Supabase SQL Editor, executer dans cet ordre:
 supabase/schema.sql
 supabase/team-management.sql
 supabase/public-pages.sql
+supabase/walk-in-sessions.sql
 ```
 
 Ces scripts creent:
@@ -41,6 +42,7 @@ Ces scripts creent:
 - les employes PIN;
 - l'attribution employe sur pointages et paiements;
 - la fonction publique controlee pour les vitrines `/g/[id]`.
+- les seances simples sans abonnement depuis le pointage.
 
 ## 4. Auth
 
@@ -67,4 +69,4 @@ https://ton-domaine.com/auth/callback
 5. Arriver sur le dashboard.
 6. Creer une formule.
 7. Creer un membre.
-8. Tester pointage, paiement, recu et export.
+8. Tester pointage membre, seance simple, paiement, recu et export.
