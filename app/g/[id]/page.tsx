@@ -6,6 +6,7 @@ import {
   CheckCircle2,
   Clock3,
   MapPin,
+  MessageCircle,
   Phone,
   ShieldCheck,
   Sparkles,
@@ -21,6 +22,30 @@ type PublicGymPageProps = {
   }>;
 };
 
+function getWhatsAppHref(phone: string | null, gymName: string) {
+  if (!phone) {
+    return null;
+  }
+
+  let digits = phone.replace(/\D/g, "");
+
+  if (digits.startsWith("00")) {
+    digits = digits.slice(2);
+  }
+
+  if (digits.length === 9 && digits.startsWith("7")) {
+    digits = `221${digits}`;
+  }
+
+  if (!digits) {
+    return null;
+  }
+
+  const message = encodeURIComponent(`Bonjour ${gymName}, je souhaite avoir des informations sur vos formules.`);
+
+  return `https://wa.me/${digits}?text=${message}`;
+}
+
 export default async function PublicGymProfilePage({ params }: PublicGymPageProps) {
   const { id } = await params;
   const page = await getPublicGymPage(id);
@@ -30,6 +55,7 @@ export default async function PublicGymProfilePage({ params }: PublicGymPageProp
   }
 
   const phoneHref = page.gym.phone ? `tel:${page.gym.phone.replace(/\s/g, "")}` : null;
+  const whatsappHref = getWhatsAppHref(page.gym.phone, page.gym.name);
   const featuredPlan = page.plans[0] ?? null;
   const planCountLabel = page.plans.length > 1 ? "formules" : "formule";
 
@@ -75,10 +101,16 @@ export default async function PublicGymProfilePage({ params }: PublicGymPageProp
               </span>
             </div>
             <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+              {whatsappHref ? (
+                <a href={whatsappHref} target="_blank" rel="noreferrer" className="inline-flex h-12 items-center justify-center gap-2 rounded-md bg-mint px-5 text-sm font-semibold transition hover:bg-emerald-700">
+                  Ecrire sur WhatsApp
+                  <MessageCircle size={17} />
+                </a>
+              ) : null}
               {phoneHref ? (
-                <Link href={phoneHref} className="inline-flex h-12 items-center justify-center gap-2 rounded-md bg-mint px-5 text-sm font-semibold transition hover:bg-emerald-700">
+                <Link href={phoneHref} className="inline-flex h-12 items-center justify-center gap-2 rounded-md border border-white/40 px-5 text-sm font-semibold transition hover:bg-white/10">
                   Appeler la salle
-                  <ArrowRight size={17} />
+                  <Phone size={17} />
                 </Link>
               ) : null}
               <a href="#formules" className="inline-flex h-12 items-center justify-center rounded-md border border-white/40 px-5 text-sm font-semibold transition hover:bg-white/10">
@@ -166,16 +198,18 @@ export default async function PublicGymProfilePage({ params }: PublicGymPageProp
                       </div>
                     </div>
 
-                    {phoneHref ? (
-                      <Link
-                        href={phoneHref}
+                    {whatsappHref || phoneHref ? (
+                      <a
+                        href={whatsappHref ?? phoneHref ?? "#"}
+                        target={whatsappHref ? "_blank" : undefined}
+                        rel={whatsappHref ? "noreferrer" : undefined}
                         className={`mt-6 inline-flex h-11 w-full items-center justify-center gap-2 rounded-md text-sm font-semibold transition ${
                           highlighted ? "bg-mint text-white hover:bg-emerald-700" : "bg-ink text-white hover:bg-neutral-800"
                         }`}
                       >
                         Demander cette formule
-                        <ArrowRight size={16} />
-                      </Link>
+                        {whatsappHref ? <MessageCircle size={16} /> : <ArrowRight size={16} />}
+                      </a>
                     ) : null}
                   </article>
                 );
@@ -200,6 +234,20 @@ export default async function PublicGymProfilePage({ params }: PublicGymPageProp
             <Phone className="text-mint" size={22} />
             <h3 className="mt-4 font-semibold">Contact</h3>
             <p className="mt-2 text-sm leading-6 text-neutral-600">{page.gym.phone ?? "Telephone a venir"}</p>
+            <div className="mt-4 flex flex-col gap-2 sm:flex-row lg:flex-col">
+              {whatsappHref ? (
+                <a href={whatsappHref} target="_blank" rel="noreferrer" className="inline-flex h-10 items-center justify-center gap-2 rounded-md bg-mint px-3 text-sm font-semibold text-white">
+                  WhatsApp
+                  <MessageCircle size={15} />
+                </a>
+              ) : null}
+              {phoneHref ? (
+                <Link href={phoneHref} className="inline-flex h-10 items-center justify-center gap-2 rounded-md bg-ink px-3 text-sm font-semibold text-white">
+                  Appeler
+                  <Phone size={15} />
+                </Link>
+              ) : null}
+            </div>
           </div>
           <div className="rounded-md border border-line bg-paper p-5">
             <Clock3 className="text-mint" size={22} />
@@ -224,7 +272,12 @@ export default async function PublicGymProfilePage({ params }: PublicGymPageProp
               Choisis une formule, contacte la salle, puis viens t&apos;entrainer dans les meilleures conditions.
             </p>
           </div>
-          {phoneHref ? (
+          {whatsappHref ? (
+            <a href={whatsappHref} target="_blank" rel="noreferrer" className="inline-flex h-12 shrink-0 items-center justify-center gap-2 rounded-md bg-mint px-5 text-sm font-semibold transition hover:bg-emerald-700">
+              Ecrire sur WhatsApp
+              <MessageCircle size={16} />
+            </a>
+          ) : phoneHref ? (
             <Link href={phoneHref} className="inline-flex h-12 shrink-0 items-center justify-center gap-2 rounded-md bg-mint px-5 text-sm font-semibold transition hover:bg-emerald-700">
               Appeler maintenant
               <Phone size={16} />
