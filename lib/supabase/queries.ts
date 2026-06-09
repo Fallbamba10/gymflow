@@ -43,6 +43,7 @@ export type GymSettings = {
   public_hours: string | null;
   whatsapp_phone: string | null;
   instagram_url: string | null;
+  tiktok_url: string | null;
   cover_image_url: string | null;
   currency: string;
 };
@@ -93,6 +94,7 @@ export type PublicGymPage = {
     public_hours: string | null;
     whatsapp_phone: string | null;
     instagram_url: string | null;
+    tiktok_url: string | null;
     cover_image_url: string | null;
   };
   plans: Array<{
@@ -291,7 +293,7 @@ export async function getGymSettings(gymId: string): Promise<GymSettings | null>
   const supabase = await createClient();
   const { data, error } = await supabase
     .from("gyms")
-    .select("id, name, phone, address, currency, public_description, public_hours, whatsapp_phone, instagram_url, cover_image_url")
+    .select("id, name, phone, address, currency, public_description, public_hours, whatsapp_phone, instagram_url, tiktok_url, cover_image_url")
     .eq("id", gymId)
     .single();
 

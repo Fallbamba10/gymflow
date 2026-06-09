@@ -5,6 +5,7 @@ add column if not exists public_description text,
 add column if not exists public_hours text,
 add column if not exists whatsapp_phone text,
 add column if not exists instagram_url text,
+add column if not exists tiktok_url text,
 add column if not exists cover_image_url text;
 
 insert into storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
@@ -75,6 +76,7 @@ as $$
       'public_hours', g.public_hours,
       'whatsapp_phone', g.whatsapp_phone,
       'instagram_url', g.instagram_url,
+      'tiktok_url', g.tiktok_url,
       'cover_image_url', g.cover_image_url
     ),
     'plans',

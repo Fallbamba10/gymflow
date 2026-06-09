@@ -41,6 +41,7 @@ export async function updateGymSettings(formData: FormData) {
   const public_hours = getString(formData, "public_hours");
   const whatsapp_phone = getString(formData, "whatsapp_phone");
   const instagram_url = getOptionalUrl(getString(formData, "instagram_url"));
+  const tiktok_url = getOptionalUrl(getString(formData, "tiktok_url"));
   const cover_image_url = getOptionalUrl(getString(formData, "cover_image_url"));
   const currency = getCurrency(getString(formData, "currency"));
 
@@ -59,6 +60,7 @@ export async function updateGymSettings(formData: FormData) {
       public_hours,
       whatsapp_phone,
       instagram_url,
+      tiktok_url,
       cover_image_url,
       currency,
     })

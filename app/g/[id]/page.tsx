@@ -8,6 +8,7 @@ import {
   Instagram,
   MapPin,
   MessageCircle,
+  Music2,
   Phone,
   ShieldCheck,
   Sparkles,
@@ -133,6 +134,12 @@ export default async function PublicGymProfilePage({ params }: PublicGymPageProp
                 <a href={page.gym.instagram_url} target="_blank" rel="noreferrer" className="inline-flex h-12 items-center justify-center gap-2 rounded-md border border-white/40 px-5 text-sm font-semibold transition hover:bg-white/10">
                   Instagram
                   <Instagram size={17} />
+                </a>
+              ) : null}
+              {page.gym.tiktok_url ? (
+                <a href={page.gym.tiktok_url} target="_blank" rel="noreferrer" className="inline-flex h-12 items-center justify-center gap-2 rounded-md border border-white/40 px-5 text-sm font-semibold transition hover:bg-white/10">
+                  TikTok
+                  <Music2 size={17} />
                 </a>
               ) : null}
             </div>
@@ -279,6 +286,31 @@ export default async function PublicGymProfilePage({ params }: PublicGymPageProp
           </div>
         </div>
       </section>
+
+      {page.gym.instagram_url || page.gym.tiktok_url ? (
+        <section className="px-4 pb-6 md:px-8">
+          <div className="mx-auto flex max-w-7xl flex-col gap-3 rounded-md border border-line bg-white p-5 shadow-soft sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <p className="text-sm font-semibold uppercase text-mint">Reseaux sociaux</p>
+              <p className="mt-1 text-sm text-neutral-500">Suis la salle pour voir l&apos;ambiance, les annonces et les nouveautes.</p>
+            </div>
+            <div className="flex flex-col gap-2 sm:flex-row">
+              {page.gym.instagram_url ? (
+                <a href={page.gym.instagram_url} target="_blank" rel="noreferrer" className="inline-flex h-10 items-center justify-center gap-2 rounded-md bg-ink px-4 text-sm font-semibold text-white">
+                  Instagram
+                  <Instagram size={15} />
+                </a>
+              ) : null}
+              {page.gym.tiktok_url ? (
+                <a href={page.gym.tiktok_url} target="_blank" rel="noreferrer" className="inline-flex h-10 items-center justify-center gap-2 rounded-md bg-ink px-4 text-sm font-semibold text-white">
+                  TikTok
+                  <Music2 size={15} />
+                </a>
+              ) : null}
+            </div>
+          </div>
+        </section>
+      ) : null}
 
       <section className="px-4 py-14 md:px-8">
         <div

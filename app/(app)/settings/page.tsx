@@ -12,6 +12,7 @@ import {
   Instagram,
   MapPin,
   MessageCircle,
+  Music2,
   Phone,
   ShieldCheck,
   Sparkles,
@@ -234,6 +235,18 @@ export default async function SettingsPage({ searchParams }: SettingsPageProps) 
                     />
                   </div>
                 </FormField>
+                <FormField label="TikTok">
+                  <div className="relative">
+                    <Music2 className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-neutral-400" size={17} />
+                    <input
+                      name="tiktok_url"
+                      type="url"
+                      className="h-11 w-full rounded-md border border-line bg-paper pl-10 pr-3 outline-none focus:border-mint"
+                      defaultValue={settings.tiktok_url ?? ""}
+                      placeholder="https://www.tiktok.com/@ta_salle"
+                    />
+                  </div>
+                </FormField>
                 <FormField label="Image de couverture">
                   <CoverImageUpload gymId={gym.id} inputName="cover_image_url" initialUrl={settings.cover_image_url} />
                 </FormField>
@@ -349,6 +362,15 @@ export default async function SettingsPage({ searchParams }: SettingsPageProps) 
                       Instagram
                     </p>
                     <p className="mt-1 truncate text-sm text-neutral-600">{settings.instagram_url}</p>
+                  </div>
+                ) : null}
+                {settings.tiktok_url ? (
+                  <div className="rounded-md bg-paper p-3">
+                    <p className="inline-flex items-center gap-2 text-sm font-semibold">
+                      <Music2 size={16} className="text-mint" />
+                      TikTok
+                    </p>
+                    <p className="mt-1 truncate text-sm text-neutral-600">{settings.tiktok_url}</p>
                   </div>
                 ) : null}
               </div>

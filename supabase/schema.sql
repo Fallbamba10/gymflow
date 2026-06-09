@@ -17,6 +17,7 @@ create table public.gyms (
   public_hours text,
   whatsapp_phone text,
   instagram_url text,
+  tiktok_url text,
   cover_image_url text,
   currency text not null default 'XOF',
   owner_id uuid not null references auth.users(id) on delete cascade,
