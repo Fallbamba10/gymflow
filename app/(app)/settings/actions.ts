@@ -18,12 +18,30 @@ function getCurrency(value: string) {
   return "XOF";
 }
 
+function getOptionalUrl(value: string) {
+  if (!value) {
+    return "";
+  }
+
+  try {
+    const url = new URL(value);
+    return url.protocol === "http:" || url.protocol === "https:" ? url.toString() : "";
+  } catch {
+    return "";
+  }
+}
+
 export async function updateGymSettings(formData: FormData) {
   const gym = await requireAdminGym();
 
   const name = getString(formData, "name");
   const phone = getString(formData, "phone");
   const address = getString(formData, "address");
+  const public_description = getString(formData, "public_description");
+  const public_hours = getString(formData, "public_hours");
+  const whatsapp_phone = getString(formData, "whatsapp_phone");
+  const instagram_url = getOptionalUrl(getString(formData, "instagram_url"));
+  const cover_image_url = getOptionalUrl(getString(formData, "cover_image_url"));
   const currency = getCurrency(getString(formData, "currency"));
 
   if (!name) {
@@ -37,6 +55,11 @@ export async function updateGymSettings(formData: FormData) {
       name,
       phone,
       address,
+      public_description,
+      public_hours,
+      whatsapp_phone,
+      instagram_url,
+      cover_image_url,
       currency,
     })
     .eq("id", gym.id);
@@ -47,5 +70,6 @@ export async function updateGymSettings(formData: FormData) {
 
   revalidatePath("/", "layout");
   revalidatePath("/settings");
+  revalidatePath(`/g/${gym.id}`);
   redirect("/settings?success=Parametres enregistres");
 }

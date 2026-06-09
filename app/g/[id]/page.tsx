@@ -5,6 +5,7 @@ import {
   CalendarDays,
   CheckCircle2,
   Clock3,
+  Instagram,
   MapPin,
   MessageCircle,
   Phone,
@@ -54,10 +55,18 @@ export default async function PublicGymProfilePage({ params }: PublicGymPageProp
     notFound();
   }
 
+  const publicPhone = page.gym.whatsapp_phone || page.gym.phone;
   const phoneHref = page.gym.phone ? `tel:${page.gym.phone.replace(/\s/g, "")}` : null;
-  const whatsappHref = getWhatsAppHref(page.gym.phone, page.gym.name);
+  const whatsappHref = getWhatsAppHref(publicPhone, page.gym.name);
   const featuredPlan = page.plans[0] ?? null;
   const planCountLabel = page.plans.length > 1 ? "formules" : "formule";
+  const coverImage =
+    page.gym.cover_image_url ||
+    "https://images.unsplash.com/photo-1571902943202-507ec2618e8f?auto=format&fit=crop&w=2400&q=88";
+  const description =
+    page.gym.public_description ||
+    "Une adresse sportive presentee avec clarte : formules, contact et informations essentielles avant de te deplacer.";
+  const publicHours = page.gym.public_hours || "Horaires a confirmer avec la salle";
 
   return (
     <main className="min-h-screen bg-paper text-ink">
@@ -65,7 +74,7 @@ export default async function PublicGymProfilePage({ params }: PublicGymPageProp
         className="relative overflow-hidden bg-cover bg-center text-white"
         style={{
           backgroundImage:
-            "linear-gradient(105deg, rgba(10,10,10,0.95) 0%, rgba(10,10,10,0.78) 46%, rgba(10,10,10,0.28) 100%), url('https://images.unsplash.com/photo-1571902943202-507ec2618e8f?auto=format&fit=crop&w=2400&q=88')",
+            `linear-gradient(105deg, rgba(10,10,10,0.95) 0%, rgba(10,10,10,0.78) 46%, rgba(10,10,10,0.28) 100%), url('${coverImage}')`,
         }}
       >
         <header className="relative z-10 mx-auto flex max-w-7xl items-center justify-between px-4 py-5 md:px-8">
@@ -88,7 +97,7 @@ export default async function PublicGymProfilePage({ params }: PublicGymPageProp
               {page.gym.name}
             </h1>
             <p className="mt-5 max-w-2xl text-lg leading-8 text-white/72">
-              Une adresse sportive presentee avec clarte : formules, contact et informations essentielles avant de te deplacer.
+              {description}
             </p>
             <div className="mt-6 flex flex-wrap gap-3 text-sm text-white/82">
               <span className="inline-flex items-center gap-2 rounded-md border border-white/15 bg-white/10 px-3 py-2 backdrop-blur">
@@ -98,6 +107,10 @@ export default async function PublicGymProfilePage({ params }: PublicGymPageProp
               <span className="inline-flex items-center gap-2 rounded-md border border-white/15 bg-white/10 px-3 py-2 backdrop-blur">
                 <Phone size={16} />
                 {page.gym.phone ?? "Telephone a venir"}
+              </span>
+              <span className="inline-flex items-center gap-2 rounded-md border border-white/15 bg-white/10 px-3 py-2 backdrop-blur">
+                <Clock3 size={16} />
+                {publicHours}
               </span>
             </div>
             <div className="mt-8 flex flex-col gap-3 sm:flex-row">
@@ -116,6 +129,12 @@ export default async function PublicGymProfilePage({ params }: PublicGymPageProp
               <a href="#formules" className="inline-flex h-12 items-center justify-center rounded-md border border-white/40 px-5 text-sm font-semibold transition hover:bg-white/10">
                 Voir les formules
               </a>
+              {page.gym.instagram_url ? (
+                <a href={page.gym.instagram_url} target="_blank" rel="noreferrer" className="inline-flex h-12 items-center justify-center gap-2 rounded-md border border-white/40 px-5 text-sm font-semibold transition hover:bg-white/10">
+                  Instagram
+                  <Instagram size={17} />
+                </a>
+              ) : null}
             </div>
           </div>
 
@@ -144,7 +163,11 @@ export default async function PublicGymProfilePage({ params }: PublicGymPageProp
               ) : null}
               <div className="rounded-md border border-line bg-paper p-4">
                 <p className="text-xs font-semibold uppercase tracking-[0.08em] text-neutral-500">Contact direct</p>
-                <p className="mt-2 font-semibold">{page.gym.phone ?? "-"}</p>
+                <p className="mt-2 font-semibold">{publicPhone ?? "-"}</p>
+              </div>
+              <div className="rounded-md border border-line bg-paper p-4">
+                <p className="text-xs font-semibold uppercase tracking-[0.08em] text-neutral-500">Horaires</p>
+                <p className="mt-2 text-sm font-semibold leading-6">{publicHours}</p>
               </div>
             </div>
           </aside>
@@ -251,8 +274,8 @@ export default async function PublicGymProfilePage({ params }: PublicGymPageProp
           </div>
           <div className="rounded-md border border-line bg-paper p-5">
             <Clock3 className="text-mint" size={22} />
-            <h3 className="mt-4 font-semibold">Avant de venir</h3>
-            <p className="mt-2 text-sm leading-6 text-neutral-600">Confirme la formule, le tarif et les conditions directement avec la salle.</p>
+            <h3 className="mt-4 font-semibold">Horaires</h3>
+            <p className="mt-2 text-sm leading-6 text-neutral-600">{publicHours}</p>
           </div>
         </div>
       </section>

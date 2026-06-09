@@ -1,4 +1,11 @@
--- Public gym pages expose only safe storefront data.
+-- Public page customization for each gym storefront.
+
+alter table public.gyms
+add column if not exists public_description text,
+add column if not exists public_hours text,
+add column if not exists whatsapp_phone text,
+add column if not exists instagram_url text,
+add column if not exists cover_image_url text;
 
 create or replace function public.get_public_gym_page(target_gym_id uuid)
 returns jsonb

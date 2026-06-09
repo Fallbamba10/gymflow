@@ -1,6 +1,22 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import { Building2, CheckCircle2, CreditCard, DatabaseBackup, Download, ExternalLink, MapPin, Phone, ShieldCheck, UsersRound } from "lucide-react";
+import {
+  Building2,
+  CheckCircle2,
+  Clock3,
+  CreditCard,
+  DatabaseBackup,
+  Download,
+  ExternalLink,
+  Image as ImageIcon,
+  Instagram,
+  MapPin,
+  MessageCircle,
+  Phone,
+  ShieldCheck,
+  Sparkles,
+  UsersRound,
+} from "lucide-react";
 import { AppShell } from "@/components/app-shell";
 import { FormField } from "@/components/form-field";
 import { PageHeader } from "@/components/page-header";
@@ -42,6 +58,10 @@ export default async function SettingsPage({ searchParams }: SettingsPageProps) 
     {
       label: "Devise",
       complete: Boolean(settings.currency),
+    },
+    {
+      label: "Vitrine publique",
+      complete: Boolean(settings.public_description || settings.cover_image_url),
     },
   ];
   const completedItems = checklist.filter((item) => item.complete).length;
@@ -152,6 +172,80 @@ export default async function SettingsPage({ searchParams }: SettingsPageProps) 
                   <option value="USD">USD</option>
                 </select>
               </FormField>
+            </div>
+
+            <div className="mt-7 border-t border-line pt-6">
+              <div className="flex items-center gap-3">
+                <div className="flex size-10 items-center justify-center rounded-md bg-emerald-50 text-mint">
+                  <Sparkles size={20} />
+                </div>
+                <div>
+                  <h3 className="text-lg font-semibold">Vitrine publique</h3>
+                  <p className="mt-1 text-sm text-neutral-500">Ces elements apparaissent sur la page client de ta salle.</p>
+                </div>
+              </div>
+
+              <div className="mt-5 grid gap-5 md:grid-cols-2">
+                <FormField label="Description courte">
+                  <textarea
+                    name="public_description"
+                    className="min-h-28 w-full rounded-md border border-line bg-paper px-3 py-3 outline-none focus:border-mint"
+                    defaultValue={settings.public_description ?? ""}
+                    placeholder="Une salle premium au coeur de Dakar, pensee pour progresser avec regularite."
+                  />
+                </FormField>
+                <FormField label="Horaires publics">
+                  <textarea
+                    name="public_hours"
+                    className="min-h-28 w-full rounded-md border border-line bg-paper px-3 py-3 outline-none focus:border-mint"
+                    defaultValue={settings.public_hours ?? ""}
+                    placeholder="Lun - Sam : 06h00 - 22h00"
+                  />
+                </FormField>
+                <FormField label="WhatsApp public">
+                  <div className="relative">
+                    <MessageCircle className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-neutral-400" size={17} />
+                    <input
+                      name="whatsapp_phone"
+                      className="h-11 w-full rounded-md border border-line bg-paper pl-10 pr-3 outline-none focus:border-mint"
+                      defaultValue={settings.whatsapp_phone ?? ""}
+                      placeholder="+221 77 123 45 67"
+                    />
+                  </div>
+                </FormField>
+                <FormField label="Instagram">
+                  <div className="relative">
+                    <Instagram className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-neutral-400" size={17} />
+                    <input
+                      name="instagram_url"
+                      type="url"
+                      className="h-11 w-full rounded-md border border-line bg-paper pl-10 pr-3 outline-none focus:border-mint"
+                      defaultValue={settings.instagram_url ?? ""}
+                      placeholder="https://instagram.com/ta_salle"
+                    />
+                  </div>
+                </FormField>
+                <FormField label="Image de couverture">
+                  <div className="relative">
+                    <ImageIcon className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-neutral-400" size={17} />
+                    <input
+                      name="cover_image_url"
+                      type="url"
+                      className="h-11 w-full rounded-md border border-line bg-paper pl-10 pr-3 outline-none focus:border-mint"
+                      defaultValue={settings.cover_image_url ?? ""}
+                      placeholder="https://..."
+                    />
+                  </div>
+                </FormField>
+                <div className="rounded-md border border-line bg-paper p-4">
+                  <p className="text-sm font-semibold">Apercu public</p>
+                  <div className="mt-3 space-y-2 text-sm text-neutral-600">
+                    <p className="inline-flex items-center gap-2"><MessageCircle size={15} /> WhatsApp prioritaire si renseigne</p>
+                    <p className="inline-flex items-center gap-2"><Clock3 size={15} /> Horaires visibles sur la page salle</p>
+                    <p className="inline-flex items-center gap-2"><ImageIcon size={15} /> Photo utilisee en hero si disponible</p>
+                  </div>
+                </div>
+              </div>
             </div>
 
             <div className="mt-6 flex justify-end">
