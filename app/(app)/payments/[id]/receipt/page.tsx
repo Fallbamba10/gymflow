@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ArrowLeft, ReceiptText } from "lucide-react";
+import { ArrowLeft, Banknote, CalendarDays, CheckCircle2, Hash, MapPin, Phone, ReceiptText, UserRound } from "lucide-react";
 import { AppShell } from "@/components/app-shell";
 import { BrandMark } from "@/components/brand-mark";
 import { PageHeader } from "@/components/page-header";
@@ -57,11 +57,15 @@ export default async function PaymentReceiptPage({ params }: ReceiptPageProps) {
     notFound();
   }
 
+  const receiptId = receiptNumber(payment.id);
+  const paymentLabel = payment.kind === "subscription" ? "Abonnement" : "Paiement comptoir";
+  const description = payment.plan ?? payment.notes ?? "Encaissement";
+
   return (
     <AppShell>
       <PageHeader
         title="Recu de paiement"
-        eyebrow={receiptNumber(payment.id)}
+        eyebrow={receiptId}
         actions={
           <>
             <Link href="/payments" className="inline-flex h-11 items-center justify-center gap-2 rounded-md border border-line bg-white px-4 text-sm font-semibold shadow-sm print:hidden">
@@ -74,60 +78,102 @@ export default async function PaymentReceiptPage({ params }: ReceiptPageProps) {
       />
 
       <div className="px-4 py-6 md:px-8 print:bg-white print:p-0">
-        <article className="mx-auto max-w-3xl rounded-md border border-line bg-white p-6 shadow-soft print:max-w-none print:border-0 print:p-0 print:shadow-none">
-          <div className="flex flex-col gap-6 border-b border-line pb-6 sm:flex-row sm:items-start sm:justify-between">
-            <div className="flex items-center gap-4">
-              <BrandMark className="size-14" />
+        <article className="mx-auto max-w-4xl overflow-hidden rounded-md border border-line bg-white shadow-soft print:max-w-none print:border-0 print:shadow-none">
+          <div className="bg-ink p-6 text-white print:border-b print:border-line print:bg-white print:text-ink">
+            <div className="flex flex-col gap-6 sm:flex-row sm:items-start sm:justify-between">
+              <div className="flex items-center gap-4">
+                <BrandMark inverse className="size-14 print:bg-ink print:text-white" />
+                <div>
+                  <p className="text-xs font-semibold uppercase tracking-[0.12em] text-white/45 print:text-neutral-500">Recu officiel</p>
+                  <h2 className="mt-2 text-2xl font-semibold">{settings.name}</h2>
+                  <div className="mt-3 space-y-1 text-sm text-white/62 print:text-neutral-600">
+                    <p className="inline-flex items-center gap-2">
+                      <Phone size={15} />
+                      {settings.phone ?? "Telephone non renseigne"}
+                    </p>
+                    <p className="flex items-center gap-2">
+                      <MapPin size={15} />
+                      {settings.address ?? "Adresse non renseignee"}
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="rounded-md border border-white/15 bg-white/10 p-4 text-left backdrop-blur print:border-line print:bg-paper sm:text-right">
+                <p className="text-xs font-semibold uppercase tracking-[0.12em] text-white/45 print:text-neutral-500">Reference</p>
+                <p className="mt-2 text-2xl font-semibold">{receiptId}</p>
+                <p className="mt-2 text-sm text-white/60 print:text-neutral-600">{formatDateTime(payment.paid_at)}</p>
+              </div>
+            </div>
+
+            <div className="mt-8 grid gap-4 md:grid-cols-[1fr_320px] md:items-end">
               <div>
-                <h2 className="text-2xl font-semibold">{settings.name}</h2>
-                <p className="mt-1 text-sm text-neutral-500">{settings.phone ?? "Telephone non renseigne"}</p>
-                <p className="mt-1 text-sm text-neutral-500">{settings.address ?? "Adresse non renseignee"}</p>
+                <p className="inline-flex items-center gap-2 rounded-md bg-emerald-50 px-3 py-2 text-sm font-semibold text-mint print:border print:border-line print:bg-white">
+                  <CheckCircle2 size={17} />
+                  Paiement confirme
+                </p>
+                <p className="mt-4 max-w-xl text-sm leading-7 text-white/62 print:text-neutral-600">
+                  Ce recu confirme l&apos;encaissement effectue par la salle pour le client indique ci-dessous.
+                </p>
               </div>
-            </div>
-            <div className="text-left sm:text-right">
-              <p className="text-xs font-semibold uppercase text-neutral-500">Recu</p>
-              <p className="mt-1 text-xl font-semibold">{receiptNumber(payment.id)}</p>
-              <p className="mt-2 text-sm text-neutral-500">{formatDateTime(payment.paid_at)}</p>
+              <div className="rounded-md bg-white p-5 text-ink print:border print:border-line">
+                <p className="text-xs font-semibold uppercase tracking-[0.1em] text-neutral-500">Montant paye</p>
+                <p className="mt-3 text-4xl font-semibold">{formatCurrency(payment.amount)}</p>
+                <p className="mt-2 text-sm font-semibold text-mint">{methodLabels[payment.method]}</p>
+              </div>
             </div>
           </div>
 
-          <div className="grid gap-4 border-b border-line py-6 md:grid-cols-2">
-            <div className="rounded-md bg-paper p-4 print:border print:border-line print:bg-white">
-              <p className="text-xs font-semibold uppercase text-neutral-500">Client</p>
-              <p className="mt-2 text-lg font-semibold">{payment.member_name}</p>
-              <p className="mt-1 text-sm text-neutral-500">
-                {payment.member_number ? `Membre ${String(payment.member_number).padStart(6, "0")}` : "Paiement comptoir"}
-              </p>
-              <p className="mt-1 text-sm text-neutral-500">{payment.member_phone ?? "-"}</p>
-            </div>
-            <div className="rounded-md bg-paper p-4 print:border print:border-line print:bg-white">
-              <p className="text-xs font-semibold uppercase text-neutral-500">Paiement</p>
-              <div className="mt-2 flex flex-wrap items-center gap-2">
-                <p className="text-lg font-semibold">{methodLabels[payment.method]}</p>
-                <StatusBadge tone="active">Paye</StatusBadge>
+          <div className="p-6">
+            <div className="grid gap-4 md:grid-cols-3">
+              <div className="rounded-md border border-line bg-paper p-4 print:bg-white">
+                <UserRound className="text-mint" size={20} />
+                <p className="mt-4 text-xs font-semibold uppercase tracking-[0.08em] text-neutral-500">Client</p>
+                <p className="mt-2 text-lg font-semibold">{payment.member_name}</p>
+                <p className="mt-1 text-sm text-neutral-500">
+                  {payment.member_number ? `Membre ${String(payment.member_number).padStart(6, "0")}` : "Client comptoir"}
+                </p>
+                <p className="mt-1 text-sm text-neutral-500">{payment.member_phone ?? "-"}</p>
               </div>
-              <p className="mt-1 text-sm text-neutral-500">
-                {payment.staff_name ? `Encaisse par ${payment.staff_name}` : "Encaissement enregistre"}
-              </p>
-            </div>
-          </div>
 
-          <div className="py-6">
-            <div className="overflow-hidden rounded-md border border-line">
-              <div className="grid grid-cols-[1.4fr_0.8fr] bg-neutral-50 px-4 py-3 text-xs font-semibold uppercase text-neutral-500">
-                <span>Description</span>
+              <div className="rounded-md border border-line bg-paper p-4 print:bg-white">
+                <Banknote className="text-mint" size={20} />
+                <p className="mt-4 text-xs font-semibold uppercase tracking-[0.08em] text-neutral-500">Paiement</p>
+                <div className="mt-2 flex flex-wrap items-center gap-2">
+                  <p className="text-lg font-semibold">{methodLabels[payment.method]}</p>
+                  <StatusBadge tone="active">Paye</StatusBadge>
+                </div>
+                <p className="mt-1 text-sm text-neutral-500">
+                  {payment.staff_name ? `Encaisse par ${payment.staff_name}` : "Encaissement enregistre"}
+                </p>
+              </div>
+
+              <div className="rounded-md border border-line bg-paper p-4 print:bg-white">
+                <Hash className="text-mint" size={20} />
+                <p className="mt-4 text-xs font-semibold uppercase tracking-[0.08em] text-neutral-500">Reference</p>
+                <p className="mt-2 text-lg font-semibold">{receiptId}</p>
+                <p className="mt-1 inline-flex items-center gap-2 text-sm text-neutral-500">
+                  <CalendarDays size={15} />
+                  {formatDateTime(payment.paid_at)}
+                </p>
+              </div>
+            </div>
+
+            <div className="mt-6 overflow-hidden rounded-md border border-line">
+              <div className="grid grid-cols-[1.3fr_0.7fr] bg-neutral-50 px-4 py-3 text-xs font-semibold uppercase tracking-[0.08em] text-neutral-500 print:bg-white">
+                <span>Prestation</span>
                 <span className="text-right">Montant</span>
               </div>
-              <div className="grid grid-cols-[1.4fr_0.8fr] px-4 py-4 text-sm">
-                <div>
-                  <div className="flex items-center gap-2 font-semibold">
+              <div className="grid grid-cols-[1.3fr_0.7fr] px-4 py-5 text-sm">
+                <div className="min-w-0">
+                  <p className="flex items-center gap-2 font-semibold">
                     <ReceiptText size={17} />
-                    {payment.kind === "subscription" ? "Abonnement" : "Paiement manuel"}
-                  </div>
-                  <p className="mt-1 text-neutral-500">{payment.plan ?? payment.notes ?? "Encaissement"}</p>
+                    {paymentLabel}
+                  </p>
+                  <p className="mt-2 text-neutral-500">{description}</p>
                   {payment.subscription_starts_at || payment.subscription_expires_at ? (
-                    <p className="mt-1 text-xs text-neutral-500">
-                      Periode: {formatDate(payment.subscription_starts_at)} - {formatDate(payment.subscription_expires_at)}
+                    <p className="mt-2 text-xs font-semibold text-neutral-500">
+                      Periode : {formatDate(payment.subscription_starts_at)} - {formatDate(payment.subscription_expires_at)}
                     </p>
                   ) : null}
                 </div>
@@ -135,19 +181,19 @@ export default async function PaymentReceiptPage({ params }: ReceiptPageProps) {
               </div>
             </div>
 
-            <div className="mt-5 flex justify-end">
-              <div className="w-full max-w-xs rounded-md bg-paper p-4 print:border print:border-line print:bg-white">
-                <div className="flex items-center justify-between text-sm">
+            <div className="mt-6 flex justify-end">
+              <div className="w-full max-w-sm rounded-md border border-line bg-paper p-4 print:bg-white">
+                <div className="flex items-center justify-between gap-4 text-sm">
                   <span className="font-semibold">Total paye</span>
                   <span className="text-xl font-semibold">{formatCurrency(payment.amount)}</span>
                 </div>
               </div>
             </div>
-          </div>
 
-          <div className="border-t border-line pt-5 text-center text-sm text-neutral-500">
-            <p className="font-semibold text-ink">Merci pour votre paiement.</p>
-            <p className="mt-1">Recu genere par GymFlow.</p>
+            <div className="mt-8 border-t border-line pt-5 text-center text-sm text-neutral-500">
+              <p className="font-semibold text-ink">Merci pour votre paiement.</p>
+              <p className="mt-1">Recu genere par GymFlow pour {settings.name}.</p>
+            </div>
           </div>
         </article>
       </div>
