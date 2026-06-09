@@ -179,6 +179,34 @@ export default async function Home() {
   const urgentAlerts = dashboard.alerts.filter((alert) => alert.status === "expired").length;
   const warningAlerts = dashboard.alerts.length - urgentAlerts;
   const topPlanMax = Math.max(...dashboard.topPlans.map((plan) => plan.amount), 1);
+  const latestCheckin = dashboard.checkinsToday[0] ?? null;
+  const topPlan = dashboard.topPlans[0] ?? null;
+  const ownerSignals = [
+    {
+      label: "Flux comptoir",
+      value: `${dashboard.checkinsToday.length} entree${dashboard.checkinsToday.length > 1 ? "s" : ""}`,
+      detail: latestCheckin ? `Dernier passage a ${formatTime(latestCheckin.checked_in_at)}` : "Aucune entree validee",
+      icon: DoorOpen,
+    },
+    {
+      label: "Priorite du jour",
+      value: dashboard.alerts.length > 0 ? `${dashboard.alerts.length} a traiter` : "Salle stable",
+      detail: urgentAlerts > 0 ? `${urgentAlerts} renouvellement${urgentAlerts > 1 ? "s" : ""} urgent${urgentAlerts > 1 ? "s" : ""}` : "Aucune urgence critique",
+      icon: AlertTriangle,
+    },
+    {
+      label: "Formule forte",
+      value: topPlan?.name ?? "Aucune vente",
+      detail: topPlan ? `${formatCurrency(topPlan.amount)} sur 7 jours` : "Les ventes apparaitront ici",
+      icon: TrendingUp,
+    },
+  ];
+  const statToneClasses = {
+    mint: "bg-emerald-50 text-mint",
+    ink: "bg-neutral-100 text-ink",
+    amber: "bg-amber/10 text-amber",
+    danger: "bg-red-50 text-danger",
+  } as const;
 
   const stats = [
     {
@@ -264,6 +292,23 @@ export default async function Home() {
           </div>
         </section>
 
+        <section className="mt-5 grid gap-4 lg:grid-cols-3">
+          {ownerSignals.map((signal) => (
+            <article key={signal.label} className="rounded-md border border-line bg-white p-5 shadow-soft">
+              <div className="flex items-start justify-between gap-4">
+                <div>
+                  <p className="text-xs font-semibold uppercase tracking-[0.08em] text-neutral-500">{signal.label}</p>
+                  <p className="mt-3 text-xl font-semibold">{signal.value}</p>
+                  <p className="mt-2 text-sm leading-6 text-neutral-500">{signal.detail}</p>
+                </div>
+                <div className="flex size-11 shrink-0 items-center justify-center rounded-md bg-ink text-white">
+                  <signal.icon size={21} />
+                </div>
+              </div>
+            </article>
+          ))}
+        </section>
+
         <section className="mt-5 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
           {stats.map((stat) => (
             <article key={stat.label} className="rounded-md border border-line bg-white p-5 shadow-soft">
@@ -273,7 +318,7 @@ export default async function Home() {
                   <p className="mt-3 text-2xl font-semibold">{stat.value}</p>
                   <p className="mt-1 text-sm leading-5 text-neutral-500">{stat.detail}</p>
                 </div>
-                <div className="flex size-10 shrink-0 items-center justify-center rounded-md bg-paper text-ink">
+                <div className={`flex size-10 shrink-0 items-center justify-center rounded-md ${statToneClasses[stat.tone as keyof typeof statToneClasses]}`}>
                   <stat.icon size={20} />
                 </div>
               </div>
