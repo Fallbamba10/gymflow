@@ -7,6 +7,56 @@ add column if not exists whatsapp_phone text,
 add column if not exists instagram_url text,
 add column if not exists cover_image_url text;
 
+insert into storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
+values (
+  'gym-covers',
+  'gym-covers',
+  true,
+  5242880,
+  array['image/jpeg', 'image/png', 'image/webp']
+)
+on conflict (id) do update
+set
+  public = excluded.public,
+  file_size_limit = excluded.file_size_limit,
+  allowed_mime_types = excluded.allowed_mime_types;
+
+drop policy if exists "public can read gym cover images" on storage.objects;
+create policy "public can read gym cover images"
+on storage.objects for select
+using (bucket_id = 'gym-covers');
+
+drop policy if exists "gym admins can upload cover images" on storage.objects;
+create policy "gym admins can upload cover images"
+on storage.objects for insert
+to authenticated
+with check (
+  bucket_id = 'gym-covers'
+  and public.is_gym_admin((storage.foldername(name))[1]::uuid)
+);
+
+drop policy if exists "gym admins can update cover images" on storage.objects;
+create policy "gym admins can update cover images"
+on storage.objects for update
+to authenticated
+using (
+  bucket_id = 'gym-covers'
+  and public.is_gym_admin((storage.foldername(name))[1]::uuid)
+)
+with check (
+  bucket_id = 'gym-covers'
+  and public.is_gym_admin((storage.foldername(name))[1]::uuid)
+);
+
+drop policy if exists "gym admins can delete cover images" on storage.objects;
+create policy "gym admins can delete cover images"
+on storage.objects for delete
+to authenticated
+using (
+  bucket_id = 'gym-covers'
+  and public.is_gym_admin((storage.foldername(name))[1]::uuid)
+);
+
 create or replace function public.get_public_gym_page(target_gym_id uuid)
 returns jsonb
 language sql

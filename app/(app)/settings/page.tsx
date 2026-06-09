@@ -18,6 +18,7 @@ import {
   UsersRound,
 } from "lucide-react";
 import { AppShell } from "@/components/app-shell";
+import { CoverImageUpload } from "@/components/cover-image-upload";
 import { FormField } from "@/components/form-field";
 import { PageHeader } from "@/components/page-header";
 import { StatusBadge } from "@/components/status-badge";
@@ -226,16 +227,7 @@ export default async function SettingsPage({ searchParams }: SettingsPageProps) 
                   </div>
                 </FormField>
                 <FormField label="Image de couverture">
-                  <div className="relative">
-                    <ImageIcon className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-neutral-400" size={17} />
-                    <input
-                      name="cover_image_url"
-                      type="url"
-                      className="h-11 w-full rounded-md border border-line bg-paper pl-10 pr-3 outline-none focus:border-mint"
-                      defaultValue={settings.cover_image_url ?? ""}
-                      placeholder="https://..."
-                    />
-                  </div>
+                  <CoverImageUpload gymId={gym.id} inputName="cover_image_url" initialUrl={settings.cover_image_url} />
                 </FormField>
                 <div className="rounded-md border border-line bg-paper p-4">
                   <p className="text-sm font-semibold">Apercu public</p>
