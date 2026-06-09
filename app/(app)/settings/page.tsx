@@ -67,6 +67,14 @@ export default async function SettingsPage({ searchParams }: SettingsPageProps) 
   ];
   const completedItems = checklist.filter((item) => item.complete).length;
   const setupPercent = Math.round((completedItems / checklist.length) * 100);
+  const publicCover =
+    settings.cover_image_url ||
+    "https://images.unsplash.com/photo-1571902943202-507ec2618e8f?auto=format&fit=crop&w=1200&q=80";
+  const publicDescription =
+    settings.public_description ||
+    "Ajoute une description courte pour presenter l'ambiance et la promesse de ta salle.";
+  const publicHours = settings.public_hours || "Horaires a completer";
+  const publicContact = settings.whatsapp_phone || settings.phone || "Contact a completer";
 
   return (
     <AppShell>
@@ -299,6 +307,59 @@ export default async function SettingsPage({ searchParams }: SettingsPageProps) 
         </section>
 
         <aside className="space-y-6 xl:sticky xl:top-6 xl:self-start">
+          <section className="overflow-hidden rounded-md border border-line bg-white shadow-soft">
+            <div
+              className="min-h-44 bg-cover bg-center p-4 text-white"
+              style={{
+                backgroundImage: `linear-gradient(180deg, rgba(10,10,10,0.18), rgba(10,10,10,0.78)), url('${publicCover}')`,
+              }}
+            >
+              <div className="flex h-full min-h-36 flex-col justify-between">
+                <span className="inline-flex w-fit items-center gap-2 rounded-md border border-white/20 bg-white/10 px-3 py-1 text-xs font-semibold uppercase tracking-[0.08em] text-white/70 backdrop-blur">
+                  <Sparkles size={13} />
+                  Apercu vitrine
+                </span>
+                <div>
+                  <h2 className="text-2xl font-semibold leading-tight">{settings.name}</h2>
+                  <p className="mt-2 line-clamp-2 text-sm leading-6 text-white/72">{publicDescription}</p>
+                </div>
+              </div>
+            </div>
+
+            <div className="p-5">
+              <div className="grid gap-3">
+                <div className="rounded-md bg-paper p-3">
+                  <p className="inline-flex items-center gap-2 text-sm font-semibold">
+                    <Clock3 size={16} className="text-mint" />
+                    Horaires
+                  </p>
+                  <p className="mt-1 text-sm leading-6 text-neutral-600">{publicHours}</p>
+                </div>
+                <div className="rounded-md bg-paper p-3">
+                  <p className="inline-flex items-center gap-2 text-sm font-semibold">
+                    <MessageCircle size={16} className="text-mint" />
+                    Contact public
+                  </p>
+                  <p className="mt-1 text-sm leading-6 text-neutral-600">{publicContact}</p>
+                </div>
+                {settings.instagram_url ? (
+                  <div className="rounded-md bg-paper p-3">
+                    <p className="inline-flex items-center gap-2 text-sm font-semibold">
+                      <Instagram size={16} className="text-mint" />
+                      Instagram
+                    </p>
+                    <p className="mt-1 truncate text-sm text-neutral-600">{settings.instagram_url}</p>
+                  </div>
+                ) : null}
+              </div>
+
+              <Link href={`/g/${gym.id}`} className="mt-4 flex h-11 items-center justify-center gap-2 rounded-md bg-ink px-4 text-sm font-semibold text-white hover:bg-neutral-800">
+                Ouvrir la vitrine
+                <ExternalLink size={15} />
+              </Link>
+            </div>
+          </section>
+
           <section className="rounded-md border border-line bg-white p-5 shadow-soft">
             <div className="flex items-start gap-3">
               <div className="flex size-10 items-center justify-center rounded-md bg-emerald-50 text-mint">
