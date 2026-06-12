@@ -7,6 +7,9 @@ import { SubmitButton } from "@/components/submit-button";
 import { createSubscriptionType } from "@/app/(app)/subscriptions/actions";
 import { requireAdminGym } from "@/lib/supabase/guards";
 
+const inputCls =
+  "h-11 w-full rounded-xl border border-white/10 bg-white/6 px-3.5 text-sm text-white placeholder-white/25 outline-none transition focus:border-emerald-500/60 focus:bg-white/8";
+
 export default async function NewSubscriptionTypePage() {
   await requireAdminGym();
 
@@ -16,53 +19,63 @@ export default async function NewSubscriptionTypePage() {
         title="Nouvelle formule"
         eyebrow="Configuration abonnement"
         actions={
-          <Link href="/subscriptions" className="inline-flex h-11 items-center justify-center gap-2 rounded-md border border-line bg-white px-4 text-sm font-semibold shadow-sm">
-            <ArrowLeft size={18} />
+          <Link
+            href="/subscriptions"
+            className="inline-flex h-10 items-center gap-2 rounded-xl border border-white/10 bg-white/5 px-4 text-sm font-semibold text-white/60 transition hover:bg-white/8 hover:text-white"
+          >
+            <ArrowLeft size={16} />
             Retour
           </Link>
         }
       />
 
-      <div className="px-4 py-6 md:px-8">
-        <form action={createSubscriptionType} className="max-w-3xl rounded-md border border-line bg-white p-5 shadow-soft">
-          <div className="flex items-center gap-3 border-b border-line pb-5">
-            <div className="flex size-10 items-center justify-center rounded-md bg-paper text-ink">
-              <CreditCard size={20} />
+      <div className="px-6 py-6 md:px-8">
+        <form action={createSubscriptionType} className="max-w-2xl overflow-hidden rounded-2xl border border-white/8 bg-white/4">
+          <div className="flex items-center gap-3 border-b border-white/8 px-6 py-5">
+            <div className="flex size-9 items-center justify-center rounded-xl bg-emerald-500/15 text-emerald-400">
+              <CreditCard size={17} />
             </div>
             <div>
-              <h2 className="text-lg font-semibold">Details de la formule</h2>
-              <p className="mt-1 text-sm text-neutral-500">La formule sera disponible pour les prochains abonnements.</p>
+              <h2 className="font-semibold">Détails de la formule</h2>
+              <p className="mt-0.5 text-xs text-white/40">La formule sera disponible pour les prochains abonnements.</p>
             </div>
           </div>
 
-          <div className="mt-5 grid gap-5 md:grid-cols-2">
-            <FormField label="Nom">
-              <input name="name" className="h-11 w-full rounded-md border border-line bg-paper px-3 outline-none focus:border-mint" placeholder="Mensuel illimite" required />
-            </FormField>
-            <FormField label="Prix">
-              <input name="price" type="number" className="h-11 w-full rounded-md border border-line bg-paper px-3 outline-none focus:border-mint" placeholder="15000" min="0" required />
-            </FormField>
-            <FormField label="Duree en jours">
-              <input name="duration_days" type="number" className="h-11 w-full rounded-md border border-line bg-paper px-3 outline-none focus:border-mint" placeholder="30" min="1" required />
-            </FormField>
-            <FormField label="Nombre de seances">
-              <input name="sessions" type="number" className="h-11 w-full rounded-md border border-line bg-paper px-3 outline-none focus:border-mint" min="1" placeholder="Vide = illimite" />
-            </FormField>
-          </div>
+          <div className="px-6 py-6">
+            <div className="grid gap-5 md:grid-cols-2">
+              <FormField label="Nom">
+                <input name="name" className={inputCls} placeholder="Mensuel illimité" required />
+              </FormField>
+              <FormField label="Prix">
+                <input name="price" type="number" className={inputCls} placeholder="15000" min="0" required />
+              </FormField>
+              <FormField label="Durée en jours">
+                <input name="duration_days" type="number" className={inputCls} placeholder="30" min="1" required />
+              </FormField>
+              <FormField label="Nombre de séances">
+                <input name="sessions" type="number" className={inputCls} min="1" placeholder="Vide = illimité" />
+              </FormField>
+            </div>
 
-          <div className="mt-6 rounded-md border border-line bg-paper p-4">
-            <p className="text-sm font-semibold">Astuce</p>
-            <p className="mt-1 text-sm text-neutral-500">Laisse le nombre de seances vide pour une formule illimitee sur la duree choisie.</p>
-          </div>
+            <div className="mt-5 rounded-xl border border-emerald-500/20 bg-emerald-500/8 px-4 py-3 text-xs text-emerald-400">
+              Laisse le nombre de séances vide pour une formule illimitée sur la durée choisie.
+            </div>
 
-          <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:justify-end">
-            <Link href="/subscriptions" className="inline-flex h-11 items-center justify-center rounded-md border border-line bg-white px-4 text-sm font-semibold">
-              Annuler
-            </Link>
-            <SubmitButton type="submit" variant="accent" className="h-11" pendingLabel="Creation...">
-              <CheckCircle2 size={18} />
-              Creer la formule
-            </SubmitButton>
+            <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:justify-end">
+              <Link
+                href="/subscriptions"
+                className="inline-flex h-11 items-center justify-center rounded-xl border border-white/10 bg-white/5 px-5 text-sm font-semibold text-white/60 transition hover:bg-white/8 hover:text-white"
+              >
+                Annuler
+              </Link>
+              <SubmitButton
+                className="inline-flex h-11 items-center justify-center gap-2 rounded-xl bg-emerald-500 px-5 text-sm font-semibold text-white hover:bg-emerald-400"
+                pendingLabel="Création…"
+              >
+                <CheckCircle2 size={15} />
+                Créer la formule
+              </SubmitButton>
+            </div>
           </div>
         </form>
       </div>
