@@ -1499,3 +1499,91 @@ export async function getAnalyticsData(gymId: string): Promise<AnalyticsData> {
     newMembersByWeek,
   };
 }
+
+// ─── Notifications in-app ──────────────────────────────────────────────────
+
+export type AppNotification = {
+  id: string;
+  type: "expiry_today" | "expiry_soon" | "new_member" | "payment_pending";
+  title: string;
+  body: string;
+  href: string;
+  createdAt: string;
+};
+
+export async function getNotifications(gymId: string): Promise<AppNotification[]> {
+  const supabase = await createClient();
+  const notifications: AppNotification[] = [];
+
+  const today = new Date().toISOString().slice(0, 10);
+  const in3Days = new Date(Date.now() + 3 * 86400000).toISOString().slice(0, 10);
+  const since24h = new Date(Date.now() - 86400000).toISOString();
+
+  // Abonnements qui expirent aujourd'hui
+  const { data: expiringToday } = await supabase
+    .from("subscriptions")
+    .select("id, members(id, full_name)")
+    .eq("gym_id", gymId)
+    .eq("status", "active")
+    .eq("expires_at", today);
+
+  for (const sub of expiringToday ?? []) {
+    const member = Array.isArray(sub.members) ? sub.members[0] : sub.members;
+    if (!member) continue;
+    notifications.push({
+      id: `expiry_today_${sub.id}`,
+      type: "expiry_today",
+      title: "Abonnement expire aujourd'hui",
+      body: (member as { full_name: string | null }).full_name ?? "Membre",
+      href: `/members/${(member as { id: string }).id}`,
+      createdAt: new Date().toISOString(),
+    });
+  }
+
+  // Abonnements qui expirent dans 1-3 jours
+  const { data: expiringSoon } = await supabase
+    .from("subscriptions")
+    .select("id, members(id, full_name)")
+    .eq("gym_id", gymId)
+    .eq("status", "active")
+    .gt("expires_at", today)
+    .lte("expires_at", in3Days);
+
+  for (const sub of expiringSoon ?? []) {
+    const member = Array.isArray(sub.members) ? sub.members[0] : sub.members;
+    if (!member) continue;
+    notifications.push({
+      id: `expiry_soon_${sub.id}`,
+      type: "expiry_soon",
+      title: "Abonnement expire bientôt",
+      body: (member as { full_name: string | null }).full_name ?? "Membre",
+      href: `/members/${(member as { id: string }).id}`,
+      createdAt: new Date().toISOString(),
+    });
+  }
+
+  // Nouveaux membres (24 dernières heures)
+  const { data: newMembers } = await supabase
+    .from("members")
+    .select("id, full_name, created_at")
+    .eq("gym_id", gymId)
+    .gte("created_at", since24h)
+    .order("created_at", { ascending: false });
+
+  for (const m of newMembers ?? []) {
+    notifications.push({
+      id: `new_member_${m.id}`,
+      type: "new_member",
+      title: "Nouveau membre",
+      body: (m.full_name as string | null) ?? "Sans nom",
+      href: `/members/${m.id}`,
+      createdAt: m.created_at as string,
+    });
+  }
+
+  // Trier : expirations today en premier, puis le reste par date
+  return notifications.sort((a, b) => {
+    const order = { expiry_today: 0, expiry_soon: 1, new_member: 2, payment_pending: 3 };
+    return order[a.type] - order[b.type];
+  });
+}

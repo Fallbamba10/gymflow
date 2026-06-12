@@ -7,6 +7,7 @@ import { Activity, Banknote, CreditCard, LayoutDashboard, LogOut, Menu, Settings
 import { signOut } from "@/app/auth/actions";
 import { BrandMark } from "@/components/brand-mark";
 import { ToastProvider } from "@/components/toast";
+import { NotificationsBell } from "@/components/notifications-bell";
 import { createClient } from "@/lib/supabase/client";
 import { cn } from "@/lib/utils";
 
@@ -85,14 +86,17 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               <p className="mt-1 truncate text-sm text-neutral-500">{gymName}</p>
             </div>
           </Link>
-          <button
-            className="flex size-10 shrink-0 items-center justify-center rounded-md border border-line bg-white text-ink"
-            onClick={() => setMobileMenuOpen((current) => !current)}
-            aria-expanded={mobileMenuOpen}
-            aria-label={mobileMenuOpen ? "Fermer le menu" : "Ouvrir le menu"}
-          >
-            {mobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
-          </button>
+          <div className="flex items-center gap-2">
+            {role === "admin" && <NotificationsBell />}
+            <button
+              className="flex size-10 shrink-0 items-center justify-center rounded-md border border-line bg-white text-ink"
+              onClick={() => setMobileMenuOpen((current) => !current)}
+              aria-expanded={mobileMenuOpen}
+              aria-label={mobileMenuOpen ? "Fermer le menu" : "Ouvrir le menu"}
+            >
+              {mobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
+            </button>
+          </div>
         </div>
       </header>
 
@@ -159,6 +163,12 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         </nav>
 
         <div className="absolute bottom-5 left-5 right-5 space-y-2">
+          {role === "admin" && (
+            <div className="flex items-center justify-between rounded-md border border-line bg-paper px-3 py-2">
+              <span className="text-xs font-semibold text-neutral-500">Alertes</span>
+              <NotificationsBell />
+            </div>
+          )}
           <form action={signOut}>
             <button className="flex h-10 w-full items-center justify-center gap-2 rounded-md border border-line bg-white px-3 text-sm font-semibold text-neutral-600 hover:bg-neutral-50">
               <LogOut size={16} />
