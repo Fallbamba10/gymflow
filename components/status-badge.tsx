@@ -7,16 +7,15 @@ type StatusBadgeProps = {
 
 export function StatusBadge({ tone, children }: StatusBadgeProps) {
   const tones = {
-    active: "bg-emerald-50 text-mint",
-    warning: "bg-amber-50 text-amber",
-    expired: "bg-red-50 text-danger",
-    neutral: "bg-neutral-100 text-neutral-600",
+    active: "bg-emerald-500/15 text-emerald-400",
+    warning: "bg-amber-500/15 text-amber-400",
+    expired: "bg-red-500/15 text-red-400",
+    neutral: "bg-white/8 text-white/40",
   };
 
   return (
-    <span className={cn("rounded-md px-2.5 py-1 text-xs font-semibold", tones[tone])}>
+    <span className={cn("rounded-lg px-2.5 py-1 text-xs font-semibold", tones[tone])}>
       {children}
     </span>
   );
 }
-
