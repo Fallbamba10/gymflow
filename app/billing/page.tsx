@@ -136,7 +136,7 @@ export default async function BillingPage({ searchParams }: BillingPageProps) {
                       {gym.billing_status === "incomplete" && "Paiement incomplet"}
                     </h1>
                     <p className="mt-2 text-sm leading-6 text-white/62">
-                      {isTrialing && `Ton essai gratuit se termine dans ${trialDays} jour${trialDays > 1 ? "s" : ""}. Aucun accès coupé sans confirmation.`}
+                      {isTrialing && `Profite de ${trialDays} jour${trialDays > 1 ? "s" : ""} d'essai gratuit. Souscris avant la fin pour conserver ton accès.`}
                       {gym.billing_status === "active" && `Prochain renouvellement le ${formatDate(gym.billing_period_end)}.`}
                       {isCanceled && "Ton abonnement est résilié. Souscris à nouveau pour retrouver l'accès."}
                       {isPastDue && "Le dernier paiement a échoué. Mets à jour ton moyen de paiement."}
@@ -177,8 +177,8 @@ export default async function BillingPage({ searchParams }: BillingPageProps) {
 
               {/* Actions */}
               <div className="border-t border-white/10 p-5">
-                {!isActive || isCanceled || isPastDue ? (
-                  <CheckoutButton label={isCanceled || isPastDue ? "Réactiver l'abonnement" : "Souscrire maintenant"} />
+                {isTrialing || isCanceled || isPastDue || !isActive ? (
+                  <CheckoutButton label={isCanceled || isPastDue ? "Réactiver l'abonnement" : "Souscrire — 5 900 FCFA/mois"} />
                 ) : (
                   <div className="flex flex-wrap gap-3">
                     <PortalButton />
@@ -219,7 +219,7 @@ export default async function BillingPage({ searchParams }: BillingPageProps) {
 
               <div className="mt-4">
                 <p className="text-4xl font-semibold">
-                  29<span className="text-lg font-medium text-neutral-500"> €/mois</span>
+                  5 900<span className="text-lg font-medium text-neutral-500"> FCFA/mois</span>
                 </p>
                 <p className="mt-1 text-sm text-neutral-500">Par salle, sans engagement</p>
               </div>
@@ -239,9 +239,9 @@ export default async function BillingPage({ searchParams }: BillingPageProps) {
                 ))}
               </div>
 
-              {(!isActive || isCanceled) && (
+              {(isTrialing || !isActive || isCanceled) && (
                 <div className="mt-5">
-                  <CheckoutButton label="Commencer l'essai gratuit" fullWidth />
+                  <CheckoutButton label="Souscrire maintenant" fullWidth />
                 </div>
               )}
               {isPastDue && (
