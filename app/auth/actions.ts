@@ -3,6 +3,7 @@
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
+import { sendWelcomeEmail } from "@/lib/email";
 
 function getString(formData: FormData, key: string) {
   const value = formData.get(key);
@@ -70,16 +71,25 @@ export async function createGym(formData: FormData) {
     redirect("/login");
   }
 
+  const trialEndsAt = new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString();
+
   const { error } = await supabase.from("gyms").insert({
     name,
     phone,
     address,
     currency,
     owner_id: user.id,
+    billing_status: "trialing",
+    trial_ends_at: trialEndsAt,
   });
 
   if (error) {
     redirect(`/onboarding?error=${encodeURIComponent(error.message)}`);
+  }
+
+  // Email de bienvenue — fire and forget, sans bloquer le redirect
+  if (user.email) {
+    sendWelcomeEmail({ to: user.email, gymName: name, trialEndsAt }).catch(() => null);
   }
 
   revalidatePath("/", "layout");
