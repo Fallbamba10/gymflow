@@ -1,6 +1,6 @@
 /* eslint-disable @next/next/no-img-element */
 import Link from "next/link";
-import { AlertTriangle, CheckCircle2, Plus, Search, Users } from "lucide-react";
+import { AlertTriangle, CheckCircle2, Download, Plus, Search, Upload, UserRound, Users } from "lucide-react";
 import { AppShell } from "@/components/app-shell";
 import { PageHeader } from "@/components/page-header";
 import { StatusBadge } from "@/components/status-badge";
@@ -8,21 +8,43 @@ import { requireAdminGym } from "@/lib/supabase/guards";
 import { getMembers } from "@/lib/supabase/queries";
 
 function getMemberStatus(member: Awaited<ReturnType<typeof getMembers>>[number]) {
-  if (member.archived_at) return { tone: "neutral" as const, label: "Archivé" };
-  const sub = member.active_subscription;
-  if (!sub) return { tone: "expired" as const, label: "Sans abonnement" };
-  if (sub.status !== "active") return { tone: "expired" as const, label: "Expiré" };
-  if (sub.sessions_left !== null && sub.sessions_left <= 2)
-    return { tone: "warning" as const, label: `${sub.sessions_left} séance${sub.sessions_left > 1 ? "s" : ""}` };
-  const daysLeft = Math.ceil((new Date(sub.expires_at).getTime() - Date.now()) / 86400000);
-  if (daysLeft <= 2) return { tone: "warning" as const, label: `Expire J-${Math.max(daysLeft, 0)}` };
+  if (member.archived_at) {
+    return { tone: "neutral" as const, label: "Archive" };
+  }
+
+  const subscription = member.active_subscription;
+  if (!subscription) {
+    return { tone: "expired" as const, label: "Aucun abonnement" };
+  }
+
+  if (subscription.status !== "active") {
+    return { tone: "expired" as const, label: "Expire" };
+  }
+
+  if (subscription.sessions_left !== null && subscription.sessions_left <= 2) {
+    return {
+      tone: "warning" as const,
+      label: `${subscription.sessions_left} seance${subscription.sessions_left > 1 ? "s" : ""}`,
+    };
+  }
+
+  const expiresAt = new Date(subscription.expires_at);
+  const daysLeft = Math.ceil((expiresAt.getTime() - Date.now()) / 86400000);
+  if (daysLeft <= 2) {
+    return { tone: "warning" as const, label: `Expire J-${Math.max(daysLeft, 0)}` };
+  }
+
   return { tone: "active" as const, label: "Actif" };
 }
 
 const PAGE_SIZE = 50;
 
 type MembersPageProps = {
-  searchParams: Promise<{ q?: string; status?: string; page?: string }>;
+  searchParams: Promise<{
+    q?: string;
+    status?: string;
+    page?: string;
+  }>;
 };
 
 export default async function MembersPage({ searchParams }: MembersPageProps) {
@@ -32,22 +54,22 @@ export default async function MembersPage({ searchParams }: MembersPageProps) {
   const currentPage = Math.max(1, parseInt(params.page ?? "1", 10));
   const gym = await requireAdminGym();
   const allMembers = await getMembers(gym.id, { includeArchived: true });
-  const visibleActive = allMembers.filter((m) => !m.archived_at);
-
-  const members = allMembers.filter((m) => {
-    const status = getMemberStatus(m);
-    const matchQ =
+  const visibleActiveMembers = allMembers.filter((member) => !member.archived_at);
+  const members = allMembers.filter((member) => {
+    const status = getMemberStatus(member);
+    const matchesQuery =
       !query ||
-      m.full_name.toLowerCase().includes(query) ||
-      (m.phone ?? "").toLowerCase().includes(query) ||
-      String(m.member_number).padStart(6, "0").includes(query);
-    const matchS =
-      (selectedStatus === "all" && !m.archived_at) ||
+      member.full_name.toLowerCase().includes(query) ||
+      (member.phone ?? "").toLowerCase().includes(query) ||
+      String(member.member_number).padStart(6, "0").includes(query);
+    const matchesStatus =
+      (selectedStatus === "all" && !member.archived_at) ||
       (selectedStatus === "active" && status.tone === "active") ||
       (selectedStatus === "renewal" && (status.tone === "warning" || status.tone === "expired")) ||
       (selectedStatus === "expired" && status.tone === "expired") ||
-      (selectedStatus === "archived" && Boolean(m.archived_at));
-    return matchQ && matchS;
+      (selectedStatus === "archived" && Boolean(member.archived_at));
+
+    return matchesQuery && matchesStatus;
   });
 
   const totalFiltered = members.length;
@@ -64,184 +86,192 @@ export default async function MembersPage({ searchParams }: MembersPageProps) {
     return `/members${s ? `?${s}` : ""}`;
   }
 
-  const renewalCount = allMembers.filter((m) => {
-    const s = getMemberStatus(m);
-    return s.tone === "warning" || s.tone === "expired";
+  const renewalCount = allMembers.filter((member) => {
+    const status = getMemberStatus(member);
+    return status.tone === "warning" || status.tone === "expired";
   }).length;
-  const activeCount = visibleActive.filter((m) => getMemberStatus(m).tone === "active").length;
-  const expiredCount = visibleActive.filter((m) => getMemberStatus(m).tone === "expired").length;
-  const archivedCount = allMembers.filter((m) => m.archived_at).length;
-
+  const activeCount = visibleActiveMembers.filter((member) => getMemberStatus(member).tone === "active").length;
+  const expiredCount = visibleActiveMembers.filter((member) => getMemberStatus(member).tone === "expired").length;
+  const archivedCount = allMembers.filter((member) => member.archived_at).length;
   const filters = [
-    { label: "Tous", value: "all", count: visibleActive.length },
+    { label: "Tous", value: "all", count: visibleActiveMembers.length },
     { label: "Actifs", value: "active", count: activeCount },
-    { label: "À renouveler", value: "renewal", count: renewalCount },
-    { label: "Expirés", value: "expired", count: expiredCount },
-    { label: "Archivés", value: "archived", count: archivedCount },
+    { label: "A renouveler", value: "renewal", count: renewalCount },
+    { label: "Expires", value: "expired", count: expiredCount },
+    { label: "Archives", value: "archived", count: archivedCount },
+  ];
+  const summary = [
+    { label: "Membres visibles", value: visibleActiveMembers.length, detail: "hors archives", icon: Users },
+    { label: "Actifs", value: activeCount, detail: "abonnement valide", icon: CheckCircle2 },
+    { label: "A traiter", value: renewalCount, detail: "renouvellement", icon: AlertTriangle },
   ];
 
   return (
     <AppShell>
       <PageHeader
         title="Membres"
-        eyebrow={`${visibleActive.length} membres enregistrés`}
+        eyebrow={`${members.length} membres enregistres`}
         actions={
-          <Link
-            href="/members/new"
-            className="inline-flex h-10 items-center gap-2 rounded-xl bg-emerald-500 px-4 text-sm font-semibold text-white transition hover:bg-emerald-400"
-          >
-            <Plus size={16} />
-            Nouveau membre
-          </Link>
+          <>
+            <Link href="/members/import" className="inline-flex h-11 items-center justify-center gap-2 rounded-md border border-line bg-white px-4 text-sm font-semibold shadow-sm transition hover:bg-neutral-50">
+              <Upload size={18} />
+              Import CSV
+            </Link>
+            <Link href="/members/export" className="inline-flex h-11 items-center justify-center gap-2 rounded-md border border-line bg-white px-4 text-sm font-semibold shadow-sm transition hover:bg-neutral-50">
+              <Download size={18} />
+              Export CSV
+            </Link>
+            <Link href="/members/new" className="inline-flex h-11 items-center justify-center gap-2 rounded-md bg-mint px-4 text-sm font-semibold text-white shadow-sm transition hover:bg-emerald-700">
+              <Plus size={18} />
+              Nouveau membre
+            </Link>
+          </>
         }
       />
 
-      <div className="px-6 py-6 md:px-8">
+      <div className="px-4 py-6 md:px-8">
 
-        {/* KPIs */}
-        <div className="grid grid-cols-3 gap-3">
-          {[
-            { label: "Membres visibles", value: visibleActive.length, icon: Users, accent: "text-white/60" },
-            { label: "Actifs", value: activeCount, icon: CheckCircle2, accent: "text-emerald-400" },
-            { label: "À traiter", value: renewalCount, icon: AlertTriangle, accent: renewalCount > 0 ? "text-amber-400" : "text-white/40" },
-          ].map((item) => (
-            <div key={item.label} className="rounded-2xl border border-white/8 bg-white/4 px-5 py-4">
-              <div className="flex items-center justify-between gap-3">
-                <p className="text-xs font-semibold uppercase tracking-[0.1em] text-white/40">{item.label}</p>
-                <item.icon size={15} className={item.accent} />
+
+        <section className="rounded-md border border-neutral-900 bg-ink p-5 text-white shadow-soft md:p-6">
+          <div className="grid gap-6 xl:grid-cols-[1fr_0.9fr] xl:items-end">
+            <div>
+              <div className="inline-flex items-center gap-2 rounded-md border border-white/15 bg-white/10 px-3 py-1 text-xs font-semibold uppercase tracking-[0.08em] text-white/70">
+                <UserRound size={14} />
+                Portefeuille membres
               </div>
-              <p className="mt-2 text-2xl font-semibold">{item.value}</p>
+              <h2 className="mt-4 text-2xl font-semibold md:text-3xl">Repere vite les membres a traiter</h2>
+              <p className="mt-2 max-w-2xl text-sm leading-6 text-white/65">
+                Une vue simple pour chercher, verifier le statut et ouvrir une fiche sans perdre le fil.
+              </p>
             </div>
-          ))}
-        </div>
 
-        {/* Recherche */}
-        <form className="mt-4 flex gap-2" action="/members">
-          <div className="relative flex-1">
-            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 text-white/25" size={16} />
-            <input
-              className="h-11 w-full rounded-xl border border-white/10 bg-white/6 pl-10 pr-4 text-sm text-white placeholder-white/25 outline-none transition focus:border-emerald-500/60 focus:bg-white/8"
-              name="q"
-              placeholder="Rechercher par nom, téléphone ou numéro…"
-              defaultValue={params.q ?? ""}
-            />
+            <div className="grid gap-4 sm:grid-cols-3">
+              {summary.map((item) => (
+                <div key={item.label} className="border-l border-white/15 pl-4">
+                  <p className="inline-flex items-center gap-2 text-xs font-medium uppercase tracking-[0.08em] text-white/45">
+                    <item.icon size={13} />
+                    {item.label}
+                  </p>
+                  <p className="mt-2 text-xl font-semibold">{item.value}</p>
+                  <p className="mt-1 text-xs text-white/50">{item.detail}</p>
+                </div>
+              ))}
+            </div>
           </div>
-          <button className="inline-flex h-11 items-center gap-2 rounded-xl bg-white/8 px-4 text-sm font-semibold text-white/70 transition hover:bg-white/12 hover:text-white">
-            <Search size={15} />
-            Chercher
-          </button>
-          <input type="hidden" name="status" value={selectedStatus} />
-        </form>
+        </section>
 
-        {/* Filtres */}
-        <div className="mt-3 flex flex-wrap gap-2">
-          {filters.map((f) => (
+        <section className="mt-5 rounded-md border border-line bg-white p-4 shadow-soft">
+          <form className="grid gap-3 xl:grid-cols-[1fr_auto]" action="/members">
+            <div className="relative">
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-neutral-400" size={19} />
+              <input
+                className="h-12 w-full rounded-md border border-line bg-paper pl-12 pr-3 text-sm outline-none focus:border-mint"
+                name="q"
+                placeholder="Rechercher par nom, telephone ou numero"
+                defaultValue={params.q ?? ""}
+              />
+            </div>
+            <button className="inline-flex h-12 items-center justify-center gap-2 rounded-md bg-ink px-5 text-sm font-semibold text-white transition hover:bg-neutral-800">
+              <Search size={18} />
+              Rechercher
+            </button>
+            <input type="hidden" name="status" value={selectedStatus} />
+          </form>
+        </section>
+
+        <div className="my-4 flex flex-wrap items-center gap-2">
+          {filters.map((filter) => (
             <Link
-              key={f.value}
-              href={`/members?status=${f.value}${params.q ? `&q=${encodeURIComponent(params.q)}` : ""}`}
-              className={`inline-flex h-9 items-center gap-2 rounded-xl px-3 text-sm font-semibold transition ${
-                selectedStatus === f.value
-                  ? "bg-emerald-500 text-white"
-                  : "border border-white/8 bg-white/4 text-white/50 hover:bg-white/8 hover:text-white"
+              key={filter.value}
+              href={`/members?status=${filter.value}${params.q ? `&q=${encodeURIComponent(params.q)}` : ""}`}
+              className={`inline-flex h-10 items-center gap-2 rounded-md px-3 text-sm font-semibold shadow-sm transition ${
+                selectedStatus === filter.value ? "bg-ink text-white" : "border border-line bg-white text-neutral-600 hover:bg-neutral-50"
               }`}
             >
-              {f.label}
-              <span className={`rounded-md px-1.5 py-0.5 text-xs ${selectedStatus === f.value ? "bg-white/20 text-white" : "bg-white/8 text-white/40"}`}>
-                {f.count}
+              {filter.label}
+              <span className={`rounded-md px-2 py-0.5 text-xs ${selectedStatus === filter.value ? "bg-white/15 text-white" : "bg-paper text-neutral-500"}`}>
+                {filter.count}
               </span>
             </Link>
           ))}
         </div>
 
-        {/* Tableau */}
-        <div className="mt-4 overflow-hidden rounded-2xl border border-white/8">
-          <div className="overflow-x-auto">
-            <div className="min-w-[860px]">
-              <div className="grid grid-cols-[0.6fr_1.6fr_1fr_1fr_0.7fr_0.9fr_0.8fr] border-b border-white/8 bg-white/3 px-5 py-3 text-xs font-semibold uppercase tracking-[0.08em] text-white/35">
-                <span>N°</span>
-                <span>Membre</span>
-                <span>Téléphone</span>
-                <span>Formule</span>
-                <span>Séances</span>
-                <span>Expiration</span>
-                <span>Statut</span>
-              </div>
-
-              {paginatedMembers.length > 0 ? (
-                paginatedMembers.map((member) => {
-                  const status = getMemberStatus(member);
-                  const sub = member.active_subscription;
-                  return (
-                    <Link
-                      key={member.id}
-                      href={`/members/${member.id}`}
-                      className="grid grid-cols-[0.6fr_1.6fr_1fr_1fr_0.7fr_0.9fr_0.8fr] items-center border-b border-white/6 px-5 py-3.5 text-sm transition last:border-b-0 hover:bg-white/4"
-                    >
-                      <span className="font-mono text-xs text-white/35">
-                        {String(member.member_number).padStart(6, "0")}
-                      </span>
-                      <span className="flex min-w-0 items-center gap-3">
-                        <span className="flex size-8 shrink-0 items-center justify-center overflow-hidden rounded-full border border-white/10 bg-white/8 text-xs font-bold text-white/60">
-                          {member.photo_url ? (
-                            <img src={member.photo_url} alt={member.full_name} className="size-full object-cover" />
-                          ) : (
-                            member.full_name.split(" ").map((w) => w[0]).slice(0, 2).join("").toUpperCase()
-                          )}
-                        </span>
-                        <span className="min-w-0">
-                          <span className="block truncate font-semibold">{member.full_name}</span>
-                          <span className="mt-0.5 block text-xs text-white/35">
-                            Ajouté le {new Intl.DateTimeFormat("fr-FR").format(new Date(member.created_at))}
-                          </span>
-                        </span>
-                      </span>
-                      <span className="text-white/55">{member.phone ?? "—"}</span>
-                      <span className="truncate text-white/70">{sub?.subscription_types?.name ?? "—"}</span>
-                      <span className="text-white/55">{sub?.sessions_left ?? "Illimité"}</span>
-                      <span className="text-white/55">
-                        {sub?.expires_at ? new Intl.DateTimeFormat("fr-FR").format(new Date(sub.expires_at)) : "—"}
-                      </span>
-                      <StatusBadge tone={status.tone}>{status.label}</StatusBadge>
-                    </Link>
-                  );
-                })
-              ) : (
-                <div className="px-5 py-10 text-center">
-                  <p className="font-semibold text-white/60">Aucun membre trouvé</p>
-                  <p className="mt-1 text-sm text-white/30">Ajuste la recherche ou ajoute un nouveau membre.</p>
-                  <Link
-                    href="/members/new"
-                    className="mt-5 inline-flex h-10 items-center gap-2 rounded-xl bg-emerald-500 px-4 text-sm font-semibold text-white"
-                  >
-                    <Plus size={15} />
-                    Ajouter un membre
-                  </Link>
-                </div>
-              )}
+        <div className="overflow-x-auto rounded-md border border-line bg-white shadow-soft">
+          <div className="min-w-[920px]">
+            <div className="grid grid-cols-[0.75fr_1.55fr_1fr_1fr_0.8fr_0.9fr_0.9fr] border-b border-line bg-neutral-50 px-4 py-3 text-xs font-semibold uppercase tracking-[0.04em] text-neutral-500">
+              <span>Numero</span>
+              <span>Membre</span>
+              <span>Telephone</span>
+              <span>Formule</span>
+              <span>Seances</span>
+              <span>Expiration</span>
+              <span>Statut</span>
             </div>
+            {paginatedMembers.length > 0 ? (
+              paginatedMembers.map((member) => {
+                const status = getMemberStatus(member);
+                const subscription = member.active_subscription;
+                return (
+                  <Link
+                    key={member.id}
+                    href={`/members/${member.id}`}
+                    className="grid grid-cols-[0.75fr_1.55fr_1fr_1fr_0.8fr_0.9fr_0.9fr] items-center border-b border-line px-4 py-4 text-sm transition last:border-b-0 hover:bg-neutral-50"
+                  >
+                    <span className="font-mono text-neutral-500">{String(member.member_number).padStart(6, "0")}</span>
+                    <span className="flex min-w-0 items-center gap-3">
+                      <span className="flex size-8 shrink-0 items-center justify-center overflow-hidden rounded-full border border-line bg-paper">
+                        {member.photo_url ? (
+                          <img src={member.photo_url} alt={member.full_name} className="size-full object-cover" />
+                        ) : (
+                          <span className="text-xs font-semibold text-neutral-400">
+                            {member.full_name.split(" ").map((w) => w[0]).slice(0, 2).join("").toUpperCase()}
+                          </span>
+                        )}
+                      </span>
+                      <span className="min-w-0">
+                        <span className="block truncate font-semibold">{member.full_name}</span>
+                        <span className="mt-0.5 block text-xs text-neutral-500">Ajoute le {new Intl.DateTimeFormat("fr-FR").format(new Date(member.created_at))}</span>
+                      </span>
+                    </span>
+                    <span className="text-neutral-600">{member.phone ?? "-"}</span>
+                    <span className="truncate">{subscription?.subscription_types?.name ?? "-"}</span>
+                    <span>{subscription?.sessions_left ?? "Illimite"}</span>
+                    <span>{subscription?.expires_at ? new Intl.DateTimeFormat("fr-FR").format(new Date(subscription.expires_at)) : "-"}</span>
+                    <StatusBadge tone={status.tone}>{status.label}</StatusBadge>
+                  </Link>
+                );
+              })
+            ) : (
+              <div className="p-8 text-center">
+                <p className="font-semibold">Aucun membre trouve</p>
+                <p className="mt-2 text-sm text-neutral-500">Ajuste la recherche ou ajoute un nouveau membre.</p>
+                <Link href="/members/new" className="mt-5 inline-flex h-10 items-center justify-center rounded-md bg-mint px-4 text-sm font-semibold text-white">
+                  Ajouter un membre
+                </Link>
+              </div>
+            )}
           </div>
         </div>
 
-        {/* Pagination */}
         {totalPages > 1 && (
-          <div className="mt-4 flex items-center justify-between gap-4 text-sm">
-            <p className="text-white/35">
-              {(safePage - 1) * PAGE_SIZE + 1}–{Math.min(safePage * PAGE_SIZE, totalFiltered)} sur {totalFiltered}
+          <div className="mt-5 flex items-center justify-between gap-4 text-sm">
+            <p className="text-neutral-500">
+              {(safePage - 1) * PAGE_SIZE + 1}–{Math.min(safePage * PAGE_SIZE, totalFiltered)} sur {totalFiltered} membres
             </p>
             <div className="flex items-center gap-2">
-              {safePage > 1 && (
-                <Link href={pageHref(safePage - 1)} className="inline-flex h-9 items-center rounded-xl border border-white/10 bg-white/5 px-4 text-sm font-semibold text-white/60 transition hover:bg-white/8 hover:text-white">
+              {safePage > 1 ? (
+                <Link href={pageHref(safePage - 1)} className="inline-flex h-10 items-center justify-center rounded-md border border-line bg-white px-4 font-semibold transition hover:bg-neutral-50">
                   Précédent
                 </Link>
-              )}
-              <span className="inline-flex h-9 items-center rounded-xl bg-emerald-500 px-4 text-sm font-semibold text-white">
+              ) : null}
+              <span className="inline-flex h-10 items-center justify-center rounded-md bg-ink px-4 font-semibold text-white">
                 {safePage} / {totalPages}
               </span>
-              {safePage < totalPages && (
-                <Link href={pageHref(safePage + 1)} className="inline-flex h-9 items-center rounded-xl border border-white/10 bg-white/5 px-4 text-sm font-semibold text-white/60 transition hover:bg-white/8 hover:text-white">
+              {safePage < totalPages ? (
+                <Link href={pageHref(safePage + 1)} className="inline-flex h-10 items-center justify-center rounded-md border border-line bg-white px-4 font-semibold transition hover:bg-neutral-50">
                   Suivant
                 </Link>
-              )}
+              ) : null}
             </div>
           </div>
         )}

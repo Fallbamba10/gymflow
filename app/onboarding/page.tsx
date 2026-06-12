@@ -1,36 +1,21 @@
 import Link from "next/link";
-import { ArrowRight, Building2, CheckCircle2, CreditCard, Users, Zap } from "lucide-react";
+import { ArrowRight, Building2, CheckCircle2, CreditCard, Sparkles, Users } from "lucide-react";
+import { BrandMark } from "@/components/brand-mark";
 import { EnvWarning } from "@/components/env-warning";
 import { SubmitButton } from "@/components/submit-button";
 import { createGym } from "@/app/auth/actions";
 import { hasSupabaseEnv } from "@/lib/supabase/env";
 
 type OnboardingPageProps = {
-  searchParams: Promise<{ error?: string }>;
+  searchParams: Promise<{
+    error?: string;
+  }>;
 };
 
 const steps = [
-  {
-    number: 1,
-    label: "Ta salle",
-    desc: "Nom, adresse, téléphone",
-    icon: Building2,
-    active: true,
-  },
-  {
-    number: 2,
-    label: "Formules",
-    desc: "Mensuel, trimestriel...",
-    icon: CreditCard,
-    active: false,
-  },
-  {
-    number: 3,
-    label: "Équipe",
-    desc: "Ajouter des opérateurs",
-    icon: Users,
-    active: false,
-  },
+  { number: 1, label: "Votre salle", icon: Building2, active: true },
+  { number: 2, label: "Formules", icon: CreditCard, active: false },
+  { number: 3, label: "Equipe", icon: Users, active: false },
 ];
 
 export default async function OnboardingPage({ searchParams }: OnboardingPageProps) {
@@ -38,199 +23,171 @@ export default async function OnboardingPage({ searchParams }: OnboardingPagePro
   const enabled = hasSupabaseEnv();
 
   return (
-    <main className="min-h-screen bg-[#080808] text-white">
-      {/* Fond photo */}
-      <div
-        className="fixed inset-0 bg-cover bg-center"
-        style={{
-          backgroundImage:
-            "url('https://images.unsplash.com/photo-1534258936925-c58bed479fcb?auto=format&fit=crop&w=2400&q=88')",
-          opacity: 0.16,
-        }}
-      />
-      {/* Dégradé */}
-      <div className="fixed inset-0 bg-gradient-to-br from-[#080808]/95 via-[#080808]/75 to-[#080808]/95" />
-      {/* Glow émeraude */}
-      <div className="pointer-events-none fixed left-[25%] top-[40%] h-[500px] w-[500px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-emerald-500/10 blur-[130px]" />
-
-      <div className="relative z-10 flex min-h-screen flex-col">
-        {/* Nav */}
-        <header className="flex items-center justify-between px-6 py-5 md:px-12">
-          <Link href="/site" className="flex items-center gap-2.5">
-            <div className="flex size-8 items-center justify-center rounded-lg bg-white">
-              <Zap size={15} className="text-[#080808]" fill="currentColor" />
+    <main
+      className="relative min-h-screen overflow-hidden bg-ink px-4 py-8 text-white"
+      style={{
+        backgroundImage:
+          "linear-gradient(115deg, rgba(10,10,10,0.96) 0%, rgba(10,10,10,0.84) 46%, rgba(10,10,10,0.52) 100%), url('https://images.unsplash.com/photo-1534258936925-c58bed479fcb?auto=format&fit=crop&w=2200&q=85')",
+        backgroundPosition: "center",
+        backgroundSize: "cover",
+      }}
+    >
+      <div className="mx-auto flex min-h-[calc(100vh-4rem)] w-full max-w-6xl flex-col">
+        {/* Header */}
+        <header className="flex items-center justify-between py-2">
+          <Link href="/site" className="flex items-center gap-3">
+            <BrandMark inverse />
+            <div>
+              <p className="text-base font-semibold leading-none">GymFlow</p>
+              <p className="mt-0.5 text-xs text-white/55">Gestion de salle premium</p>
             </div>
-            <span className="text-sm font-semibold tracking-tight">GymFlow</span>
           </Link>
-          <Link
-            href="/login"
-            className="text-xs font-semibold text-white/35 transition hover:text-white/65"
-          >
-            Déjà un compte ?
+          <Link href="/login" className="text-sm font-semibold text-white/60 transition hover:text-white">
+            Deja un compte ?
           </Link>
         </header>
 
-        {/* Corps */}
-        <div className="flex flex-1 items-center px-6 py-10 md:px-12">
-          <div className="mx-auto grid w-full max-w-5xl gap-16 lg:grid-cols-[1fr_440px] lg:items-center">
+        <div className="flex flex-1 items-center">
+          <section className="grid w-full gap-8 lg:grid-cols-[1fr_460px] lg:items-center">
 
-            {/* Gauche */}
-            <div className="hidden lg:block">
-              <div className="mb-7 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-1.5 text-xs font-semibold uppercase tracking-[0.12em] text-white/40 backdrop-blur">
-                <span className="size-1.5 rounded-full bg-emerald-400" />
+            {/* Left — context */}
+            <div className="hidden max-w-2xl lg:block">
+              <p className="inline-flex items-center gap-2 rounded-md border border-white/15 bg-white/10 px-3 py-2 text-xs font-semibold uppercase tracking-[0.12em] text-white/70 backdrop-blur">
+                <Sparkles size={14} />
                 Configuration initiale
-              </div>
-
-              <h2 className="text-[2.8rem] font-semibold leading-tight tracking-tight">
-                Ta salle prête
-                <br />
-                <span className="text-emerald-400">en 3 étapes.</span>
-              </h2>
-
-              <p className="mt-5 max-w-sm text-base leading-8 text-white/45">
-                Commence par nommer ton espace. Les formules et l&apos;équipe s&apos;ajoutent depuis le tableau de bord, à ton rythme.
+              </p>
+              <h1 className="mt-6 text-5xl font-semibold leading-tight">
+                Votre salle prête en 3 étapes.
+              </h1>
+              <p className="mt-5 max-w-lg text-base leading-8 text-white/65">
+                Commencez par nommer votre espace. Ajoutez ensuite vos formules et votre équipe depuis le tableau de bord.
               </p>
 
-              {/* Steps */}
               <div className="mt-10 space-y-3">
-                {steps.map((step, i) => {
-                  const Icon = step.icon;
-                  return (
-                    <div key={step.number} className="flex items-start gap-4">
-                      {/* Connecteur vertical */}
-                      <div className="flex flex-col items-center">
-                        <div
-                          className={`flex size-10 shrink-0 items-center justify-center rounded-2xl text-sm font-bold transition ${
-                            step.active
-                              ? "bg-emerald-500 text-white"
-                              : "border border-white/10 bg-white/5 text-white/25"
-                          }`}
-                        >
-                          {step.active ? <CheckCircle2 size={18} /> : <Icon size={16} />}
-                        </div>
-                        {i < steps.length - 1 && (
-                          <div className="mt-1 h-8 w-px bg-white/8" />
-                        )}
-                      </div>
-                      <div className={`pb-2 pt-1.5 ${step.active ? "" : "opacity-40"}`}>
-                        <div className="flex items-center gap-2">
-                          <p className="text-sm font-semibold">{step.label}</p>
-                          {step.active && (
-                            <span className="rounded-full bg-emerald-500/20 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-emerald-400">
-                              Maintenant
-                            </span>
-                          )}
-                        </div>
-                        <p className="mt-0.5 text-xs text-white/40">{step.desc}</p>
-                      </div>
+                {steps.map((step) => (
+                  <div
+                    key={step.number}
+                    className={`flex items-center gap-4 rounded-md border px-4 py-3 transition ${
+                      step.active
+                        ? "border-mint/40 bg-mint/10 text-white"
+                        : "border-white/10 bg-white/5 text-white/40"
+                    }`}
+                  >
+                    <div className={`flex size-9 shrink-0 items-center justify-center rounded-md text-sm font-semibold ${
+                      step.active ? "bg-mint text-white" : "bg-white/10 text-white/40"
+                    }`}>
+                      {step.active ? <CheckCircle2 size={17} /> : <span>{step.number}</span>}
                     </div>
-                  );
-                })}
+                    <div className="flex min-w-0 flex-1 items-center justify-between gap-4">
+                      <div>
+                        <p className="font-semibold">{step.label}</p>
+                      </div>
+                      {step.active && (
+                        <span className="rounded-md bg-mint/20 px-2 py-0.5 text-xs font-semibold text-mint">
+                          En cours
+                        </span>
+                      )}
+                      {!step.active && (
+                        <span className="text-xs text-white/30">Après</span>
+                      )}
+                    </div>
+                  </div>
+                ))}
               </div>
 
-              <p className="mt-8 text-xs text-white/25">
-                Les étapes 2 et 3 sont disponibles depuis les Paramètres.
+              <p className="mt-8 text-sm text-white/40">
+                Les étapes 2 et 3 se font depuis votre tableau de bord, à votre rythme.
               </p>
             </div>
 
-            {/* Droite — formulaire */}
-            <div className="w-full overflow-hidden rounded-3xl border border-white/10 bg-white/5 backdrop-blur-xl">
-              {/* En-tête carte */}
-              <div className="relative overflow-hidden border-b border-white/8 px-8 py-6">
-                <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-emerald-400/70 to-transparent" />
-                <div className="mb-1 flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <div className="flex size-6 items-center justify-center rounded-md bg-white">
-                      <Zap size={11} className="text-[#080808]" fill="currentColor" />
-                    </div>
-                    <span className="text-xs font-semibold text-white/40">GymFlow</span>
-                  </div>
-                  {/* Progress dots */}
-                  <div className="flex items-center gap-1.5">
-                    <span className="h-1.5 w-6 rounded-full bg-emerald-500" />
-                    <span className="h-1.5 w-6 rounded-full bg-white/15" />
-                    <span className="h-1.5 w-6 rounded-full bg-white/15" />
+            {/* Right — form */}
+            <div className="w-full rounded-md border border-white/18 bg-white p-6 text-ink shadow-soft backdrop-blur md:p-8">
+              <div className="flex items-center justify-between gap-4 border-b border-line pb-5">
+                <div className="flex items-center gap-3">
+                  <BrandMark />
+                  <div>
+                    <p className="text-lg font-semibold leading-none">Votre salle</p>
+                    <p className="mt-1 text-sm text-neutral-500">Etape 1 sur 3</p>
                   </div>
                 </div>
-                <h1 className="text-xl font-semibold">Nomme ton espace</h1>
-                <p className="mt-1 text-sm text-white/45">
-                  Ces infos apparaissent sur ta vitrine et tes reçus.
+                <div className="flex items-center gap-1.5">
+                  <span className="h-2 w-8 rounded-full bg-mint" />
+                  <span className="h-2 w-8 rounded-full bg-line" />
+                  <span className="h-2 w-8 rounded-full bg-line" />
+                </div>
+              </div>
+
+              <div className="mt-6">
+                <h2 className="text-2xl font-semibold">Nommez votre espace</h2>
+                <p className="mt-2 text-sm leading-6 text-neutral-500">
+                  Ces informations apparaîtront sur votre vitrine publique et vos reçus.
                 </p>
               </div>
 
-              {/* Formulaire */}
-              <div className="px-8 py-7">
-                {!enabled ? <div className="mb-5"><EnvWarning /></div> : null}
+              {!enabled ? <div className="mt-5"><EnvWarning /></div> : null}
 
-                {params.error ? (
-                  <div className="mb-5 rounded-xl border border-red-500/25 bg-red-500/10 px-4 py-3 text-sm font-semibold text-red-400">
-                    {params.error}
-                  </div>
-                ) : null}
+              {params.error ? (
+                <div className="mt-5 rounded-md border border-red-200 bg-red-50 p-4 text-sm font-semibold text-danger">
+                  {params.error}
+                </div>
+              ) : null}
 
-                <form action={createGym} className="space-y-4">
-                  <label className="block">
-                    <span className="mb-2 block text-sm font-semibold text-white/70">
-                      Nom de la salle <span className="text-red-400">*</span>
-                    </span>
-                    <input
-                      className="h-11 w-full rounded-xl border border-white/10 bg-white/6 px-3.5 text-sm text-white placeholder-white/25 outline-none transition focus:border-emerald-500/60 focus:bg-white/8"
-                      name="name"
-                      placeholder="Ex. Iron Club Dakar"
-                      required
-                      autoFocus
-                    />
-                  </label>
-
-                  <label className="block">
-                    <span className="mb-2 block text-sm font-semibold text-white/70">Téléphone</span>
-                    <input
-                      className="h-11 w-full rounded-xl border border-white/10 bg-white/6 px-3.5 text-sm text-white placeholder-white/25 outline-none transition focus:border-emerald-500/60 focus:bg-white/8"
-                      name="phone"
-                      placeholder="+221 77 123 45 67"
-                    />
-                  </label>
-
-                  <label className="block">
-                    <span className="mb-2 block text-sm font-semibold text-white/70">Adresse</span>
-                    <input
-                      className="h-11 w-full rounded-xl border border-white/10 bg-white/6 px-3.5 text-sm text-white placeholder-white/25 outline-none transition focus:border-emerald-500/60 focus:bg-white/8"
-                      name="address"
-                      placeholder="Ex. Dakar Plateau, Avenue Pompidou"
-                    />
-                  </label>
-
-                  <label className="block">
-                    <span className="mb-2 block text-sm font-semibold text-white/70">Devise</span>
-                    <select
-                      className="h-11 w-full rounded-xl border border-white/10 bg-[#0f0f0f] px-3.5 text-sm text-white outline-none transition focus:border-emerald-500/60"
-                      name="currency"
-                      defaultValue="XOF"
-                    >
-                      <option value="XOF">F CFA (XOF)</option>
-                      <option value="EUR">Euro (EUR)</option>
-                      <option value="USD">Dollar (USD)</option>
-                      <option value="GHS">Cedi (GHS)</option>
-                      <option value="XOF">Franc malien (XOF)</option>
-                    </select>
-                  </label>
-
-                  <SubmitButton
-                    className="mt-2 inline-flex h-11 w-full items-center justify-center gap-2 rounded-xl bg-emerald-500 font-semibold text-white hover:bg-emerald-400 disabled:opacity-60"
-                    disabled={!enabled}
-                    pendingLabel="Configuration en cours..."
+              <form action={createGym} className="mt-6 space-y-4">
+                <label className="block">
+                  <span className="text-sm font-semibold text-neutral-700">Nom de la salle <span className="text-danger">*</span></span>
+                  <input
+                    className="mt-2 h-11 w-full rounded-md border border-line bg-paper px-3 outline-none focus:border-mint"
+                    name="name"
+                    placeholder="Ex. Iron Club Dakar"
+                    required
+                    autoFocus
+                  />
+                </label>
+                <label className="block">
+                  <span className="text-sm font-semibold text-neutral-700">Téléphone</span>
+                  <input
+                    className="mt-2 h-11 w-full rounded-md border border-line bg-paper px-3 outline-none focus:border-mint"
+                    name="phone"
+                    placeholder="+221 77 123 45 67"
+                  />
+                </label>
+                <label className="block">
+                  <span className="text-sm font-semibold text-neutral-700">Adresse</span>
+                  <input
+                    className="mt-2 h-11 w-full rounded-md border border-line bg-paper px-3 outline-none focus:border-mint"
+                    name="address"
+                    placeholder="Ex. Dakar Plateau, Avenue Pompidou"
+                  />
+                </label>
+                <label className="block">
+                  <span className="text-sm font-semibold text-neutral-700">Devise</span>
+                  <select
+                    className="mt-2 h-11 w-full rounded-md border border-line bg-paper px-3 outline-none focus:border-mint"
+                    name="currency"
+                    defaultValue="XOF"
                   >
-                    Créer mon espace
-                    <ArrowRight size={16} />
-                  </SubmitButton>
-                </form>
+                    <option value="XOF">F CFA (XOF)</option>
+                    <option value="EUR">Euro (EUR)</option>
+                    <option value="USD">Dollar (USD)</option>
+                  </select>
+                </label>
 
-                <p className="mt-5 text-center text-xs text-white/25">
-                  Tu pourras tout modifier depuis les Paramètres.
-                </p>
-              </div>
+                <SubmitButton
+                  variant="accent"
+                  className="mt-2 h-12 w-full gap-2"
+                  disabled={!enabled}
+                  pendingLabel="Configuration en cours..."
+                >
+                  Créer mon espace
+                  <ArrowRight size={17} />
+                </SubmitButton>
+              </form>
+
+              <p className="mt-5 text-center text-xs text-neutral-400">
+                Vous pourrez tout modifier depuis les paramètres.
+              </p>
             </div>
-          </div>
+          </section>
         </div>
       </div>
     </main>
