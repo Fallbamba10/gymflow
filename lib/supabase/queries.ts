@@ -32,6 +32,9 @@ export type CurrentGym = {
   name: string;
   currency: string;
   role: "admin" | "operator";
+  billing_status: string;
+  trial_ends_at: string | null;
+  billing_period_end: string | null;
 };
 
 export type GymSettings = {
@@ -268,7 +271,7 @@ export async function getCurrentGym(): Promise<CurrentGym | null> {
 
   const { data, error } = await supabase
     .from("gym_users")
-    .select("role, gyms(id, name, currency)")
+    .select("role, gyms(id, name, currency, billing_status, trial_ends_at, billing_period_end)")
     .eq("user_id", user.id)
     .eq("active", true)
     .limit(1)
@@ -288,6 +291,9 @@ export async function getCurrentGym(): Promise<CurrentGym | null> {
     name: gym.name,
     currency: gym.currency,
     role: data.role,
+    billing_status: (gym as Record<string, unknown>).billing_status as string ?? "trialing",
+    trial_ends_at: (gym as Record<string, unknown>).trial_ends_at as string | null ?? null,
+    billing_period_end: (gym as Record<string, unknown>).billing_period_end as string | null ?? null,
   };
 }
 
