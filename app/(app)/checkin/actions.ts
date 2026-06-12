@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { getCurrentGym, type PaymentMethod } from "@/lib/supabase/queries";
+import { notifySessionsLow } from "@/lib/whatsapp";
 
 function getString(formData: FormData, key: string) {
   const value = formData.get(key);
@@ -61,6 +62,42 @@ export async function performMemberCheckin(formData: FormData) {
 
   if (error) {
     redirect(`/checkin?error=${encodeURIComponent(translateCheckinError(error.message))}${querySuffix}`);
+  }
+
+  // Alerte WhatsApp si séances restantes <= 2 après pointage
+  try {
+    const supabase2 = await createClient();
+    const { data: subData } = await supabase2
+      .from("subscriptions")
+      .select("sessions_left, members(full_name, phone), subscription_types(name)")
+      .eq("gym_id", gym.id)
+      .eq("member_id", memberId)
+      .eq("status", "active")
+      .single();
+
+    const sessionsLeft = subData?.sessions_left ?? null;
+    const memberInfo = Array.isArray(subData?.members) ? subData.members[0] : subData?.members;
+    const phone = memberInfo?.phone ?? null;
+
+    if (phone && sessionsLeft !== null && sessionsLeft <= 2 && sessionsLeft > 0) {
+      const { data: gymData } = await supabase2
+        .from("gyms")
+        .select("name, whatsapp_phone, phone")
+        .eq("id", gym.id)
+        .single();
+
+      if (gymData) {
+        await notifySessionsLow({
+          phone,
+          memberName: memberInfo?.full_name ?? "",
+          gymName: gymData.name,
+          sessionsLeft,
+          gymContact: gymData.whatsapp_phone || gymData.phone || "",
+        });
+      }
+    }
+  } catch {
+    // Ne jamais bloquer le pointage pour une erreur de notification
   }
 
   revalidatePath("/checkin");

@@ -4,6 +4,10 @@ import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { requireAdminGym } from "@/lib/supabase/guards";
+import {
+  notifyWelcome,
+  notifySubscriptionConfirmed,
+} from "@/lib/whatsapp";
 
 function getString(formData: FormData, key: string) {
   const value = formData.get(key);
@@ -49,7 +53,7 @@ export async function createMember(formData: FormData) {
 
   const { data: type, error: typeError } = await supabase
     .from("subscription_types")
-    .select("id, duration_days, sessions, price")
+    .select("id, name, duration_days, sessions, price")
     .eq("gym_id", gym.id)
     .eq("id", subscriptionTypeId)
     .single();
@@ -107,6 +111,27 @@ export async function createMember(formData: FormData) {
     redirect(`/members/new?error=${encodeURIComponent(translateMemberActionError(paymentError.message))}`);
   }
 
+  if (phone) {
+    const { data: gymData } = await supabase
+      .from("gyms")
+      .select("name, whatsapp_phone, phone")
+      .eq("id", gym.id)
+      .single();
+
+    if (gymData) {
+      const gymContact = gymData.whatsapp_phone || gymData.phone || "";
+      await notifyWelcome({ phone, memberName: fullName, gymName: gymData.name });
+      await notifySubscriptionConfirmed({
+        phone,
+        memberName: fullName,
+        gymName: gymData.name,
+        planName: type.name ?? "",
+        expiresAt: toDateString(expiresAt),
+        gymContact,
+      });
+    }
+  }
+
   revalidatePath("/members");
   revalidatePath("/");
   redirect("/members");
@@ -131,7 +156,7 @@ export async function renewMemberSubscription(formData: FormData) {
 
   const { data: type, error: typeError } = await supabase
     .from("subscription_types")
-    .select("id, duration_days, sessions, price")
+    .select("id, name, duration_days, sessions, price")
     .eq("gym_id", gym.id)
     .eq("id", subscriptionTypeId)
     .single();
@@ -179,6 +204,31 @@ export async function renewMemberSubscription(formData: FormData) {
 
   if (paymentError) {
     redirect(`/members/${memberId}?error=${encodeURIComponent(translateMemberActionError(paymentError.message))}`);
+  }
+
+  const { data: memberData } = await supabase
+    .from("members")
+    .select("full_name, phone")
+    .eq("id", memberId)
+    .single();
+
+  if (memberData?.phone) {
+    const { data: gymData } = await supabase
+      .from("gyms")
+      .select("name, whatsapp_phone, phone")
+      .eq("id", gym.id)
+      .single();
+
+    if (gymData) {
+      await notifySubscriptionConfirmed({
+        phone: memberData.phone,
+        memberName: memberData.full_name,
+        gymName: gymData.name,
+        planName: type.name ?? "",
+        expiresAt: toDateString(expiresAt),
+        gymContact: gymData.whatsapp_phone || gymData.phone || "",
+      });
+    }
   }
 
   revalidatePath(`/members/${memberId}`);

@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import {
   ArrowRight,
@@ -60,6 +61,32 @@ const flows = [
     text: "Le gerant suit les entrees, les abonnements, les paiements et les actions a traiter.",
   },
 ];
+
+export const metadata: Metadata = {
+  title: "GymFlow · Logiciel de gestion de salle de sport",
+  description:
+    "GymFlow simplifie la gestion de votre salle de sport : membres, abonnements, pointage, caisse et équipe. Pensé pour les salles en Afrique de l'Ouest.",
+  openGraph: {
+    title: "GymFlow · Logiciel de gestion de salle de sport",
+    description:
+      "Pointage, abonnements, caisse et équipe dans une interface premium. Pensé pour les salles de sport en Afrique de l'Ouest.",
+    type: "website",
+    siteName: "GymFlow",
+    images: [
+      {
+        url: "https://images.unsplash.com/photo-1534258936925-c58bed479fcb?auto=format&fit=crop&w=1200&q=80",
+        width: 1200,
+        height: 630,
+        alt: "GymFlow - Logiciel de gestion de salle",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "GymFlow · Logiciel de gestion de salle de sport",
+    description: "Pointage, abonnements, caisse et équipe. Interface premium pour salles de sport.",
+  },
+};
 
 export default function SitePage() {
   return (
@@ -255,6 +282,91 @@ export default function SitePage() {
               </p>
             </div>
           </div>
+        </div>
+      </section>
+
+      {/* Pricing */}
+      <section className="bg-ink px-4 py-16 text-white md:px-8">
+        <div className="mx-auto max-w-7xl">
+          <div className="text-center">
+            <p className="text-sm font-semibold uppercase text-mint">Tarifs</p>
+            <h2 className="mt-3 text-3xl font-semibold leading-tight md:text-5xl">
+              Simple. Transparent. Sans surprise.
+            </h2>
+            <p className="mt-4 text-base leading-7 text-white/62">
+              Un seul plan pour piloter toute votre salle. Pas de modules cachés, pas de limites artificielles.
+            </p>
+          </div>
+
+          <div className="mt-10 grid gap-6 lg:grid-cols-3 lg:items-start">
+            {/* Free */}
+            <article className="rounded-md border border-white/12 bg-white/6 p-6">
+              <p className="text-xs font-semibold uppercase tracking-[0.1em] text-white/45">Démarrage</p>
+              <p className="mt-4 text-4xl font-semibold">Gratuit</p>
+              <p className="mt-2 text-sm text-white/55">Pour tester et lancer votre salle.</p>
+              <div className="my-6 border-t border-white/10" />
+              <ul className="space-y-3 text-sm text-white/75">
+                {["Jusqu'à 30 membres", "Pointage illimité", "Caisse et reçus", "1 administrateur", "Vitrine publique"].map((f) => (
+                  <li key={f} className="flex items-center gap-2">
+                    <CheckCircle2 className="shrink-0 text-mint" size={15} />
+                    {f}
+                  </li>
+                ))}
+              </ul>
+              <Link href="/signup" className="mt-6 inline-flex h-11 w-full items-center justify-center rounded-md border border-white/20 text-sm font-semibold transition hover:bg-white/10">
+                Commencer gratuitement
+              </Link>
+            </article>
+
+            {/* Pro — highlighted */}
+            <article className="relative rounded-md border border-mint/40 bg-mint/10 p-6 shadow-[0_0_0_1px_rgba(30,138,106,0.25)]">
+              <span className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-mint px-4 py-1 text-xs font-semibold text-white">
+                Recommandé
+              </span>
+              <p className="text-xs font-semibold uppercase tracking-[0.1em] text-mint">Pro</p>
+              <div className="mt-4 flex items-end gap-2">
+                <p className="text-4xl font-semibold">9 900 <span className="text-2xl">F CFA</span></p>
+                <p className="mb-1 text-sm text-white/55">/ mois</p>
+              </div>
+              <p className="mt-2 text-sm text-white/55">Pour les salles actives avec une équipe.</p>
+              <div className="my-6 border-t border-white/10" />
+              <ul className="space-y-3 text-sm text-white/85">
+                {["Membres illimités", "Pointage illimité", "Caisse, reçus et exports", "Équipe avec rôles (admin / opérateur)", "Staff avec PIN", "Notifications WhatsApp", "Vitrine publique personnalisée", "Support prioritaire"].map((f) => (
+                  <li key={f} className="flex items-center gap-2">
+                    <CheckCircle2 className="shrink-0 text-mint" size={15} />
+                    {f}
+                  </li>
+                ))}
+              </ul>
+              <Link href="/signup" className="mt-6 inline-flex h-11 w-full items-center justify-center gap-2 rounded-md bg-mint text-sm font-semibold transition hover:bg-emerald-700">
+                Démarrer l&apos;essai
+                <ArrowRight size={16} />
+              </Link>
+            </article>
+
+            {/* Multi-salles */}
+            <article className="rounded-md border border-white/12 bg-white/6 p-6">
+              <p className="text-xs font-semibold uppercase tracking-[0.1em] text-white/45">Multi-salles</p>
+              <p className="mt-4 text-4xl font-semibold">Sur devis</p>
+              <p className="mt-2 text-sm text-white/55">Pour les groupes et franchises.</p>
+              <div className="my-6 border-t border-white/10" />
+              <ul className="space-y-3 text-sm text-white/75">
+                {["Tout le plan Pro", "Plusieurs salles depuis un compte", "Tableau de bord centralisé", "Onboarding dédié", "SLA garanti"].map((f) => (
+                  <li key={f} className="flex items-center gap-2">
+                    <CheckCircle2 className="shrink-0 text-mint" size={15} />
+                    {f}
+                  </li>
+                ))}
+              </ul>
+              <a href="https://wa.me/221000000000" target="_blank" rel="noreferrer" className="mt-6 inline-flex h-11 w-full items-center justify-center rounded-md border border-white/20 text-sm font-semibold transition hover:bg-white/10">
+                Nous contacter
+              </a>
+            </article>
+          </div>
+
+          <p className="mt-8 text-center text-sm text-white/35">
+            Paiement mensuel sans engagement. Annulation à tout moment.
+          </p>
         </div>
       </section>
 

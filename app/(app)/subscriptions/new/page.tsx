@@ -7,16 +7,7 @@ import { SubmitButton } from "@/components/submit-button";
 import { createSubscriptionType } from "@/app/(app)/subscriptions/actions";
 import { requireAdminGym } from "@/lib/supabase/guards";
 
-type NewSubscriptionTypePageProps = {
-  searchParams: Promise<{
-    error?: string;
-  }>;
-};
-
-export default async function NewSubscriptionTypePage({
-  searchParams,
-}: NewSubscriptionTypePageProps) {
-  const params = await searchParams;
+export default async function NewSubscriptionTypePage() {
   await requireAdminGym();
 
   return (
@@ -43,12 +34,6 @@ export default async function NewSubscriptionTypePage({
               <p className="mt-1 text-sm text-neutral-500">La formule sera disponible pour les prochains abonnements.</p>
             </div>
           </div>
-
-          {params.error ? (
-            <div className="mt-5 rounded-md border border-red-200 bg-red-50 p-4 text-sm font-semibold text-danger">
-              {params.error}
-            </div>
-          ) : null}
 
           <div className="mt-5 grid gap-5 md:grid-cols-2">
             <FormField label="Nom">

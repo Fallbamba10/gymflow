@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-img-element */
 import Link from "next/link";
 import { AlertTriangle, CheckCircle2, Download, Plus, Search, UserRound, Users } from "lucide-react";
 import { AppShell } from "@/components/app-shell";
@@ -36,12 +37,13 @@ function getMemberStatus(member: Awaited<ReturnType<typeof getMembers>>[number])
   return { tone: "active" as const, label: "Actif" };
 }
 
+const PAGE_SIZE = 50;
+
 type MembersPageProps = {
   searchParams: Promise<{
-    error?: string;
     q?: string;
     status?: string;
-    success?: string;
+    page?: string;
   }>;
 };
 
@@ -49,6 +51,7 @@ export default async function MembersPage({ searchParams }: MembersPageProps) {
   const params = await searchParams;
   const query = params.q?.trim().toLowerCase() ?? "";
   const selectedStatus = params.status ?? "all";
+  const currentPage = Math.max(1, parseInt(params.page ?? "1", 10));
   const gym = await requireAdminGym();
   const allMembers = await getMembers(gym.id, { includeArchived: true });
   const visibleActiveMembers = allMembers.filter((member) => !member.archived_at);
@@ -68,6 +71,21 @@ export default async function MembersPage({ searchParams }: MembersPageProps) {
 
     return matchesQuery && matchesStatus;
   });
+
+  const totalFiltered = members.length;
+  const totalPages = Math.max(1, Math.ceil(totalFiltered / PAGE_SIZE));
+  const safePage = Math.min(currentPage, totalPages);
+  const paginatedMembers = members.slice((safePage - 1) * PAGE_SIZE, safePage * PAGE_SIZE);
+
+  function pageHref(p: number) {
+    const qs = new URLSearchParams();
+    if (params.q) qs.set("q", params.q);
+    if (selectedStatus !== "all") qs.set("status", selectedStatus);
+    if (p > 1) qs.set("page", String(p));
+    const s = qs.toString();
+    return `/members${s ? `?${s}` : ""}`;
+  }
+
   const renewalCount = allMembers.filter((member) => {
     const status = getMemberStatus(member);
     return status.tone === "warning" || status.tone === "expired";
@@ -108,17 +126,7 @@ export default async function MembersPage({ searchParams }: MembersPageProps) {
       />
 
       <div className="px-4 py-6 md:px-8">
-        {params.success ? (
-          <div className="mb-5 rounded-md border border-emerald-200 bg-emerald-50 p-4 text-sm font-semibold text-mint">
-            {params.success}
-          </div>
-        ) : null}
 
-        {params.error ? (
-          <div className="mb-5 rounded-md border border-red-200 bg-red-50 p-4 text-sm font-semibold text-danger">
-            {params.error}
-          </div>
-        ) : null}
 
         <section className="rounded-md border border-neutral-900 bg-ink p-5 text-white shadow-soft md:p-6">
           <div className="grid gap-6 xl:grid-cols-[1fr_0.9fr] xl:items-end">
@@ -195,8 +203,8 @@ export default async function MembersPage({ searchParams }: MembersPageProps) {
               <span>Expiration</span>
               <span>Statut</span>
             </div>
-            {members.length > 0 ? (
-              members.map((member) => {
+            {paginatedMembers.length > 0 ? (
+              paginatedMembers.map((member) => {
                 const status = getMemberStatus(member);
                 const subscription = member.active_subscription;
                 return (
@@ -206,9 +214,20 @@ export default async function MembersPage({ searchParams }: MembersPageProps) {
                     className="grid grid-cols-[0.75fr_1.55fr_1fr_1fr_0.8fr_0.9fr_0.9fr] items-center border-b border-line px-4 py-4 text-sm transition last:border-b-0 hover:bg-neutral-50"
                   >
                     <span className="font-mono text-neutral-500">{String(member.member_number).padStart(6, "0")}</span>
-                    <span className="min-w-0">
-                      <span className="block truncate font-semibold">{member.full_name}</span>
-                      <span className="mt-1 block text-xs text-neutral-500">Ajoute le {new Intl.DateTimeFormat("fr-FR").format(new Date(member.created_at))}</span>
+                    <span className="flex min-w-0 items-center gap-3">
+                      <span className="flex size-8 shrink-0 items-center justify-center overflow-hidden rounded-full border border-line bg-paper">
+                        {member.photo_url ? (
+                          <img src={member.photo_url} alt={member.full_name} className="size-full object-cover" />
+                        ) : (
+                          <span className="text-xs font-semibold text-neutral-400">
+                            {member.full_name.split(" ").map((w) => w[0]).slice(0, 2).join("").toUpperCase()}
+                          </span>
+                        )}
+                      </span>
+                      <span className="min-w-0">
+                        <span className="block truncate font-semibold">{member.full_name}</span>
+                        <span className="mt-0.5 block text-xs text-neutral-500">Ajoute le {new Intl.DateTimeFormat("fr-FR").format(new Date(member.created_at))}</span>
+                      </span>
                     </span>
                     <span className="text-neutral-600">{member.phone ?? "-"}</span>
                     <span className="truncate">{subscription?.subscription_types?.name ?? "-"}</span>
@@ -229,6 +248,29 @@ export default async function MembersPage({ searchParams }: MembersPageProps) {
             )}
           </div>
         </div>
+
+        {totalPages > 1 && (
+          <div className="mt-5 flex items-center justify-between gap-4 text-sm">
+            <p className="text-neutral-500">
+              {(safePage - 1) * PAGE_SIZE + 1}–{Math.min(safePage * PAGE_SIZE, totalFiltered)} sur {totalFiltered} membres
+            </p>
+            <div className="flex items-center gap-2">
+              {safePage > 1 ? (
+                <Link href={pageHref(safePage - 1)} className="inline-flex h-10 items-center justify-center rounded-md border border-line bg-white px-4 font-semibold transition hover:bg-neutral-50">
+                  Précédent
+                </Link>
+              ) : null}
+              <span className="inline-flex h-10 items-center justify-center rounded-md bg-ink px-4 font-semibold text-white">
+                {safePage} / {totalPages}
+              </span>
+              {safePage < totalPages ? (
+                <Link href={pageHref(safePage + 1)} className="inline-flex h-10 items-center justify-center rounded-md border border-line bg-white px-4 font-semibold transition hover:bg-neutral-50">
+                  Suivant
+                </Link>
+              ) : null}
+            </div>
+          </div>
+        )}
       </div>
     </AppShell>
   );

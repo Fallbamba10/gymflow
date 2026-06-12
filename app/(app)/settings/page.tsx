@@ -28,15 +28,7 @@ import { updateGymSettings } from "@/app/(app)/settings/actions";
 import { requireAdminGym } from "@/lib/supabase/guards";
 import { getGymSettings } from "@/lib/supabase/queries";
 
-type SettingsPageProps = {
-  searchParams: Promise<{
-    error?: string;
-    success?: string;
-  }>;
-};
-
-export default async function SettingsPage({ searchParams }: SettingsPageProps) {
-  const params = await searchParams;
+export default async function SettingsPage() {
   const gym = await requireAdminGym();
 
   const settings = await getGymSettings(gym.id);
@@ -134,17 +126,6 @@ export default async function SettingsPage({ searchParams }: SettingsPageProps) 
               </div>
             </div>
 
-            {params.success ? (
-              <div className="mt-5 rounded-md border border-emerald-200 bg-emerald-50 p-4 text-sm font-semibold text-mint">
-                {params.success}
-              </div>
-            ) : null}
-
-            {params.error ? (
-              <div className="mt-5 rounded-md border border-red-200 bg-red-50 p-4 text-sm font-semibold text-danger">
-                {params.error}
-              </div>
-            ) : null}
 
             <div className="mt-5 grid gap-5 md:grid-cols-2">
               <FormField label="Nom de la salle">

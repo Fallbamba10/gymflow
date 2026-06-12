@@ -83,6 +83,6 @@ export async function createGym(formData: FormData) {
   }
 
   revalidatePath("/", "layout");
-  redirect("/");
+  redirect("/?welcome=1");
 }
 

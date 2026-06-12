@@ -15,13 +15,6 @@ import {
 import { requireAdminGym } from "@/lib/supabase/guards";
 import { getGymStaff, getGymUsers } from "@/lib/supabase/queries";
 
-type TeamPageProps = {
-  searchParams: Promise<{
-    error?: string;
-    success?: string;
-  }>;
-};
-
 function formatDate(value: string) {
   return new Intl.DateTimeFormat("fr-FR").format(new Date(value));
 }
@@ -30,8 +23,7 @@ function formatRole(role: "admin" | "operator") {
   return role === "admin" ? "Admin" : "Operateur";
 }
 
-export default async function TeamPage({ searchParams }: TeamPageProps) {
-  const params = await searchParams;
+export default async function TeamPage() {
   const gym = await requireAdminGym();
 
   const [team, staff] = await Promise.all([
@@ -54,17 +46,6 @@ export default async function TeamPage({ searchParams }: TeamPageProps) {
             <UsersRound className="text-mint" size={22} />
           </div>
 
-          {params.success ? (
-            <div className="mx-5 mt-5 rounded-md border border-emerald-200 bg-emerald-50 p-4 text-sm font-semibold text-mint">
-              {params.success}
-            </div>
-          ) : null}
-
-          {params.error ? (
-            <div className="mx-5 mt-5 rounded-md border border-red-200 bg-red-50 p-4 text-sm font-semibold text-danger">
-              {params.error}
-            </div>
-          ) : null}
 
           <div className="divide-y divide-line">
             {team.map((user) => (

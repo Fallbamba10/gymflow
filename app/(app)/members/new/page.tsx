@@ -9,14 +9,7 @@ import { formatCurrency } from "@/lib/demo-data";
 import { requireAdminGym } from "@/lib/supabase/guards";
 import { getSubscriptionTypes } from "@/lib/supabase/queries";
 
-type NewMemberPageProps = {
-  searchParams: Promise<{
-    error?: string;
-  }>;
-};
-
-export default async function NewMemberPage({ searchParams }: NewMemberPageProps) {
-  const params = await searchParams;
+export default async function NewMemberPage() {
   const gym = await requireAdminGym();
   const subscriptionTypes = await getSubscriptionTypes(gym.id);
 
@@ -44,12 +37,6 @@ export default async function NewMemberPage({ searchParams }: NewMemberPageProps
               <p className="mt-1 text-sm text-neutral-500">Creation du membre et de son premier abonnement.</p>
             </div>
           </div>
-
-          {params.error ? (
-            <div className="mt-5 rounded-md border border-red-200 bg-red-50 p-4 text-sm font-semibold text-danger">
-              {params.error}
-            </div>
-          ) : null}
 
           <div className="mt-5 grid gap-5 md:grid-cols-2">
             <FormField label="Nom complet">

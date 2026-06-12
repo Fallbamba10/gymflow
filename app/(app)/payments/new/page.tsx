@@ -8,14 +8,7 @@ import { createManualPayment } from "@/app/(app)/payments/actions";
 import { requireAdminGym } from "@/lib/supabase/guards";
 import { getMembers } from "@/lib/supabase/queries";
 
-type NewPaymentPageProps = {
-  searchParams: Promise<{
-    error?: string;
-  }>;
-};
-
-export default async function NewPaymentPage({ searchParams }: NewPaymentPageProps) {
-  const params = await searchParams;
+export default async function NewPaymentPage() {
   const gym = await requireAdminGym();
   const members = await getMembers(gym.id);
 
@@ -43,12 +36,6 @@ export default async function NewPaymentPage({ searchParams }: NewPaymentPagePro
               <p className="mt-1 text-sm text-neutral-500">Ajoute un encaissement hors abonnement automatique.</p>
             </div>
           </div>
-
-          {params.error ? (
-            <div className="mt-5 rounded-md border border-red-200 bg-red-50 p-4 text-sm font-semibold text-danger">
-              {params.error}
-            </div>
-          ) : null}
 
           <div className="mt-5 grid gap-5 md:grid-cols-2">
             <FormField label="Montant">

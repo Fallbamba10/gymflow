@@ -46,7 +46,7 @@ export async function updateGymSettings(formData: FormData) {
   const currency = getCurrency(getString(formData, "currency"));
 
   if (!name) {
-    redirect("/settings?error=Nom de salle obligatoire");
+    redirect("/settings?error=Nom+de+salle+obligatoire");
   }
 
   const supabase = await createClient();
@@ -73,5 +73,5 @@ export async function updateGymSettings(formData: FormData) {
   revalidatePath("/", "layout");
   revalidatePath("/settings");
   revalidatePath(`/g/${gym.id}`);
-  redirect("/settings?success=Parametres enregistres");
+  redirect("/settings?success=Param%C3%A8tres+enregistr%C3%A9s");
 }

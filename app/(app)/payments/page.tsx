@@ -50,13 +50,14 @@ function formatDateTime(value: string) {
   }).format(new Date(value));
 }
 
+const PAGE_SIZE = 50;
+
 type PaymentsPageProps = {
   searchParams: Promise<{
-    error?: string;
     period?: string;
     method?: string;
     q?: string;
-    success?: string;
+    page?: string;
   }>;
 };
 
@@ -77,8 +78,23 @@ export default async function PaymentsPage({ searchParams }: PaymentsPageProps) 
   const period = getPeriod(params.period);
   const method = getMethod(params.method);
   const query = params.q ?? "";
+  const currentPage = Math.max(1, parseInt(params.page ?? "1", 10));
   const gym = await requireAdminGym();
   const paymentsData = await getPaymentsData(gym.id, { period, method, query });
+
+  const totalPayments = paymentsData.payments.length;
+  const totalPages = Math.max(1, Math.ceil(totalPayments / PAGE_SIZE));
+  const safePage = Math.min(currentPage, totalPages);
+  const paginatedPayments = paymentsData.payments.slice((safePage - 1) * PAGE_SIZE, safePage * PAGE_SIZE);
+
+  function pageHref(p: number) {
+    const qs = new URLSearchParams();
+    qs.set("period", period);
+    qs.set("method", method);
+    if (query) qs.set("q", query);
+    if (p > 1) qs.set("page", String(p));
+    return `/payments?${qs.toString()}`;
+  }
 
   const stats = [
     {
@@ -158,17 +174,6 @@ export default async function PaymentsPage({ searchParams }: PaymentsPageProps) 
       />
 
       <div className="px-4 py-6 md:px-8">
-        {params.success ? (
-          <div className="mb-5 rounded-md border border-emerald-200 bg-emerald-50 p-4 text-sm font-semibold text-mint">
-            {params.success}
-          </div>
-        ) : null}
-
-        {params.error ? (
-          <div className="mb-5 rounded-md border border-red-200 bg-red-50 p-4 text-sm font-semibold text-danger">
-            {params.error}
-          </div>
-        ) : null}
 
         <section className="rounded-md border border-neutral-900 bg-ink p-5 text-white shadow-soft md:p-6">
           <div className="grid gap-6 xl:grid-cols-[1fr_0.9fr] xl:items-end">
@@ -357,8 +362,8 @@ export default async function PaymentsPage({ searchParams }: PaymentsPageProps) 
                 <span className="text-right">Montant</span>
                 <span className="text-right">Recu</span>
               </div>
-              {paymentsData.payments.length > 0 ? (
-                paymentsData.payments.map((payment) => (
+              {paginatedPayments.length > 0 ? (
+                paginatedPayments.map((payment) => (
                   <div
                     key={payment.id}
                     className="grid grid-cols-[1fr_1.2fr_1fr_0.9fr_0.9fr_0.9fr_0.9fr_0.7fr] items-center border-b border-line px-4 py-4 text-sm transition last:border-b-0 hover:bg-neutral-50"
@@ -405,6 +410,29 @@ export default async function PaymentsPage({ searchParams }: PaymentsPageProps) 
             </div>
           </div>
         </section>
+
+        {totalPages > 1 && (
+          <div className="mt-5 flex items-center justify-between gap-4 text-sm">
+            <p className="text-neutral-500">
+              {(safePage - 1) * PAGE_SIZE + 1}–{Math.min(safePage * PAGE_SIZE, totalPayments)} sur {totalPayments} paiements
+            </p>
+            <div className="flex items-center gap-2">
+              {safePage > 1 ? (
+                <Link href={pageHref(safePage - 1)} className="inline-flex h-10 items-center justify-center rounded-md border border-line bg-white px-4 font-semibold transition hover:bg-neutral-50">
+                  Précédent
+                </Link>
+              ) : null}
+              <span className="inline-flex h-10 items-center justify-center rounded-md bg-ink px-4 font-semibold text-white">
+                {safePage} / {totalPages}
+              </span>
+              {safePage < totalPages ? (
+                <Link href={pageHref(safePage + 1)} className="inline-flex h-10 items-center justify-center rounded-md border border-line bg-white px-4 font-semibold transition hover:bg-neutral-50">
+                  Suivant
+                </Link>
+              ) : null}
+            </div>
+          </div>
+        )}
       </div>
     </AppShell>
   );

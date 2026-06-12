@@ -14,19 +14,11 @@ import { requireAdminGym } from "@/lib/supabase/guards";
 import { getSubscriptionType } from "@/lib/supabase/queries";
 
 type EditSubscriptionTypePageProps = {
-  params: Promise<{
-    id: string;
-  }>;
-  searchParams: Promise<{
-    error?: string;
-  }>;
+  params: Promise<{ id: string }>;
 };
 
-export default async function EditSubscriptionTypePage({
-  params,
-  searchParams,
-}: EditSubscriptionTypePageProps) {
-  const [{ id }, query] = await Promise.all([params, searchParams]);
+export default async function EditSubscriptionTypePage({ params }: EditSubscriptionTypePageProps) {
+  const { id } = await params;
   const gym = await requireAdminGym();
   const subscriptionType = await getSubscriptionType(gym.id, id);
 
@@ -60,12 +52,6 @@ export default async function EditSubscriptionTypePage({
               <p className="mt-1 text-sm text-neutral-500">Les changements s&apos;appliquent aux prochains abonnements vendus.</p>
             </div>
           </div>
-
-          {query.error ? (
-            <div className="mt-5 rounded-md border border-red-200 bg-red-50 p-4 text-sm font-semibold text-danger">
-              {query.error}
-            </div>
-          ) : null}
 
           <div className="mt-5 grid gap-5 md:grid-cols-2">
             <FormField label="Nom">

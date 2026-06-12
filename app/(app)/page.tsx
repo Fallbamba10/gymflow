@@ -13,6 +13,7 @@ import {
   Plus,
   ReceiptText,
   ShieldCheck,
+  Sparkles,
   TrendingUp,
   UserPlus,
   UserCheck,
@@ -35,8 +36,13 @@ function plural(count: number, singular: string, pluralValue = `${singular}s`) {
   return `${count} ${count > 1 ? pluralValue : singular}`;
 }
 
-export default async function Home() {
-  const gym = await getCurrentGym();
+type HomeProps = {
+  searchParams: Promise<{ welcome?: string }>;
+};
+
+export default async function Home({ searchParams }: HomeProps) {
+  const [gym, sp] = await Promise.all([getCurrentGym(), searchParams]);
+  const isWelcome = sp.welcome === "1";
 
   if (gym?.role === "operator") {
     const checkins = await getTodayCheckins(gym.id);
@@ -260,6 +266,37 @@ export default async function Home() {
       />
 
       <div className="px-4 py-6 md:px-8">
+        {isWelcome && (
+          <div className="mb-5 rounded-md border border-emerald-200 bg-emerald-50 p-5 shadow-soft">
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+              <div>
+                <p className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.08em] text-mint">
+                  <Sparkles size={13} />
+                  Bienvenue sur GymFlow
+                </p>
+                <h2 className="mt-2 text-lg font-semibold text-ink">Votre espace est prêt. Voici les 3 premières étapes.</h2>
+              </div>
+            </div>
+            <div className="mt-4 grid gap-3 sm:grid-cols-3">
+              <Link href="/subscriptions/new" className="group flex items-center gap-3 rounded-md border border-emerald-200 bg-white p-3 text-sm font-semibold transition hover:border-mint/50 hover:shadow-sm">
+                <span className="flex size-8 shrink-0 items-center justify-center rounded-md bg-mint text-white text-xs font-bold">1</span>
+                <span>Créer une formule d&apos;abonnement</span>
+                <ArrowRight className="ml-auto text-neutral-300 transition group-hover:text-mint" size={15} />
+              </Link>
+              <Link href="/members/new" className="group flex items-center gap-3 rounded-md border border-emerald-200 bg-white p-3 text-sm font-semibold transition hover:border-mint/50 hover:shadow-sm">
+                <span className="flex size-8 shrink-0 items-center justify-center rounded-md bg-ink text-white text-xs font-bold">2</span>
+                <span>Ajouter votre premier membre</span>
+                <ArrowRight className="ml-auto text-neutral-300 transition group-hover:text-ink" size={15} />
+              </Link>
+              <Link href="/settings" className="group flex items-center gap-3 rounded-md border border-emerald-200 bg-white p-3 text-sm font-semibold transition hover:border-mint/50 hover:shadow-sm">
+                <span className="flex size-8 shrink-0 items-center justify-center rounded-md bg-amber/20 text-amber text-xs font-bold">3</span>
+                <span>Compléter les paramètres salle</span>
+                <ArrowRight className="ml-auto text-neutral-300 transition group-hover:text-amber" size={15} />
+              </Link>
+            </div>
+          </div>
+        )}
+
         <section className="rounded-md border border-neutral-900 bg-ink p-5 text-white shadow-soft md:p-6">
           <div className="grid gap-6 xl:grid-cols-[1.1fr_0.9fr] xl:items-end">
             <div>

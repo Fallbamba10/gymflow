@@ -9,8 +9,6 @@ import { getSubscriptionTypeStats, getSubscriptionTypes } from "@/lib/supabase/q
 
 type SubscriptionsPageProps = {
   searchParams: Promise<{
-    success?: string;
-    error?: string;
     status?: string;
   }>;
 };
@@ -108,17 +106,6 @@ export default async function SubscriptionsPage({ searchParams }: SubscriptionsP
             <CreditCard className="text-mint" size={22} />
           </div>
 
-          {params.success ? (
-            <div className="mx-5 mt-5 rounded-md border border-emerald-200 bg-emerald-50 p-4 text-sm font-semibold text-mint">
-              {params.success}
-            </div>
-          ) : null}
-
-          {params.error ? (
-            <div className="mx-5 mt-5 rounded-md border border-red-200 bg-red-50 p-4 text-sm font-semibold text-danger">
-              {params.error}
-            </div>
-          ) : null}
 
           <div className="flex flex-wrap gap-2 border-b border-line p-5">
             {filters.map((filter) => (

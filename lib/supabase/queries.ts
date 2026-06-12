@@ -111,6 +111,7 @@ export type MemberRecord = {
   member_number: number;
   full_name: string;
   phone: string | null;
+  photo_url: string | null;
   created_at: string;
   archived_at: string | null;
   active_subscription: {
@@ -148,6 +149,7 @@ export type TodayCheckin = {
 
 export type MemberDetail = MemberRecord & {
   notes: string | null;
+  photo_url: string | null;
 };
 
 export type MemberSubscription = {
@@ -445,7 +447,7 @@ export async function getMembers(
   const supabase = await createClient();
   let request = supabase
     .from("members")
-    .select("id, member_number, full_name, phone, created_at, archived_at")
+    .select("id, member_number, full_name, phone, photo_url, created_at, archived_at")
     .eq("gym_id", gymId)
     .order("created_at", { ascending: false });
 
@@ -603,7 +605,7 @@ export async function getMemberDetail(
   const supabase = await createClient();
   const { data: member, error } = await supabase
     .from("members")
-    .select("id, member_number, full_name, phone, notes, created_at, archived_at")
+    .select("id, member_number, full_name, phone, photo_url, notes, created_at, archived_at")
     .eq("gym_id", gymId)
     .eq("id", memberId)
     .single();

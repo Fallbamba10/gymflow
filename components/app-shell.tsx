@@ -2,10 +2,11 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useState, Suspense } from "react";
 import { Banknote, CreditCard, LayoutDashboard, LogOut, Menu, Settings, UserCheck, Users, UsersRound, X } from "lucide-react";
 import { signOut } from "@/app/auth/actions";
 import { BrandMark } from "@/components/brand-mark";
+import { ToastProvider } from "@/components/toast";
 import { createClient } from "@/lib/supabase/client";
 import { cn } from "@/lib/utils";
 
@@ -167,6 +168,10 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       </aside>
 
       <section className="lg:pl-64">{children}</section>
+
+      <Suspense>
+        <ToastProvider />
+      </Suspense>
     </main>
   );
 }

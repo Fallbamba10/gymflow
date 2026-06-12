@@ -25,9 +25,7 @@ import { getCheckinCandidates, getCurrentGym, getTodayCheckins } from "@/lib/sup
 
 type CheckinPageProps = {
   searchParams: Promise<{
-    error?: string;
     q?: string;
-    success?: string;
   }>;
 };
 
@@ -286,16 +284,6 @@ export default async function CheckinPage({ searchParams }: CheckinPageProps) {
                   </button>
                 </form>
 
-                {params.success ? (
-                  <div className="mt-4 rounded-md border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm font-semibold text-mint">
-                    {params.success}
-                  </div>
-                ) : null}
-                {params.error ? (
-                  <div className="mt-4 rounded-md border border-red-200 bg-red-50 px-4 py-3 text-sm font-semibold text-danger">
-                    {params.error}
-                  </div>
-                ) : null}
 
                 <div className="mt-5 space-y-3">
                   {sortedCandidates.length > 0 ? (

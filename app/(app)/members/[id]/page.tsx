@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-img-element */
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Archive, ArrowLeft, Banknote, CalendarClock, CheckCircle2, Phone, ReceiptText, RotateCcw, ShieldCheck, UserCheck, UserPen } from "lucide-react";
@@ -19,13 +20,7 @@ import {
 } from "@/lib/supabase/queries";
 
 type MemberDetailPageProps = {
-  params: Promise<{
-    id: string;
-  }>;
-  searchParams: Promise<{
-    error?: string;
-    success?: string;
-  }>;
+  params: Promise<{ id: string }>;
 };
 
 function formatDate(value: string | null) {
@@ -75,12 +70,8 @@ function getStatus(member: Awaited<ReturnType<typeof getMemberDetail>>) {
   return { tone: "active" as const, label: "Actif" };
 }
 
-export default async function MemberDetailPage({
-  params,
-  searchParams,
-}: MemberDetailPageProps) {
+export default async function MemberDetailPage({ params }: MemberDetailPageProps) {
   const { id } = await params;
-  const query = await searchParams;
   const gym = await requireAdminGym();
 
   const [member, subscriptionTypes, subscriptions, checkins, payments] = await Promise.all([
@@ -129,7 +120,14 @@ export default async function MemberDetailPage({
                   </div>
                   <StatusBadge tone={status.tone}>{status.label}</StatusBadge>
                 </div>
-                <h2 className="mt-4 text-2xl font-semibold md:text-3xl">{member.full_name}</h2>
+                <h2 className="mt-4 text-2xl font-semibold md:text-3xl">
+                  {member.photo_url ? (
+                    <span className="mr-3 inline-block size-10 overflow-hidden rounded-full border-2 border-white/20 align-middle">
+                      <img src={member.photo_url} alt={member.full_name} className="size-full object-cover" />
+                    </span>
+                  ) : null}
+                  {member.full_name}
+                </h2>
                 <div className="mt-3 flex flex-wrap gap-4 text-sm text-white/65">
                   <span className="inline-flex items-center gap-2">
                     <Phone size={16} />
@@ -156,16 +154,6 @@ export default async function MemberDetailPage({
               </div>
             </div>
 
-            {query.success ? (
-              <div className="mt-5 rounded-md border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm font-semibold text-mint">
-                {query.success}
-              </div>
-            ) : null}
-            {query.error ? (
-              <div className="mt-5 rounded-md border border-red-200 bg-red-50 px-4 py-3 text-sm font-semibold text-danger">
-                {query.error}
-              </div>
-            ) : null}
             {isArchived ? (
               <div className="mt-5 rounded-md border border-neutral-200 bg-neutral-50 px-4 py-3 text-sm font-semibold text-neutral-700">
                 Ce membre est archive depuis le {formatDate(member.archived_at)}. Restaure-le pour reprendre les pointages et renouvellements.
