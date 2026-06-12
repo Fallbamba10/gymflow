@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
+import { getActiveGymId, setActiveGymId } from "@/lib/active-gym";
 
 type RelationRow = {
   full_name?: string | null;
@@ -35,6 +36,13 @@ export type CurrentGym = {
   billing_status: string;
   trial_ends_at: string | null;
   billing_period_end: string | null;
+};
+
+export type UserGym = {
+  id: string;
+  name: string;
+  role: "admin" | "operator";
+  billing_status: string;
 };
 
 export type GymSettings = {
@@ -259,41 +267,73 @@ export type PaymentsData = {
   methodTotals: Record<PaymentMethod, number>;
 };
 
+export async function getUserGyms(): Promise<UserGym[]> {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return [];
+
+  const { data } = await supabase
+    .from("gym_users")
+    .select("role, gyms(id, name, billing_status)")
+    .eq("user_id", user.id)
+    .eq("active", true)
+    .order("created_at", { ascending: true });
+
+  return (data ?? []).map((row) => {
+    const gym = Array.isArray(row.gyms) ? row.gyms[0] : row.gyms;
+    if (!gym) return null;
+    return {
+      id: (gym as Record<string, unknown>).id as string,
+      name: (gym as Record<string, unknown>).name as string,
+      role: row.role as "admin" | "operator",
+      billing_status: (gym as Record<string, unknown>).billing_status as string ?? "trialing",
+    };
+  }).filter((g): g is UserGym => g !== null);
+}
+
 export async function getCurrentGym(): Promise<CurrentGym | null> {
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return null;
 
-  if (!user) {
-    return null;
-  }
+  // Lire la salle active depuis le cookie
+  const activeGymId = await getActiveGymId();
 
   const { data, error } = await supabase
     .from("gym_users")
     .select("role, gyms(id, name, currency, billing_status, trial_ends_at, billing_period_end)")
     .eq("user_id", user.id)
-    .eq("active", true)
-    .limit(1)
-    .single();
+    .eq("active", true);
 
-  if (error || !data || !data.gyms) {
-    return null;
+  if (error || !data || data.length === 0) return null;
+
+  // Chercher la salle du cookie, sinon prendre la première
+  let row = activeGymId
+    ? data.find((r) => {
+        const g = Array.isArray(r.gyms) ? r.gyms[0] : r.gyms;
+        return (g as Record<string, unknown> | null)?.id === activeGymId;
+      })
+    : null;
+
+  if (!row) {
+    row = data[0];
+    // Mémoriser la première salle si aucun cookie
+    const g = Array.isArray(row.gyms) ? row.gyms[0] : row.gyms;
+    if (g) await setActiveGymId((g as Record<string, unknown>).id as string);
   }
 
-  const gym = Array.isArray(data.gyms) ? data.gyms[0] : data.gyms;
-  if (!gym) {
-    return null;
-  }
+  const gym = Array.isArray(row.gyms) ? row.gyms[0] : row.gyms;
+  if (!gym) return null;
 
+  const g = gym as Record<string, unknown>;
   return {
-    id: gym.id,
-    name: gym.name,
-    currency: gym.currency,
-    role: data.role,
-    billing_status: (gym as Record<string, unknown>).billing_status as string ?? "trialing",
-    trial_ends_at: (gym as Record<string, unknown>).trial_ends_at as string | null ?? null,
-    billing_period_end: (gym as Record<string, unknown>).billing_period_end as string | null ?? null,
+    id: g.id as string,
+    name: g.name as string,
+    currency: g.currency as string,
+    role: row.role as "admin" | "operator",
+    billing_status: g.billing_status as string ?? "trialing",
+    trial_ends_at: g.trial_ends_at as string | null ?? null,
+    billing_period_end: g.billing_period_end as string | null ?? null,
   };
 }
 

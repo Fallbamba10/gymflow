@@ -8,6 +8,7 @@ import { signOut } from "@/app/auth/actions";
 import { BrandMark } from "@/components/brand-mark";
 import { ToastProvider } from "@/components/toast";
 import { NotificationsBell } from "@/components/notifications-bell";
+import { GymSwitcher } from "@/components/gym-switcher";
 import { createClient } from "@/lib/supabase/client";
 import { cn } from "@/lib/utils";
 
@@ -25,6 +26,7 @@ const navItems = [
 export function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const [gymName, setGymName] = useState("Salle");
+  const [gymId, setGymId] = useState<string | null>(null);
   const [role, setRole] = useState<string | null>(null);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
@@ -33,6 +35,12 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
     async function loadGym() {
       try {
+        const res = await fetch("/api/user-gyms");
+        const data = await res.json();
+        const gyms: { id: string; name: string; role: string }[] = data.gyms ?? [];
+        if (!mounted || gyms.length === 0) return;
+
+        // La salle active est celle qui correspond au cookie — on la récupère via getCurrentGym
         const supabase = createClient();
         const {
           data: { user },
@@ -40,18 +48,19 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
         if (!user) return;
 
-        const { data } = await supabase
+        const { data: guData } = await supabase
           .from("gym_users")
-          .select("role, gyms(name)")
+          .select("role, gyms(id, name)")
           .eq("user_id", user.id)
           .eq("active", true)
           .limit(1)
           .single();
 
-        const gym = Array.isArray(data?.gyms) ? data?.gyms[0] : data?.gyms;
+        const gym = Array.isArray(guData?.gyms) ? guData?.gyms[0] : guData?.gyms;
         if (mounted && gym?.name) {
           setGymName(gym.name);
-          setRole(data?.role ?? null);
+          setGymId((gym as { id: string }).id ?? null);
+          setRole(guData?.role ?? null);
         }
       } catch {
         // Keep the current label if the gym cannot be loaded.
@@ -140,7 +149,9 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           </div>
         </Link>
 
-        <nav className="mt-10 space-y-1">
+        {gymId && <div className="mt-5"><GymSwitcher currentGymId={gymId} /></div>}
+
+        <nav className="mt-6 space-y-1">
           {visibleNavItems.map((item) => {
             const active =
               pathname === item.href || (item.href !== "/" && pathname.startsWith(`${item.href}/`));
