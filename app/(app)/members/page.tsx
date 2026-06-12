@@ -1,6 +1,6 @@
 /* eslint-disable @next/next/no-img-element */
 import Link from "next/link";
-import { AlertTriangle, CheckCircle2, Download, Plus, Search, UserRound, Users } from "lucide-react";
+import { AlertTriangle, CheckCircle2, Download, Plus, Search, Upload, UserRound, Users } from "lucide-react";
 import { AppShell } from "@/components/app-shell";
 import { PageHeader } from "@/components/page-header";
 import { StatusBadge } from "@/components/status-badge";
@@ -113,6 +113,10 @@ export default async function MembersPage({ searchParams }: MembersPageProps) {
         eyebrow={`${members.length} membres enregistres`}
         actions={
           <>
+            <Link href="/members/import" className="inline-flex h-11 items-center justify-center gap-2 rounded-md border border-line bg-white px-4 text-sm font-semibold shadow-sm transition hover:bg-neutral-50">
+              <Upload size={18} />
+              Import CSV
+            </Link>
             <Link href="/members/export" className="inline-flex h-11 items-center justify-center gap-2 rounded-md border border-line bg-white px-4 text-sm font-semibold shadow-sm transition hover:bg-neutral-50">
               <Download size={18} />
               Export CSV
