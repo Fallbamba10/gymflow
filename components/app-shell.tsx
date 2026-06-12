@@ -85,20 +85,20 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   const roleLabel = role === "admin" ? "Admin" : role === "operator" ? "Operateur" : null;
 
   return (
-    <main className="min-h-screen bg-paper text-ink">
-      <header className="sticky top-0 z-30 border-b border-line bg-white/95 px-4 py-3 backdrop-blur lg:hidden">
+    <main className="min-h-screen bg-[#080808] text-white">
+      <header className="sticky top-0 z-30 border-b border-white/8 bg-[#080808]/95 px-4 py-3 backdrop-blur lg:hidden">
         <div className="flex items-center justify-between gap-3">
           <Link href="/" className="flex min-w-0 items-center gap-3">
-            <BrandMark />
+            <BrandMark inverse />
             <div className="min-w-0">
-              <p className="text-base font-semibold leading-none">GymFlow</p>
-              <p className="mt-1 truncate text-sm text-neutral-500">{gymName}</p>
+              <p className="text-base font-semibold leading-none text-white">GymFlow</p>
+              <p className="mt-1 truncate text-sm text-white/45">{gymName}</p>
             </div>
           </Link>
           <div className="flex items-center gap-2">
             {role === "admin" && <NotificationsBell />}
             <button
-              className="flex size-10 shrink-0 items-center justify-center rounded-md border border-line bg-white text-ink"
+              className="flex size-10 shrink-0 items-center justify-center rounded-lg border border-white/10 bg-white/6 text-white"
               onClick={() => setMobileMenuOpen((current) => !current)}
               aria-expanded={mobileMenuOpen}
               aria-label={mobileMenuOpen ? "Fermer le menu" : "Ouvrir le menu"}
@@ -110,8 +110,8 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       </header>
 
       {mobileMenuOpen ? (
-        <div className="fixed inset-x-0 top-[65px] z-30 border-b border-line bg-white px-4 py-4 shadow-soft lg:hidden">
-          <nav className="grid gap-2">
+        <div className="fixed inset-x-0 top-[65px] z-30 border-b border-white/8 bg-[#080808] px-4 py-4 lg:hidden">
+          <nav className="grid gap-1.5">
             {visibleNavItems.map((item) => {
               const active =
                 pathname === item.href || (item.href !== "/" && pathname.startsWith(`${item.href}/`));
@@ -120,38 +120,38 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                   key={item.href}
                   href={item.href}
                   className={cn(
-                    "flex h-11 items-center gap-3 rounded-md px-3 text-sm font-semibold transition",
-                    active ? "bg-ink text-white" : "border border-line bg-white text-neutral-700",
+                    "flex h-11 items-center gap-3 rounded-xl px-3 text-sm font-semibold transition",
+                    active ? "bg-emerald-500 text-white" : "bg-white/5 text-white/60 hover:bg-white/8 hover:text-white",
                   )}
                 >
-                  <item.icon size={18} />
+                  <item.icon size={17} />
                   {item.label}
                 </Link>
               );
             })}
           </nav>
           <form action={signOut} className="mt-4">
-            <button className="flex h-11 w-full items-center justify-center gap-2 rounded-md border border-line bg-paper px-3 text-sm font-semibold text-neutral-700">
+            <button className="flex h-11 w-full items-center justify-center gap-2 rounded-xl border border-white/10 bg-white/5 px-3 text-sm font-semibold text-white/50">
               <LogOut size={17} />
-              Deconnexion
+              Déconnexion
             </button>
           </form>
         </div>
       ) : null}
 
-      <aside className="fixed inset-y-0 left-0 hidden w-64 border-r border-line bg-white px-5 py-6 lg:block">
-        <Link href="/" className="flex items-center gap-3">
-          <BrandMark />
+      <aside className="fixed inset-y-0 left-0 hidden w-64 border-r border-white/8 bg-[#0a0a0a] px-4 py-5 lg:block">
+        <Link href="/" className="flex items-center gap-3 px-1">
+          <BrandMark inverse />
           <div>
-            <p className="text-lg font-semibold leading-none">GymFlow</p>
-            <p className="mt-1 text-sm text-neutral-500">{gymName}</p>
-            {roleLabel ? <p className="mt-0.5 text-xs font-medium text-mint">{roleLabel}</p> : null}
+            <p className="text-base font-semibold leading-none text-white">GymFlow</p>
+            <p className="mt-1 text-xs text-white/40">{gymName}</p>
+            {roleLabel ? <p className="mt-0.5 text-xs font-semibold text-emerald-400">{roleLabel}</p> : null}
           </div>
         </Link>
 
-        {gymId && <div className="mt-5"><GymSwitcher currentGymId={gymId} /></div>}
+        {gymId && <div className="mt-4"><GymSwitcher currentGymId={gymId} /></div>}
 
-        <nav className="mt-6 space-y-1">
+        <nav className="mt-5 space-y-0.5">
           {visibleNavItems.map((item) => {
             const active =
               pathname === item.href || (item.href !== "/" && pathname.startsWith(`${item.href}/`));
@@ -160,30 +160,30 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                 key={item.href}
                 href={item.href}
                 className={cn(
-                  "flex h-10 w-full items-center gap-3 rounded-md px-3 text-sm font-medium transition",
+                  "flex h-10 w-full items-center gap-3 rounded-xl px-3 text-sm font-medium transition",
                   active
-                    ? "bg-ink text-white"
-                    : "text-neutral-600 hover:bg-neutral-100",
+                    ? "bg-emerald-500 text-white"
+                    : "text-white/50 hover:bg-white/6 hover:text-white",
                 )}
               >
-                <item.icon size={17} />
+                <item.icon size={16} />
                 {item.label}
               </Link>
             );
           })}
         </nav>
 
-        <div className="absolute bottom-5 left-5 right-5 space-y-2">
+        <div className="absolute bottom-4 left-4 right-4 space-y-2">
           {role === "admin" && (
-            <div className="flex items-center justify-between rounded-md border border-line bg-paper px-3 py-2">
-              <span className="text-xs font-semibold text-neutral-500">Alertes</span>
+            <div className="flex items-center justify-between rounded-xl border border-white/8 bg-white/4 px-3 py-2">
+              <span className="text-xs font-semibold text-white/40">Alertes</span>
               <NotificationsBell />
             </div>
           )}
           <form action={signOut}>
-            <button className="flex h-10 w-full items-center justify-center gap-2 rounded-md border border-line bg-white px-3 text-sm font-semibold text-neutral-600 hover:bg-neutral-50">
-              <LogOut size={16} />
-              Deconnexion
+            <button className="flex h-10 w-full items-center justify-center gap-2 rounded-xl border border-white/8 bg-white/4 px-3 text-sm font-semibold text-white/45 hover:bg-white/8 hover:text-white/70">
+              <LogOut size={15} />
+              Déconnexion
             </button>
           </form>
         </div>

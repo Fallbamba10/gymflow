@@ -20,7 +20,6 @@ import {
   Users,
 } from "lucide-react";
 import { AppShell } from "@/components/app-shell";
-import { PageHeader } from "@/components/page-header";
 import { StatusBadge } from "@/components/status-badge";
 import { formatCurrency } from "@/lib/demo-data";
 import { getCurrentGym, getDashboardData, getTodayCheckins } from "@/lib/supabase/queries";
@@ -44,116 +43,118 @@ export default async function Home({ searchParams }: HomeProps) {
   const [gym, sp] = await Promise.all([getCurrentGym(), searchParams]);
   const isWelcome = sp.welcome === "1";
 
+  // ── Vue opérateur ─────────────────────────────────────────────────────────
   if (gym?.role === "operator") {
     const checkins = await getTodayCheckins(gym.id);
-    const memberCheckins = checkins.filter((entry) => entry.member_id);
-    const walkInCheckins = checkins.filter((entry) => !entry.member_id);
+    const memberCheckins = checkins.filter((e) => e.member_id);
+    const walkInCheckins = checkins.filter((e) => !e.member_id);
 
     return (
       <AppShell>
-        <PageHeader
-          title="Espace employe"
-          eyebrow={new Intl.DateTimeFormat("fr-FR", { dateStyle: "full" }).format(new Date())}
-          actions={
-            <Link href="/checkin" className="inline-flex h-11 items-center justify-center gap-2 rounded-md bg-mint px-4 text-sm font-semibold text-white shadow-sm transition hover:bg-emerald-700">
-              <UserCheck size={18} />
-              Ouvrir pointage
-            </Link>
-          }
-        />
-
-        <div className="px-4 py-6 md:px-8">
-          <section className="rounded-md border border-neutral-900 bg-ink p-5 text-white shadow-soft md:p-6">
-            <div className="grid gap-6 xl:grid-cols-[1fr_0.75fr] xl:items-end">
+        <div className="min-h-screen bg-[#080808] text-white">
+          {/* Header */}
+          <div className="border-b border-white/8 px-6 py-5 md:px-8">
+            <div className="flex items-center justify-between gap-4">
               <div>
-                <div className="inline-flex items-center gap-2 rounded-md border border-white/15 bg-white/10 px-3 py-1 text-xs font-semibold uppercase tracking-[0.08em] text-white/70">
-                  <ShieldCheck size={14} />
-                  Session employe
-                </div>
-                <h2 className="mt-4 text-2xl font-semibold md:text-3xl">Pointage rapide pour {gym.name}</h2>
-                <p className="mt-2 max-w-2xl text-sm leading-6 text-white/65">
-                  Valide les membres abonnes et les seances simples sans ouvrir les outils de gestion.
+                <p className="text-xs font-semibold uppercase tracking-[0.1em] text-white/40">
+                  {new Intl.DateTimeFormat("fr-FR", { dateStyle: "full" }).format(new Date())}
                 </p>
+                <h1 className="mt-1 text-2xl font-semibold">Espace employé</h1>
               </div>
-
-              <div className="grid gap-4 sm:grid-cols-3">
-                <div className="border-l border-white/15 pl-4">
-                  <p className="text-xs font-medium uppercase tracking-[0.08em] text-white/45">Entrees</p>
-                  <p className="mt-2 text-xl font-semibold">{checkins.length}</p>
-                </div>
-                <div className="border-l border-white/15 pl-4">
-                  <p className="text-xs font-medium uppercase tracking-[0.08em] text-white/45">Abonnes</p>
-                  <p className="mt-2 text-xl font-semibold">{memberCheckins.length}</p>
-                </div>
-                <div className="border-l border-white/15 pl-4">
-                  <p className="text-xs font-medium uppercase tracking-[0.08em] text-white/45">Seances</p>
-                  <p className="mt-2 text-xl font-semibold">{walkInCheckins.length}</p>
-                </div>
-              </div>
+              <Link
+                href="/checkin"
+                className="inline-flex h-10 items-center gap-2 rounded-xl bg-emerald-500 px-4 text-sm font-semibold text-white transition hover:bg-emerald-400"
+              >
+                <UserCheck size={16} />
+                Pointage
+              </Link>
             </div>
-          </section>
+          </div>
 
-          <section className="mt-5 grid gap-4 md:grid-cols-2">
-            <Link href="/checkin" className="group rounded-md border border-line bg-white p-5 shadow-soft transition hover:border-mint/50 hover:shadow-md">
-              <div className="flex items-start justify-between gap-4">
+          <div className="px-6 py-6 md:px-8">
+            {/* Stats */}
+            <div className="grid grid-cols-3 gap-4">
+              {[
+                { label: "Entrées", value: checkins.length },
+                { label: "Abonnés", value: memberCheckins.length },
+                { label: "Séances", value: walkInCheckins.length },
+              ].map((s) => (
+                <div key={s.label} className="rounded-2xl border border-white/8 bg-white/4 p-5">
+                  <p className="text-xs font-semibold uppercase tracking-[0.1em] text-white/40">{s.label}</p>
+                  <p className="mt-3 text-3xl font-semibold">{s.value}</p>
+                </div>
+              ))}
+            </div>
+
+            {/* Actions */}
+            <div className="mt-4 grid gap-3 sm:grid-cols-2">
+              <Link
+                href="/checkin"
+                className="group flex items-center justify-between rounded-2xl border border-white/8 bg-white/4 p-5 transition hover:border-emerald-500/30 hover:bg-white/6"
+              >
+                <div className="flex items-center gap-4">
+                  <div className="flex size-11 items-center justify-center rounded-xl bg-emerald-500 text-white">
+                    <DoorOpen size={20} />
+                  </div>
+                  <div>
+                    <p className="font-semibold">Encaisser une séance</p>
+                    <p className="mt-0.5 text-xs text-white/40">Prix libre, paiement direct</p>
+                  </div>
+                </div>
+                <ArrowRight size={16} className="text-white/25 transition group-hover:text-emerald-400" />
+              </Link>
+              <Link
+                href="/checkin"
+                className="group flex items-center justify-between rounded-2xl border border-white/8 bg-white/4 p-5 transition hover:border-emerald-500/30 hover:bg-white/6"
+              >
+                <div className="flex items-center gap-4">
+                  <div className="flex size-11 items-center justify-center rounded-xl bg-white/10 text-white">
+                    <CheckCircle2 size={20} />
+                  </div>
+                  <div>
+                    <p className="font-semibold">Pointer un membre</p>
+                    <p className="mt-0.5 text-xs text-white/40">Recherche par nom ou numéro</p>
+                  </div>
+                </div>
+                <ArrowRight size={16} className="text-white/25 transition group-hover:text-emerald-400" />
+              </Link>
+            </div>
+
+            {/* Journal */}
+            <div className="mt-6 overflow-hidden rounded-2xl border border-white/8 bg-white/4">
+              <div className="flex items-center justify-between border-b border-white/8 px-6 py-4">
                 <div>
-                  <div className="flex size-12 items-center justify-center rounded-md bg-mint text-white">
-                    <DoorOpen size={24} />
-                  </div>
-                  <h2 className="mt-5 text-xl font-semibold">Encaisser une seance</h2>
-                  <p className="mt-2 text-sm leading-6 text-neutral-500">Prix libre, mode de paiement, entree validee directement.</p>
+                  <h2 className="font-semibold">Journal du jour</h2>
+                  <p className="mt-0.5 text-xs text-white/40">Dernières entrées</p>
                 </div>
-                <ArrowRight className="text-neutral-400 transition group-hover:text-mint" size={20} />
+                <Clock3 size={18} className="text-emerald-400" />
               </div>
-            </Link>
-
-            <Link href="/checkin" className="group rounded-md border border-line bg-white p-5 shadow-soft transition hover:border-mint/50 hover:shadow-md">
-              <div className="flex items-start justify-between gap-4">
-                <div>
-                  <div className="flex size-12 items-center justify-center rounded-md bg-ink text-white">
-                    <CheckCircle2 size={24} />
-                  </div>
-                  <h2 className="mt-5 text-xl font-semibold">Pointer un membre</h2>
-                  <p className="mt-2 text-sm leading-6 text-neutral-500">Recherche par nom, telephone ou numero de membre.</p>
-                </div>
-                <ArrowRight className="text-neutral-400 transition group-hover:text-mint" size={20} />
-              </div>
-            </Link>
-          </section>
-
-          <section className="mt-6 rounded-md border border-line bg-white shadow-soft">
-            <div className="flex items-center justify-between border-b border-line p-5">
-              <div>
-                <h2 className="text-lg font-semibold">Journal du jour</h2>
-                <p className="mt-1 text-sm text-neutral-500">Dernieres entrees validees pendant la session.</p>
-              </div>
-              <Clock3 className="text-mint" size={22} />
-            </div>
-            <div className="divide-y divide-line">
-              {checkins.length > 0 ? (
-                checkins.slice(0, 10).map((entry) => (
-                  <div key={entry.id} className="grid gap-3 p-5 text-sm sm:grid-cols-[84px_1fr_auto] sm:items-center">
-                    <div className="inline-flex h-9 w-fit items-center gap-2 rounded-md bg-paper px-3 font-semibold text-neutral-700">
-                      <Clock3 size={15} />
-                      {formatTime(entry.checked_in_at)}
+              <div className="divide-y divide-white/6">
+                {checkins.length > 0 ? (
+                  checkins.slice(0, 10).map((entry) => (
+                    <div key={entry.id} className="flex items-center gap-4 px-6 py-3.5">
+                      <span className="shrink-0 rounded-lg bg-white/8 px-2.5 py-1 text-xs font-semibold tabular-nums text-white/60">
+                        {formatTime(entry.checked_in_at)}
+                      </span>
+                      <div className="min-w-0 flex-1">
+                        <p className="truncate text-sm font-semibold">{entry.member_name}</p>
+                        <p className="truncate text-xs text-white/40">{entry.plan ?? "Abonnement"}</p>
+                      </div>
+                      <span className="shrink-0 text-xs font-semibold text-emerald-400">Validé</span>
                     </div>
-                    <div className="min-w-0">
-                      <p className="truncate font-semibold">{entry.member_name}</p>
-                      <p className="mt-1 truncate text-xs text-neutral-500">{entry.plan ?? "Abonnement"}</p>
-                    </div>
-                    <span className="text-xs font-semibold text-mint">Valide</span>
-                  </div>
-                ))
-              ) : (
-                <p className="p-5 text-sm text-neutral-500">Aucune entree aujourd&apos;hui.</p>
-              )}
+                  ))
+                ) : (
+                  <p className="px-6 py-5 text-sm text-white/35">Aucune entrée aujourd&apos;hui.</p>
+                )}
+              </div>
             </div>
-          </section>
+          </div>
         </div>
       </AppShell>
     );
   }
 
+  // ── Vue admin ─────────────────────────────────────────────────────────────
   const dashboard = gym
     ? await getDashboardData(gym.id)
     : {
@@ -169,390 +170,436 @@ export default async function Home({ searchParams }: HomeProps) {
       };
 
   const todayLabel = new Intl.DateTimeFormat("fr-FR", { dateStyle: "full" }).format(new Date());
-  const maxRevenue = Math.max(...dashboard.revenue7Days.map((day) => day.amount), 1);
-  const weekRevenue = dashboard.revenue7Days.reduce((sum, day) => sum + day.amount, 0);
+  const maxRevenue = Math.max(...dashboard.revenue7Days.map((d) => d.amount), 1);
+  const weekRevenue = dashboard.revenue7Days.reduce((s, d) => s + d.amount, 0);
   const bestDay = dashboard.revenue7Days.reduce(
-    (best, day) => (day.amount > best.amount ? day : best),
+    (best, d) => (d.amount > best.amount ? d : best),
     { date: "", label: "-", amount: 0 },
   );
   const uniqueCheckinsToday = new Set(
-    dashboard.checkinsToday.map((entry) => entry.member_id).filter(Boolean),
+    dashboard.checkinsToday.map((e) => e.member_id).filter(Boolean),
   ).size;
   const activeRate =
-    dashboard.totalMembers > 0 ? Math.round((dashboard.activeMembers / dashboard.totalMembers) * 100) : 0;
+    dashboard.totalMembers > 0
+      ? Math.round((dashboard.activeMembers / dashboard.totalMembers) * 100)
+      : 0;
   const averageTicket =
     dashboard.paymentsToday > 0 ? dashboard.revenueToday / dashboard.paymentsToday : 0;
-  const urgentAlerts = dashboard.alerts.filter((alert) => alert.status === "expired").length;
+  const urgentAlerts = dashboard.alerts.filter((a) => a.status === "expired").length;
   const warningAlerts = dashboard.alerts.length - urgentAlerts;
-  const topPlanMax = Math.max(...dashboard.topPlans.map((plan) => plan.amount), 1);
+  const topPlanMax = Math.max(...dashboard.topPlans.map((p) => p.amount), 1);
   const latestCheckin = dashboard.checkinsToday[0] ?? null;
   const topPlan = dashboard.topPlans[0] ?? null;
-  const ownerSignals = [
-    {
-      label: "Flux comptoir",
-      value: `${dashboard.checkinsToday.length} entree${dashboard.checkinsToday.length > 1 ? "s" : ""}`,
-      detail: latestCheckin ? `Dernier passage a ${formatTime(latestCheckin.checked_in_at)}` : "Aucune entree validee",
-      icon: DoorOpen,
-    },
-    {
-      label: "Priorite du jour",
-      value: dashboard.alerts.length > 0 ? `${dashboard.alerts.length} a traiter` : "Salle stable",
-      detail: urgentAlerts > 0 ? `${urgentAlerts} renouvellement${urgentAlerts > 1 ? "s" : ""} urgent${urgentAlerts > 1 ? "s" : ""}` : "Aucune urgence critique",
-      icon: AlertTriangle,
-    },
-    {
-      label: "Formule forte",
-      value: topPlan?.name ?? "Aucune vente",
-      detail: topPlan ? `${formatCurrency(topPlan.amount)} sur 7 jours` : "Les ventes apparaitront ici",
-      icon: TrendingUp,
-    },
-  ];
-  const statToneClasses = {
-    mint: "bg-emerald-50 text-mint",
-    ink: "bg-neutral-100 text-ink",
-    amber: "bg-amber/10 text-amber",
-    danger: "bg-red-50 text-danger",
-  } as const;
 
   const stats = [
     {
       label: "Revenus du jour",
       value: formatCurrency(dashboard.revenueToday),
-      detail: `${plural(dashboard.paymentsToday, "paiement")} · ticket moyen ${formatCurrency(averageTicket)}`,
+      detail: `${plural(dashboard.paymentsToday, "paiement")} · moy. ${formatCurrency(averageTicket)}`,
       icon: Banknote,
-      tone: "mint",
+      accent: "text-emerald-400",
+      bg: "bg-emerald-500/15",
     },
     {
-      label: "Entrees aujourd'hui",
+      label: "Entrées aujourd'hui",
       value: String(dashboard.checkinsToday.length),
       detail: `${uniqueCheckinsToday} membre${uniqueCheckinsToday > 1 ? "s" : ""} unique${uniqueCheckinsToday > 1 ? "s" : ""}`,
       icon: Activity,
-      tone: "ink",
+      accent: "text-blue-400",
+      bg: "bg-blue-500/15",
     },
     {
       label: "Membres actifs",
       value: String(dashboard.activeMembers),
       detail: `${activeRate}% du portefeuille actif`,
       icon: Users,
-      tone: "amber",
+      accent: "text-violet-400",
+      bg: "bg-violet-500/15",
     },
     {
-      label: "Priorites",
+      label: "Priorités",
       value: String(dashboard.alerts.length),
-      detail: `${urgentAlerts} urgent${urgentAlerts > 1 ? "s" : ""} · ${warningAlerts} a surveiller`,
+      detail: `${urgentAlerts} urgent${urgentAlerts !== 1 ? "s" : ""} · ${warningAlerts} à surveiller`,
       icon: AlertTriangle,
-      tone: "danger",
+      accent: dashboard.alerts.length > 0 ? "text-amber-400" : "text-white/40",
+      bg: dashboard.alerts.length > 0 ? "bg-amber-500/15" : "bg-white/8",
     },
   ];
 
   const quickActions = [
-    { label: "Nouveau membre", href: "/members/new", icon: UserPlus, tone: "bg-mint text-white hover:bg-emerald-700" },
-    { label: "Pointage", href: "/checkin", icon: CheckCircle2, tone: "bg-ink text-white hover:bg-neutral-800" },
-    { label: "Caisse", href: "/payments", icon: ReceiptText, tone: "border border-line bg-white text-ink hover:bg-neutral-50" },
-    { label: "Abonnements", href: "/subscriptions", icon: CreditCard, tone: "border border-line bg-white text-ink hover:bg-neutral-50" },
+    { label: "Nouveau membre", href: "/members/new", icon: UserPlus, primary: true },
+    { label: "Pointage", href: "/checkin", icon: CheckCircle2, primary: false },
+    { label: "Caisse", href: "/payments", icon: ReceiptText, primary: false },
+    { label: "Abonnements", href: "/subscriptions", icon: CreditCard, primary: false },
   ];
 
   return (
     <AppShell>
-      <PageHeader
-        title="Tableau de bord"
-        eyebrow={todayLabel}
-        actions={
-          <Link href="/members/new" className="inline-flex h-11 items-center justify-center gap-2 rounded-md bg-mint px-4 text-sm font-semibold text-white shadow-sm transition hover:bg-emerald-700">
-            <Plus size={18} />
-            Ajouter membre
-          </Link>
-        }
-      />
+      <div className="min-h-screen bg-[#080808] text-white">
+        {/* ── Header ─────────────────────────────────────────────────── */}
+        <div className="border-b border-white/8 px-6 py-5 md:px-8">
+          <div className="flex items-center justify-between gap-4">
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-[0.1em] text-white/40">
+                {todayLabel}
+              </p>
+              <h1 className="mt-1 text-2xl font-semibold">
+                {gym?.name ?? "Tableau de bord"}
+              </h1>
+            </div>
+            <Link
+              href="/members/new"
+              className="inline-flex h-10 items-center gap-2 rounded-xl bg-emerald-500 px-4 text-sm font-semibold text-white transition hover:bg-emerald-400"
+            >
+              <Plus size={16} />
+              Ajouter membre
+            </Link>
+          </div>
+        </div>
 
-      <div className="px-4 py-6 md:px-8">
-        {isWelcome && (
-          <div className="mb-5 rounded-md border border-emerald-200 bg-emerald-50 p-5 shadow-soft">
-            <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-              <div>
-                <p className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.08em] text-mint">
-                  <Sparkles size={13} />
+        <div className="px-6 py-6 md:px-8">
+
+          {/* ── Bandeau bienvenue ───────────────────────────────────── */}
+          {isWelcome && (
+            <div className="mb-6 overflow-hidden rounded-2xl border border-emerald-500/25 bg-emerald-500/8">
+              <div className="relative px-6 py-5">
+                <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-emerald-400/60 to-transparent" />
+                <p className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.1em] text-emerald-400">
+                  <Sparkles size={12} />
                   Bienvenue sur GymFlow
                 </p>
-                <h2 className="mt-2 text-lg font-semibold text-ink">Votre espace est prêt. Voici les 3 premières étapes.</h2>
-              </div>
-            </div>
-            <div className="mt-4 grid gap-3 sm:grid-cols-3">
-              <Link href="/subscriptions/new" className="group flex items-center gap-3 rounded-md border border-emerald-200 bg-white p-3 text-sm font-semibold transition hover:border-mint/50 hover:shadow-sm">
-                <span className="flex size-8 shrink-0 items-center justify-center rounded-md bg-mint text-white text-xs font-bold">1</span>
-                <span>Créer une formule d&apos;abonnement</span>
-                <ArrowRight className="ml-auto text-neutral-300 transition group-hover:text-mint" size={15} />
-              </Link>
-              <Link href="/members/new" className="group flex items-center gap-3 rounded-md border border-emerald-200 bg-white p-3 text-sm font-semibold transition hover:border-mint/50 hover:shadow-sm">
-                <span className="flex size-8 shrink-0 items-center justify-center rounded-md bg-ink text-white text-xs font-bold">2</span>
-                <span>Ajouter votre premier membre</span>
-                <ArrowRight className="ml-auto text-neutral-300 transition group-hover:text-ink" size={15} />
-              </Link>
-              <Link href="/settings" className="group flex items-center gap-3 rounded-md border border-emerald-200 bg-white p-3 text-sm font-semibold transition hover:border-mint/50 hover:shadow-sm">
-                <span className="flex size-8 shrink-0 items-center justify-center rounded-md bg-amber/20 text-amber text-xs font-bold">3</span>
-                <span>Compléter les paramètres salle</span>
-                <ArrowRight className="ml-auto text-neutral-300 transition group-hover:text-amber" size={15} />
-              </Link>
-            </div>
-          </div>
-        )}
-
-        <section className="rounded-md border border-neutral-900 bg-ink p-5 text-white shadow-soft md:p-6">
-          <div className="grid gap-6 xl:grid-cols-[1.1fr_0.9fr] xl:items-end">
-            <div>
-              <div className="inline-flex items-center gap-2 rounded-md border border-white/15 bg-white/10 px-3 py-1 text-xs font-semibold uppercase tracking-[0.08em] text-white/70">
-                <ShieldCheck size={14} />
-                Pilotage en direct
-              </div>
-              <h2 className="mt-4 text-2xl font-semibold md:text-3xl">
-                {gym?.name ? `${gym.name} tourne aujourd'hui` : "Votre salle tourne aujourd'hui"}
-              </h2>
-              <p className="mt-2 max-w-2xl text-sm leading-6 text-white/65">
-                Gardez les ventes, les entrees et les renouvellements visibles au meme endroit pour agir vite pendant la journee.
-              </p>
-            </div>
-
-            <div className="grid gap-4 sm:grid-cols-3">
-              <div className="border-l border-white/15 pl-4">
-                <p className="text-xs font-medium uppercase tracking-[0.08em] text-white/45">Semaine</p>
-                <p className="mt-2 text-xl font-semibold">{formatCurrency(weekRevenue)}</p>
-              </div>
-              <div className="border-l border-white/15 pl-4">
-                <p className="text-xs font-medium uppercase tracking-[0.08em] text-white/45">Meilleur jour</p>
-                <p className="mt-2 text-xl font-semibold capitalize">{bestDay.label}</p>
-              </div>
-              <div className="border-l border-white/15 pl-4">
-                <p className="text-xs font-medium uppercase tracking-[0.08em] text-white/45">Sante</p>
-                <p className="mt-2 text-xl font-semibold">{activeRate}% actifs</p>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <section className="mt-5 grid gap-4 lg:grid-cols-3">
-          {ownerSignals.map((signal) => (
-            <article key={signal.label} className="rounded-md border border-line bg-white p-5 shadow-soft">
-              <div className="flex items-start justify-between gap-4">
-                <div>
-                  <p className="text-xs font-semibold uppercase tracking-[0.08em] text-neutral-500">{signal.label}</p>
-                  <p className="mt-3 text-xl font-semibold">{signal.value}</p>
-                  <p className="mt-2 text-sm leading-6 text-neutral-500">{signal.detail}</p>
-                </div>
-                <div className="flex size-11 shrink-0 items-center justify-center rounded-md bg-ink text-white">
-                  <signal.icon size={21} />
-                </div>
-              </div>
-            </article>
-          ))}
-        </section>
-
-        <section className="mt-5 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-          {stats.map((stat) => (
-            <article key={stat.label} className="rounded-md border border-line bg-white p-5 shadow-soft">
-              <div className="flex items-start justify-between gap-4">
-                <div className="min-w-0">
-                  <p className="text-sm font-medium text-neutral-500">{stat.label}</p>
-                  <p className="mt-3 text-2xl font-semibold">{stat.value}</p>
-                  <p className="mt-1 text-sm leading-5 text-neutral-500">{stat.detail}</p>
-                </div>
-                <div className={`flex size-10 shrink-0 items-center justify-center rounded-md ${statToneClasses[stat.tone as keyof typeof statToneClasses]}`}>
-                  <stat.icon size={20} />
-                </div>
-              </div>
-            </article>
-          ))}
-        </section>
-
-        <section className="mt-5 grid gap-3 md:grid-cols-4">
-          {quickActions.map((action) => (
-            <Link
-              key={action.href}
-              href={action.href}
-              className={`inline-flex h-12 items-center justify-between gap-3 rounded-md px-4 text-sm font-semibold shadow-sm transition ${action.tone}`}
-            >
-              <span className="inline-flex min-w-0 items-center gap-2">
-                <action.icon size={18} className="shrink-0" />
-                <span className="truncate">{action.label}</span>
-              </span>
-              <ArrowRight size={16} className="shrink-0" />
-            </Link>
-          ))}
-        </section>
-
-        <section className="mt-6 grid gap-6 xl:grid-cols-[1.15fr_0.85fr]">
-          <div className="rounded-md border border-line bg-white shadow-soft">
-            <div className="flex flex-col gap-3 border-b border-line p-5 sm:flex-row sm:items-center sm:justify-between">
-              <div>
-                <h2 className="text-lg font-semibold">Revenus 7 jours</h2>
-                <p className="mt-1 text-sm text-neutral-500">
-                  {formatCurrency(weekRevenue)} encaisses · pic a {formatCurrency(bestDay.amount)}
+                <p className="mt-1.5 text-sm font-semibold text-white/80">
+                  Votre espace est prêt. Voici les 3 premières étapes.
                 </p>
               </div>
-              <div className="flex items-center gap-2 rounded-md bg-emerald-50 px-3 py-2 text-sm font-semibold text-mint">
-                <TrendingUp size={17} />
-                Suivi caisse
+              <div className="grid gap-px bg-white/5 sm:grid-cols-3">
+                {[
+                  { step: "1", label: "Créer une formule", href: "/subscriptions/new", accent: "bg-emerald-500" },
+                  { step: "2", label: "Ajouter un membre", href: "/members/new", accent: "bg-white/20" },
+                  { step: "3", label: "Compléter les paramètres", href: "/settings", accent: "bg-white/10" },
+                ].map((item) => (
+                  <Link
+                    key={item.step}
+                    href={item.href}
+                    className="group flex items-center gap-3 bg-[#080808] px-5 py-3.5 transition hover:bg-white/4"
+                  >
+                    <span className={`flex size-7 shrink-0 items-center justify-center rounded-lg text-xs font-bold text-white ${item.accent}`}>
+                      {item.step}
+                    </span>
+                    <span className="text-sm font-semibold text-white/70 group-hover:text-white">{item.label}</span>
+                    <ArrowRight size={14} className="ml-auto text-white/20 transition group-hover:text-emerald-400" />
+                  </Link>
+                ))}
               </div>
             </div>
-            <div className="p-5">
-              <div className="h-64 rounded-md border border-line bg-[linear-gradient(to_bottom,#f7f7f2_0,#f7f7f2_24%,#ffffff_24%,#ffffff_25%,#f7f7f2_25%,#f7f7f2_49%,#ffffff_49%,#ffffff_50%,#f7f7f2_50%,#f7f7f2_74%,#ffffff_74%,#ffffff_75%,#f7f7f2_75%,#f7f7f2_100%)] p-4">
-                <div className="flex h-full items-end gap-3">
+          )}
+
+          {/* ── Hero cockpit ───────────────────────────────────────── */}
+          <div className="rounded-2xl border border-white/8 bg-white/4 p-6">
+            <div className="flex items-start justify-between gap-6">
+              <div>
+                <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs font-semibold uppercase tracking-[0.1em] text-white/40">
+                  <ShieldCheck size={12} />
+                  Pilotage en direct
+                </div>
+                <p className="mt-3 text-xl font-semibold">
+                  {gym?.name ? `${gym.name} tourne aujourd'hui` : "Votre salle tourne aujourd'hui"}
+                </p>
+                <p className="mt-1 text-sm text-white/40">
+                  Ventes, entrées et renouvellements au même endroit.
+                </p>
+              </div>
+              <div className="hidden shrink-0 items-center gap-8 sm:flex">
+                <div className="text-right">
+                  <p className="text-xs text-white/35">7 jours</p>
+                  <p className="mt-1 text-lg font-semibold">{formatCurrency(weekRevenue)}</p>
+                </div>
+                <div className="text-right">
+                  <p className="text-xs text-white/35">Meilleur jour</p>
+                  <p className="mt-1 text-lg font-semibold capitalize">{bestDay.label}</p>
+                </div>
+                <div className="text-right">
+                  <p className="text-xs text-white/35">Actifs</p>
+                  <p className="mt-1 text-lg font-semibold">{activeRate}%</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Signaux rapides */}
+            <div className="mt-5 grid gap-3 border-t border-white/6 pt-5 sm:grid-cols-3">
+              {[
+                {
+                  label: "Flux comptoir",
+                  value: `${dashboard.checkinsToday.length} entrée${dashboard.checkinsToday.length !== 1 ? "s" : ""}`,
+                  detail: latestCheckin ? `Dernier à ${formatTime(latestCheckin.checked_in_at)}` : "Aucune entrée validée",
+                  icon: DoorOpen,
+                },
+                {
+                  label: "Priorité du jour",
+                  value: dashboard.alerts.length > 0 ? `${dashboard.alerts.length} à traiter` : "Salle stable",
+                  detail: urgentAlerts > 0 ? `${urgentAlerts} renouvellement${urgentAlerts !== 1 ? "s" : ""} urgent${urgentAlerts !== 1 ? "s" : ""}` : "Aucune urgence",
+                  icon: AlertTriangle,
+                },
+                {
+                  label: "Formule forte",
+                  value: topPlan?.name ?? "Aucune vente",
+                  detail: topPlan ? `${formatCurrency(topPlan.amount)} sur 7 jours` : "Les ventes apparaîtront ici",
+                  icon: TrendingUp,
+                },
+              ].map((signal) => (
+                <div key={signal.label} className="flex items-start gap-3 rounded-xl border border-white/6 bg-white/3 px-4 py-3.5">
+                  <signal.icon size={16} className="mt-0.5 shrink-0 text-white/30" />
+                  <div className="min-w-0">
+                    <p className="text-xs text-white/40">{signal.label}</p>
+                    <p className="mt-1 text-sm font-semibold truncate">{signal.value}</p>
+                    <p className="mt-0.5 text-xs text-white/30 truncate">{signal.detail}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* ── KPI cards ──────────────────────────────────────────── */}
+          <div className="mt-4 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+            {stats.map((stat) => (
+              <div key={stat.label} className="rounded-2xl border border-white/8 bg-white/4 p-5">
+                <div className="flex items-start justify-between gap-3">
+                  <div className="min-w-0">
+                    <p className="text-xs font-semibold uppercase tracking-[0.1em] text-white/40">
+                      {stat.label}
+                    </p>
+                    <p className="mt-3 text-2xl font-semibold">{stat.value}</p>
+                    <p className="mt-1 text-xs text-white/35 leading-5">{stat.detail}</p>
+                  </div>
+                  <div className={`flex size-10 shrink-0 items-center justify-center rounded-xl ${stat.bg} ${stat.accent}`}>
+                    <stat.icon size={18} />
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* ── Actions rapides ─────────────────────────────────────── */}
+          <div className="mt-4 grid gap-2 sm:grid-cols-4">
+            {quickActions.map((action) => (
+              <Link
+                key={action.href}
+                href={action.href}
+                className={`inline-flex h-11 items-center justify-between gap-2 rounded-xl px-4 text-sm font-semibold transition ${
+                  action.primary
+                    ? "bg-emerald-500 text-white hover:bg-emerald-400"
+                    : "border border-white/8 bg-white/4 text-white/70 hover:bg-white/8 hover:text-white"
+                }`}
+              >
+                <span className="inline-flex items-center gap-2">
+                  <action.icon size={16} className="shrink-0" />
+                  <span className="truncate">{action.label}</span>
+                </span>
+                <ArrowRight size={14} className="shrink-0 opacity-50" />
+              </Link>
+            ))}
+          </div>
+
+          {/* ── Graphes ─────────────────────────────────────────────── */}
+          <div className="mt-6 grid gap-4 xl:grid-cols-[1.2fr_0.8fr]">
+            {/* Revenus 7 jours */}
+            <div className="overflow-hidden rounded-2xl border border-white/8 bg-white/4">
+              <div className="flex items-center justify-between border-b border-white/8 px-6 py-4">
+                <div>
+                  <h2 className="font-semibold">Revenus 7 jours</h2>
+                  <p className="mt-0.5 text-xs text-white/40">
+                    {formatCurrency(weekRevenue)} encaissés · pic {formatCurrency(bestDay.amount)}
+                  </p>
+                </div>
+                <div className="flex items-center gap-1.5 rounded-lg bg-emerald-500/15 px-3 py-1.5 text-xs font-semibold text-emerald-400">
+                  <TrendingUp size={13} />
+                  Suivi
+                </div>
+              </div>
+              <div className="p-6">
+                <div className="flex h-44 items-end gap-2">
                   {dashboard.revenue7Days.map((day) => (
                     <div key={day.date} className="flex h-full min-w-0 flex-1 flex-col justify-end gap-2">
                       <div className="flex flex-1 items-end">
                         <div
-                          className="w-full rounded-t-md bg-mint shadow-[inset_0_1px_0_rgba(255,255,255,0.28)] transition"
-                          style={{ height: `${Math.max((day.amount / maxRevenue) * 100, day.amount > 0 ? 10 : 2)}%` }}
+                          className="w-full rounded-t-lg bg-emerald-500/70 transition hover:bg-emerald-400"
+                          style={{
+                            height: `${Math.max((day.amount / maxRevenue) * 100, day.amount > 0 ? 8 : 2)}%`,
+                          }}
                           title={formatCurrency(day.amount)}
                         />
                       </div>
                       <div className="text-center">
-                        <p className="truncate text-xs font-semibold capitalize text-neutral-700">{day.label}</p>
-                        <p className="mt-1 truncate text-[11px] text-neutral-500">{formatCurrency(day.amount)}</p>
+                        <p className="truncate text-xs font-semibold capitalize text-white/50">{day.label}</p>
+                        <p className="mt-0.5 truncate text-[10px] text-white/30">{formatCurrency(day.amount)}</p>
                       </div>
                     </div>
                   ))}
                 </div>
               </div>
             </div>
-          </div>
 
-          <div className="rounded-md border border-line bg-white shadow-soft">
-            <div className="flex items-center justify-between border-b border-line p-5">
-              <div>
-                <h2 className="text-lg font-semibold">Mix des formules</h2>
-                <p className="mt-1 text-sm text-neutral-500">Ce qui genere le revenu recent.</p>
+            {/* Mix formules */}
+            <div className="overflow-hidden rounded-2xl border border-white/8 bg-white/4">
+              <div className="flex items-center justify-between border-b border-white/8 px-6 py-4">
+                <div>
+                  <h2 className="font-semibold">Mix des formules</h2>
+                  <p className="mt-0.5 text-xs text-white/40">Ce qui génère le revenu.</p>
+                </div>
+                <Gauge size={18} className="text-emerald-400" />
               </div>
-              <Gauge className="text-mint" size={22} />
-            </div>
-            <div className="space-y-4 p-5">
-              {dashboard.topPlans.length > 0 ? (
-                dashboard.topPlans.map((plan, index) => (
-                  <div key={plan.name}>
-                    <div className="flex items-center justify-between gap-4">
-                      <div className="flex min-w-0 items-center gap-3">
-                        <span className="flex size-8 shrink-0 items-center justify-center rounded-md bg-paper text-sm font-semibold">
-                          {index + 1}
-                        </span>
-                        <div className="min-w-0">
-                          <p className="truncate text-sm font-semibold">{plan.name}</p>
-                          <p className="mt-1 text-xs text-neutral-500">{plural(plan.count, "paiement")}</p>
+              <div className="space-y-4 p-6">
+                {dashboard.topPlans.length > 0 ? (
+                  dashboard.topPlans.map((plan, i) => (
+                    <div key={plan.name}>
+                      <div className="flex items-center justify-between gap-3">
+                        <div className="flex min-w-0 items-center gap-3">
+                          <span className="flex size-7 shrink-0 items-center justify-center rounded-lg bg-white/8 text-xs font-bold text-white/60">
+                            {i + 1}
+                          </span>
+                          <div className="min-w-0">
+                            <p className="truncate text-sm font-semibold">{plan.name}</p>
+                            <p className="text-xs text-white/35">{plural(plan.count, "paiement")}</p>
+                          </div>
                         </div>
+                        <p className="shrink-0 text-sm font-semibold text-emerald-400">
+                          {formatCurrency(plan.amount)}
+                        </p>
                       </div>
-                      <p className="shrink-0 text-sm font-semibold">{formatCurrency(plan.amount)}</p>
+                      <div className="mt-2.5 h-1.5 overflow-hidden rounded-full bg-white/8">
+                        <div
+                          className="h-full rounded-full bg-emerald-500/60"
+                          style={{ width: `${Math.max((plan.amount / topPlanMax) * 100, 6)}%` }}
+                        />
+                      </div>
                     </div>
-                    <div className="mt-3 h-2 overflow-hidden rounded-full bg-paper">
-                      <div className="h-full rounded-full bg-ink" style={{ width: `${Math.max((plan.amount / topPlanMax) * 100, 6)}%` }} />
-                    </div>
-                  </div>
-                ))
-              ) : (
-                <p className="text-sm text-neutral-500">Aucune vente sur les 7 derniers jours.</p>
-              )}
-            </div>
-          </div>
-        </section>
-
-        <section className="mt-6 grid gap-6 xl:grid-cols-[0.9fr_1.1fr]">
-          <div className="rounded-md border border-line bg-white shadow-soft">
-            <div className="flex items-center justify-between border-b border-line p-5">
-              <div>
-                <h2 className="text-lg font-semibold">Priorites clients</h2>
-                <p className="mt-1 text-sm text-neutral-500">Renouvellements et seances faibles.</p>
+                  ))
+                ) : (
+                  <p className="text-sm text-white/35">Aucune vente sur 7 jours.</p>
+                )}
               </div>
-              <CalendarClock className="text-amber" size={22} />
-            </div>
-            <div className="divide-y divide-line">
-              {dashboard.alerts.length > 0 ? (
-                dashboard.alerts.map((alert) => (
-                  <Link
-                    key={alert.member_id}
-                    href={`/members/${alert.member_id}`}
-                    className="flex items-center justify-between gap-3 p-5 transition hover:bg-neutral-50"
-                  >
-                    <div className="min-w-0">
-                      <p className="truncate text-sm font-semibold">{alert.member_name}</p>
-                      <p className="mt-1 truncate text-xs text-neutral-500">{alert.plan ?? "Sans formule"}</p>
-                    </div>
-                    <StatusBadge tone={alert.status}>{alert.status_label}</StatusBadge>
-                  </Link>
-                ))
-              ) : (
-                <p className="p-5 text-sm text-neutral-500">Aucune alerte pour le moment.</p>
-              )}
             </div>
           </div>
 
-          <div className="rounded-md border border-line bg-white shadow-soft">
-            <div className="flex flex-col gap-3 border-b border-line p-5 sm:flex-row sm:items-center sm:justify-between">
-              <div>
-                <h2 className="text-lg font-semibold">Pointage en temps reel</h2>
-                <p className="mt-1 text-sm text-neutral-500">Dernieres entrees validees aujourd&apos;hui.</p>
+          {/* ── Priorités + Pointage ─────────────────────────────── */}
+          <div className="mt-4 grid gap-4 xl:grid-cols-2">
+            {/* Priorités */}
+            <div className="overflow-hidden rounded-2xl border border-white/8 bg-white/4">
+              <div className="flex items-center justify-between border-b border-white/8 px-6 py-4">
+                <div>
+                  <h2 className="font-semibold">Priorités clients</h2>
+                  <p className="mt-0.5 text-xs text-white/40">Renouvellements et séances faibles.</p>
+                </div>
+                <CalendarClock size={18} className="text-amber-400" />
               </div>
-              <Link href="/checkin" className="inline-flex h-10 items-center justify-center gap-2 rounded-md bg-ink px-4 text-sm font-semibold text-white transition hover:bg-neutral-800">
-                <CheckCircle2 size={17} />
-                Ouvrir
+              <div className="divide-y divide-white/6">
+                {dashboard.alerts.length > 0 ? (
+                  dashboard.alerts.map((alert) => (
+                    <Link
+                      key={alert.member_id}
+                      href={`/members/${alert.member_id}`}
+                      className="flex items-center justify-between gap-3 px-6 py-3.5 transition hover:bg-white/4"
+                    >
+                      <div className="min-w-0">
+                        <p className="truncate text-sm font-semibold">{alert.member_name}</p>
+                        <p className="mt-0.5 truncate text-xs text-white/35">{alert.plan ?? "Sans formule"}</p>
+                      </div>
+                      <StatusBadge tone={alert.status}>{alert.status_label}</StatusBadge>
+                    </Link>
+                  ))
+                ) : (
+                  <p className="px-6 py-5 text-sm text-white/35">Aucune alerte pour le moment.</p>
+                )}
+              </div>
+            </div>
+
+            {/* Pointage temps réel */}
+            <div className="overflow-hidden rounded-2xl border border-white/8 bg-white/4">
+              <div className="flex items-center justify-between border-b border-white/8 px-6 py-4">
+                <div>
+                  <h2 className="font-semibold">Pointage temps réel</h2>
+                  <p className="mt-0.5 text-xs text-white/40">Dernières entrées validées.</p>
+                </div>
+                <Link
+                  href="/checkin"
+                  className="inline-flex h-8 items-center gap-1.5 rounded-lg bg-white/8 px-3 text-xs font-semibold text-white/70 transition hover:bg-white/12 hover:text-white"
+                >
+                  <CheckCircle2 size={13} />
+                  Ouvrir
+                </Link>
+              </div>
+              <div className="divide-y divide-white/6">
+                {dashboard.checkinsToday.length > 0 ? (
+                  dashboard.checkinsToday.slice(0, 6).map((entry) => (
+                    <div key={entry.id} className="flex items-center gap-4 px-6 py-3.5">
+                      <span className="shrink-0 rounded-lg bg-white/8 px-2.5 py-1 text-xs font-semibold tabular-nums text-white/50">
+                        {formatTime(entry.checked_in_at)}
+                      </span>
+                      <div className="min-w-0 flex-1">
+                        <p className="truncate text-sm font-semibold">{entry.member_name}</p>
+                        <p className="truncate text-xs text-white/35">
+                          {entry.plan ?? "Abonnement"}{entry.staff_name ? ` · ${entry.staff_name}` : ""}
+                        </p>
+                      </div>
+                      <span className="shrink-0 text-xs font-semibold text-emerald-400">Validé</span>
+                    </div>
+                  ))
+                ) : (
+                  <p className="px-6 py-5 text-sm text-white/35">Aucune entrée aujourd&apos;hui.</p>
+                )}
+              </div>
+            </div>
+          </div>
+
+          {/* ── Dernières opérations ────────────────────────────── */}
+          <div className="mt-4 overflow-hidden rounded-2xl border border-white/8 bg-white/4">
+            <div className="flex items-center justify-between border-b border-white/8 px-6 py-4">
+              <div>
+                <h2 className="font-semibold">Dernières opérations</h2>
+                <p className="mt-0.5 text-xs text-white/40">Encaissements récents.</p>
+              </div>
+              <Link
+                href="/payments"
+                className="inline-flex h-8 items-center gap-1.5 rounded-lg bg-white/8 px-3 text-xs font-semibold text-white/70 transition hover:bg-white/12 hover:text-white"
+              >
+                <ReceiptText size={13} />
+                Voir caisse
               </Link>
             </div>
-            <div className="divide-y divide-line">
-              {dashboard.checkinsToday.length > 0 ? (
-                dashboard.checkinsToday.slice(0, 6).map((entry) => (
-                  <div key={entry.id} className="grid gap-3 p-5 text-sm sm:grid-cols-[84px_1fr_auto] sm:items-center">
-                    <div className="inline-flex h-9 w-fit items-center gap-2 rounded-md bg-paper px-3 font-semibold text-neutral-700">
-                      <Clock3 size={15} />
-                      {formatTime(entry.checked_in_at)}
-                    </div>
-                    <div className="min-w-0">
-                      <p className="truncate font-semibold">{entry.member_name}</p>
-                      <p className="mt-1 truncate text-xs text-neutral-500">
-                        {entry.plan ?? "Abonnement"}{entry.staff_name ? ` · ${entry.staff_name}` : ""}
+            <div className="divide-y divide-white/6">
+              {dashboard.recentPayments.length > 0 ? (
+                dashboard.recentPayments.map((payment) => (
+                  <div key={payment.id} className="flex items-center gap-4 px-6 py-3.5">
+                    <div className="min-w-0 flex-1">
+                      {payment.member_id ? (
+                        <Link
+                          href={`/members/${payment.member_id}`}
+                          className="truncate text-sm font-semibold transition hover:text-emerald-400"
+                        >
+                          {payment.member_name}
+                        </Link>
+                      ) : (
+                        <p className="truncate text-sm font-semibold">{payment.member_name}</p>
+                      )}
+                      <p className="mt-0.5 truncate text-xs text-white/35">
+                        {payment.plan ?? "Paiement manuel"}{payment.staff_name ? ` · ${payment.staff_name}` : ""}
                       </p>
                     </div>
-                    <span className="text-xs font-semibold text-mint">Valide</span>
+                    <span className="shrink-0 text-xs text-white/35 tabular-nums">
+                      {formatTime(payment.paid_at)}
+                    </span>
+                    <span className="shrink-0 text-sm font-semibold text-emerald-400">
+                      {formatCurrency(payment.amount)}
+                    </span>
                   </div>
                 ))
               ) : (
-                <p className="p-5 text-sm text-neutral-500">Aucune entree aujourd&apos;hui.</p>
+                <p className="px-6 py-5 text-sm text-white/35">Aucun paiement récent.</p>
               )}
             </div>
           </div>
-        </section>
 
-        <section className="mt-6 rounded-md border border-line bg-white shadow-soft">
-          <div className="flex flex-col gap-3 border-b border-line p-5 sm:flex-row sm:items-center sm:justify-between">
-            <div>
-              <h2 className="text-lg font-semibold">Dernieres operations</h2>
-              <p className="mt-1 text-sm text-neutral-500">Encaissements recents avec attribution equipe.</p>
-            </div>
-            <Link href="/payments" className="inline-flex h-10 items-center justify-center gap-2 rounded-md border border-line bg-white px-4 text-sm font-semibold text-ink transition hover:bg-neutral-50">
-              Voir caisse
-              <ArrowRight size={16} />
-            </Link>
-          </div>
-          <div className="divide-y divide-line">
-            {dashboard.recentPayments.length > 0 ? (
-              dashboard.recentPayments.map((payment) => (
-                <div key={payment.id} className="grid gap-3 p-5 text-sm md:grid-cols-[1.2fr_1fr_0.8fr] md:items-center">
-                  <div className="min-w-0">
-                    {payment.member_id ? (
-                      <Link href={`/members/${payment.member_id}`} className="truncate font-semibold transition hover:text-mint">
-                        {payment.member_name}
-                      </Link>
-                    ) : (
-                      <p className="truncate font-semibold">{payment.member_name}</p>
-                    )}
-                    <p className="mt-1 truncate text-xs text-neutral-500">
-                      {payment.plan ?? "Paiement manuel"}{payment.staff_name ? ` · ${payment.staff_name}` : ""}
-                    </p>
-                  </div>
-                  <p className="text-neutral-600">{formatTime(payment.paid_at)}</p>
-                  <p className="font-semibold md:text-right">{formatCurrency(payment.amount)}</p>
-                </div>
-              ))
-            ) : (
-              <p className="p-5 text-sm text-neutral-500">Aucun paiement recent.</p>
-            )}
-          </div>
-        </section>
+        </div>
       </div>
     </AppShell>
   );
