@@ -1,5 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
-import { getActiveGymId, setActiveGymId } from "@/lib/active-gym";
+import { getActiveGymId } from "@/lib/active-gym";
 
 type RelationRow = {
   full_name?: string | null;
@@ -317,9 +317,8 @@ export async function getCurrentGym(): Promise<CurrentGym | null> {
 
   if (!row) {
     row = data[0];
-    // Mémoriser la première salle si aucun cookie
-    const g = Array.isArray(row.gyms) ? row.gyms[0] : row.gyms;
-    if (g) await setActiveGymId((g as Record<string, unknown>).id as string);
+    // Ne pas appeler setActiveGymId ici : cookies().set() est interdit dans les Server Components.
+    // Le cookie est posé par /api/switch-gym (Route Handler) ou le gym-switcher.
   }
 
   const gym = Array.isArray(row.gyms) ? row.gyms[0] : row.gyms;
