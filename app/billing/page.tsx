@@ -18,6 +18,7 @@ import { createClient } from "@/lib/supabase/server";
 import { getCurrentGym } from "@/lib/supabase/queries";
 import { isActiveSubscription, TRIAL_DAYS } from "@/lib/stripe";
 import { CheckoutButton, PortalButton } from "@/components/stripe-buttons";
+import { BillingMobileMoneyButtons } from "@/components/billing-mobile-money";
 
 type BillingPageProps = {
   searchParams: Promise<{ success?: string; canceled?: string }>;
@@ -176,9 +177,12 @@ export default async function BillingPage({ searchParams }: BillingPageProps) {
               </div>
 
               {/* Actions */}
-              <div className="border-t border-white/10 p-5">
+              <div className="border-t border-white/10 p-5 space-y-4">
                 {isTrialing || isCanceled || isPastDue || !isActive ? (
-                  <CheckoutButton label={isCanceled || isPastDue ? "Réactiver l'abonnement" : "Souscrire — 5 900 FCFA/mois"} />
+                  <>
+                    <CheckoutButton label={isCanceled || isPastDue ? "Réactiver l'abonnement" : "Souscrire — 5 900 FCFA/mois"} />
+                    <BillingMobileMoneyButtons />
+                  </>
                 ) : (
                   <div className="flex flex-wrap gap-3">
                     <PortalButton />

@@ -1,15 +1,16 @@
 /* eslint-disable @next/next/no-img-element */
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { Archive, ArrowLeft, Banknote, CalendarClock, CheckCircle2, Phone, QrCode, ReceiptText, RotateCcw, ShieldCheck, UserCheck, UserPen } from "lucide-react";
+import { Archive, ArrowLeft, Banknote, CalendarClock, Phone, QrCode, ReceiptText, RotateCcw, ShieldCheck, UserCheck, UserPen } from "lucide-react";
 import { AppShell } from "@/components/app-shell";
 import { MemberQR } from "@/components/member-qr";
 import { PageHeader } from "@/components/page-header";
 import { PrintButton } from "@/components/print-button";
 import { StatusBadge } from "@/components/status-badge";
 import { SubmitButton } from "@/components/submit-button";
+import { RenewWithMobileMoney } from "@/components/renew-with-mobile-money";
 import { performMemberCheckin } from "@/app/(app)/checkin/actions";
-import { archiveMember, renewMemberSubscription, restoreMember } from "@/app/(app)/members/actions";
+import { archiveMember, restoreMember } from "@/app/(app)/members/actions";
 import { formatCurrency } from "@/lib/demo-data";
 import { requireAdminGym } from "@/lib/supabase/guards";
 import {
@@ -291,54 +292,14 @@ export default async function MemberDetailPage({ params }: MemberDetailPageProps
             </div>
           </div>
 
-          <form className="mt-5 space-y-5" action={renewMemberSubscription}>
-            <input type="hidden" name="member_id" value={member.id} />
-            <label className="block">
-              <span className="text-sm font-semibold text-neutral-700">Formule</span>
-              <select
-                className="mt-2 h-11 w-full rounded-md border border-line bg-paper px-3 outline-none focus:border-mint"
-                name="subscription_type_id"
-              >
-                {subscriptionTypes.map((type) => (
-                  <option key={type.id} value={type.id}>
-                    {type.name} - {formatCurrency(type.price)}
-                  </option>
-                ))}
-              </select>
-            </label>
-            <label className="block">
-              <span className="text-sm font-semibold text-neutral-700">Mode de paiement</span>
-              <select
-                className="mt-2 h-11 w-full rounded-md border border-line bg-paper px-3 outline-none focus:border-mint"
-                name="payment_method"
-                defaultValue="wave"
-              >
-                <option value="cash">Cash</option>
-                <option value="wave">Wave</option>
-                <option value="orange_money">Orange Money</option>
-                <option value="card">Carte bancaire</option>
-                <option value="other">Autre</option>
-              </select>
-            </label>
-
-            <div className="rounded-md border border-line bg-paper p-4 text-sm">
-              <p className="font-semibold">Renouvellement immediat</p>
-              <p className="mt-1 text-neutral-500">
-                L&apos;ancien abonnement actif sera marque expire.
-              </p>
-            </div>
-
-            <SubmitButton
-              type="submit"
-              variant="accent"
-              className="h-12 w-full"
-              disabled={subscriptionTypes.length === 0 || isArchived}
-              pendingLabel="Renouvellement..."
-            >
-              <CheckCircle2 size={18} />
-              Renouveler maintenant
-            </SubmitButton>
-          </form>
+          <div className="mt-5">
+            <RenewWithMobileMoney
+              memberId={member.id}
+              subscriptionTypes={subscriptionTypes}
+              memberPhone={member.phone}
+              isArchived={isArchived}
+            />
+          </div>
 
           <div className="mt-6 border-t border-line pt-5">
             {isArchived ? (
