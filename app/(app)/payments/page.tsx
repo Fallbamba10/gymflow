@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Banknote, CalendarDays, CreditCard, Download, Plus, ReceiptText, Search, ShieldCheck, TrendingUp, WalletCards } from "lucide-react";
+import { Banknote, CalendarDays, CreditCard, Download, FileBarChart2, Plus, ReceiptText, Search, ShieldCheck, TrendingUp, WalletCards } from "lucide-react";
 import { AppShell } from "@/components/app-shell";
 import { PageHeader } from "@/components/page-header";
 import { StatusBadge } from "@/components/status-badge";
@@ -161,6 +161,10 @@ export default async function PaymentsPage({ searchParams }: PaymentsPageProps) 
         eyebrow="Paiements et encaissements"
         actions={
           <>
+            <Link href="/payments/report" className="inline-flex h-11 items-center justify-center gap-2 rounded-md border border-line bg-white px-4 text-sm font-semibold shadow-sm transition hover:bg-neutral-50">
+              <FileBarChart2 size={18} />
+              Rapport mensuel
+            </Link>
             <Link href={exportHref} className="inline-flex h-11 items-center justify-center gap-2 rounded-md border border-line bg-white px-4 text-sm font-semibold shadow-sm transition hover:bg-neutral-50">
               <Download size={18} />
               Export CSV

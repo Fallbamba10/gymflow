@@ -1163,3 +1163,181 @@ export async function getPaymentsData(
     methodTotals,
   };
 }
+
+export type MonthlyReportDay = {
+  date: string;
+  label: string;
+  revenue: number;
+  checkins: number;
+  payments: number;
+};
+
+export type MonthlyReportPlan = {
+  name: string;
+  revenue: number;
+  count: number;
+};
+
+export type MonthlyReportData = {
+  gym: { name: string; phone: string | null; address: string | null; currency: string };
+  month: string; // "YYYY-MM"
+  monthLabel: string; // "Juin 2026"
+  totalRevenue: number;
+  totalCheckins: number;
+  totalPayments: number;
+  newMembers: number;
+  activeMembers: number;
+  methodTotals: Record<PaymentMethod, number>;
+  byDay: MonthlyReportDay[];
+  byPlan: MonthlyReportPlan[];
+  payments: PaymentRecord[];
+};
+
+export async function getMonthlyReportData(
+  gymId: string,
+  month: string, // "YYYY-MM"
+): Promise<MonthlyReportData | null> {
+  const supabase = await createClient();
+
+  const [year, mo] = month.split("-").map(Number);
+  if (!year || !mo || mo < 1 || mo > 12) return null;
+
+  const start = new Date(year, mo - 1, 1);
+  const end = new Date(year, mo, 1);
+  const startStr = start.toISOString();
+  const endStr = end.toISOString();
+
+  const monthLabel = new Intl.DateTimeFormat("fr-FR", { month: "long", year: "numeric" }).format(start);
+  const daysInMonth = new Date(year, mo, 0).getDate();
+
+  const [gymResult, paymentsInitialResult, checkinsResult, newMembersResult, allMembersResult] =
+    await Promise.all([
+      supabase
+        .from("gyms")
+        .select("name, phone, address, currency")
+        .eq("id", gymId)
+        .single(),
+      supabase
+        .from("payments")
+        .select("id, amount, method, kind, paid_at, notes, member_id, members(full_name), subscriptions(subscription_types(name)), gym_staff(full_name)")
+        .eq("gym_id", gymId)
+        .gte("paid_at", startStr)
+        .lt("paid_at", endStr)
+        .order("paid_at", { ascending: false }),
+      supabase
+        .from("checkins")
+        .select("checked_in_at, member_id")
+        .eq("gym_id", gymId)
+        .gte("checked_in_at", startStr)
+        .lt("checked_in_at", endStr),
+      supabase
+        .from("members")
+        .select("id")
+        .eq("gym_id", gymId)
+        .gte("created_at", startStr)
+        .lt("created_at", endStr),
+      supabase
+        .from("members")
+        .select("id")
+        .eq("gym_id", gymId)
+        .is("archived_at", null),
+    ]);
+
+  if (gymResult.error || !gymResult.data) return null;
+
+  let paymentsData = paymentsInitialResult.data as QueryRow[] | null;
+  let paymentsError = paymentsInitialResult.error;
+
+  if (paymentsError && isStaffAttributionUnavailable(paymentsError.message)) {
+    const fallback = await supabase
+      .from("payments")
+      .select("id, amount, method, kind, paid_at, notes, member_id, members(full_name), subscriptions(subscription_types(name))")
+      .eq("gym_id", gymId)
+      .gte("paid_at", startStr)
+      .lt("paid_at", endStr)
+      .order("paid_at", { ascending: false });
+    paymentsData = fallback.data as QueryRow[] | null;
+    paymentsError = fallback.error;
+  }
+
+  if (paymentsError) throw new Error(paymentsError.message);
+  if (checkinsResult.error) throw new Error(checkinsResult.error.message);
+
+  // Payments → typed records
+  const payments: PaymentRecord[] = (paymentsData ?? []).map((payment) => {
+    const member = getRelation(payment.members);
+    const subscription = getRelation(payment.subscriptions);
+    const subscriptionType = getRelation(subscription?.subscription_types);
+    const staff = getRelation(payment.gym_staff);
+    const notes = asNullableString(payment.notes);
+    const walkInName = notes?.replace(/^Seance simple\s*-\s*/i, "").trim();
+    return {
+      id: asString(payment.id),
+      amount: Number(payment.amount ?? 0),
+      method: normalizePaymentMethod(payment.method),
+      kind: normalizePaymentKind(payment.kind),
+      paid_at: asString(payment.paid_at),
+      notes,
+      member_id: asNullableString(payment.member_id),
+      member_name: member?.full_name ?? walkInName ?? "Client comptoir",
+      plan: subscriptionType?.name ?? null,
+      staff_name: staff?.full_name ?? null,
+    };
+  });
+
+  // Agrégats par jour
+  const revenueByDay = new Map<string, { revenue: number; payments: number }>();
+  const checkinsByDay = new Map<string, number>();
+  for (let d = 1; d <= daysInMonth; d++) {
+    const key = `${year}-${String(mo).padStart(2, "0")}-${String(d).padStart(2, "0")}`;
+    revenueByDay.set(key, { revenue: 0, payments: 0 });
+    checkinsByDay.set(key, 0);
+  }
+  for (const p of payments) {
+    const key = p.paid_at.slice(0, 10);
+    const cur = revenueByDay.get(key) ?? { revenue: 0, payments: 0 };
+    revenueByDay.set(key, { revenue: cur.revenue + p.amount, payments: cur.payments + 1 });
+  }
+  for (const c of checkinsResult.data ?? []) {
+    const key = (c.checked_in_at as string).slice(0, 10);
+    checkinsByDay.set(key, (checkinsByDay.get(key) ?? 0) + 1);
+  }
+
+  const byDay: MonthlyReportDay[] = Array.from(revenueByDay.entries()).map(([date, val]) => ({
+    date,
+    label: new Intl.DateTimeFormat("fr-FR", { day: "numeric", weekday: "short" }).format(new Date(date + "T12:00:00")),
+    revenue: val.revenue,
+    checkins: checkinsByDay.get(date) ?? 0,
+    payments: val.payments,
+  }));
+
+  // Agrégats par formule
+  const planMap = new Map<string, MonthlyReportPlan>();
+  for (const p of payments) {
+    const name = p.plan ?? "Paiement manuel";
+    const cur = planMap.get(name) ?? { name, revenue: 0, count: 0 };
+    planMap.set(name, { name, revenue: cur.revenue + p.amount, count: cur.count + 1 });
+  }
+  const byPlan = Array.from(planMap.values()).sort((a, b) => b.revenue - a.revenue);
+
+  // Totaux par méthode
+  const methodTotals: Record<PaymentMethod, number> = { cash: 0, wave: 0, orange_money: 0, card: 0, other: 0 };
+  for (const p of payments) {
+    methodTotals[p.method] += p.amount;
+  }
+
+  return {
+    gym: gymResult.data,
+    month,
+    monthLabel: monthLabel.charAt(0).toUpperCase() + monthLabel.slice(1),
+    totalRevenue: payments.reduce((s, p) => s + p.amount, 0),
+    totalCheckins: checkinsResult.data?.length ?? 0,
+    totalPayments: payments.length,
+    newMembers: newMembersResult.data?.length ?? 0,
+    activeMembers: allMembersResult.data?.length ?? 0,
+    methodTotals,
+    byDay,
+    byPlan,
+    payments,
+  };
+}
