@@ -1,9 +1,11 @@
 /* eslint-disable @next/next/no-img-element */
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { Archive, ArrowLeft, Banknote, CalendarClock, CheckCircle2, Phone, ReceiptText, RotateCcw, ShieldCheck, UserCheck, UserPen } from "lucide-react";
+import { Archive, ArrowLeft, Banknote, CalendarClock, CheckCircle2, Phone, QrCode, ReceiptText, RotateCcw, ShieldCheck, UserCheck, UserPen } from "lucide-react";
 import { AppShell } from "@/components/app-shell";
+import { MemberQR } from "@/components/member-qr";
 import { PageHeader } from "@/components/page-header";
+import { PrintButton } from "@/components/print-button";
 import { StatusBadge } from "@/components/status-badge";
 import { SubmitButton } from "@/components/submit-button";
 import { performMemberCheckin } from "@/app/(app)/checkin/actions";
@@ -364,6 +366,23 @@ export default async function MemberDetailPage({ params }: MemberDetailPageProps
                 </SubmitButton>
               </form>
             )}
+          </div>
+
+          {/* Carte QR membre */}
+          <div className="mt-6 border-t border-line pt-5">
+            <div className="mb-4 flex items-center justify-between gap-3">
+              <div className="flex items-center gap-2">
+                <QrCode size={18} className="text-mint" />
+                <h2 className="text-base font-semibold">Carte QR</h2>
+              </div>
+              <PrintButton />
+            </div>
+            <MemberQR
+              memberId={member.id}
+              memberNumber={member.member_number}
+              memberName={member.full_name}
+              gymName={gym.name}
+            />
           </div>
         </aside>
       </div>

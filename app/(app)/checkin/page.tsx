@@ -18,6 +18,7 @@ import {
 import { AppShell } from "@/components/app-shell";
 import { FormField } from "@/components/form-field";
 import { PageHeader } from "@/components/page-header";
+import { QrCheckinTrigger } from "@/components/qr-checkin-trigger";
 import { StatusBadge } from "@/components/status-badge";
 import { SubmitButton } from "@/components/submit-button";
 import { performMemberCheckin, performWalkInCheckin } from "@/app/(app)/checkin/actions";
@@ -268,21 +269,24 @@ export default async function CheckinPage({ searchParams }: CheckinPageProps) {
                 </div>
               </div>
               <div className="p-5">
-                <form className="flex flex-col gap-3 sm:flex-row" action="/checkin">
-                  <div className="relative flex-1">
-                    <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-neutral-400" size={20} />
-                    <input
-                      className="h-14 w-full rounded-md border border-line bg-paper pl-12 pr-4 text-base outline-none focus:border-mint"
-                      name="q"
-                      placeholder="Nom, telephone ou numero"
-                      defaultValue={params.q ?? ""}
-                    />
-                  </div>
-                  <button className="inline-flex h-14 items-center justify-center gap-2 rounded-md bg-ink px-5 text-sm font-semibold text-white shadow-sm transition hover:bg-neutral-800">
-                    <Search size={18} />
-                    Rechercher
-                  </button>
-                </form>
+                <div className="flex flex-col gap-3 sm:flex-row">
+                  <form className="flex flex-1 flex-col gap-3 sm:flex-row" action="/checkin">
+                    <div className="relative flex-1">
+                      <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-neutral-400" size={20} />
+                      <input
+                        className="h-14 w-full rounded-md border border-line bg-paper pl-12 pr-4 text-base outline-none focus:border-mint"
+                        name="q"
+                        placeholder="Nom, telephone ou numero"
+                        defaultValue={params.q ?? ""}
+                      />
+                    </div>
+                    <button className="inline-flex h-14 items-center justify-center gap-2 rounded-md bg-ink px-5 text-sm font-semibold text-white shadow-sm transition hover:bg-neutral-800">
+                      <Search size={18} />
+                      Rechercher
+                    </button>
+                  </form>
+                  <QrCheckinTrigger />
+                </div>
 
 
                 <div className="mt-5 space-y-3">
