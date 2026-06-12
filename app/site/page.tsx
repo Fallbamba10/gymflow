@@ -2,65 +2,19 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import {
   ArrowRight,
-  Banknote,
+  BarChart3,
+  Bell,
   CheckCircle2,
-  ClipboardList,
-  Crown,
-  Gauge,
-  Layers3,
-  ShieldCheck,
-  Smartphone,
+  CreditCard,
+  FileText,
+  MessageCircle,
+  QrCode,
+  Shield,
+  Upload,
+  UserCheck,
   Users,
+  Zap,
 } from "lucide-react";
-import { BrandMark } from "@/components/brand-mark";
-
-const productPillars = [
-  {
-    title: "Pointage signature",
-    description: "Abonnes, passages matin/soir, packs de seances et clients comptoir dans un geste simple.",
-    icon: CheckCircle2,
-  },
-  {
-    title: "Caisse maitrisee",
-    description: "Chaque encaissement reste clair : moyen de paiement, recu, historique et export propre.",
-    icon: Banknote,
-  },
-  {
-    title: "Pilotage gerant",
-    description: "Revenus, entrees, alertes et priorites visibles sans transformer la salle en bureau complique.",
-    icon: Gauge,
-  },
-  {
-    title: "Espace equipe",
-    description: "Les employes pointent et encaissent dans une vue dediee, pendant que le proprietaire garde le controle.",
-    icon: Smartphone,
-  },
-];
-
-const standards = [
-  "Un accueil plus rapide au comptoir",
-  "Des formules visibles et faciles a vendre",
-  "Une caisse lisible a la fin de la journee",
-  "Une experience mobile propre pour gerants et equipe",
-];
-
-const flows = [
-  {
-    label: "01",
-    title: "Accueil",
-    text: "Le membre arrive, l'equipe retrouve son profil, valide le passage ou vend une seance.",
-  },
-  {
-    label: "02",
-    title: "Encaissement",
-    text: "La vente est enregistree proprement avec le bon type de paiement et le bon contexte.",
-  },
-  {
-    label: "03",
-    title: "Pilotage",
-    text: "Le gerant suit les entrees, les abonnements, les paiements et les actions a traiter.",
-  },
-];
 
 export const metadata: Metadata = {
   title: "GymFlow · Logiciel de gestion de salle de sport",
@@ -88,311 +42,514 @@ export const metadata: Metadata = {
   },
 };
 
+const features = [
+  {
+    icon: UserCheck,
+    title: "Pointage instantané",
+    body: "Membres, passages simples et packs de séances accueillis en un geste. File d'attente inexistante.",
+  },
+  {
+    icon: CreditCard,
+    title: "Caisse maîtrisée",
+    body: "Cash, Wave, Orange Money. Chaque encaissement tracé, reçu imprimable, historique propre.",
+  },
+  {
+    icon: QrCode,
+    title: "Scanner QR Code",
+    body: "Chaque membre reçoit sa carte QR. L'entrée se valide avec la caméra — sans saisie, sans erreur.",
+  },
+  {
+    icon: Bell,
+    title: "Alertes en temps réel",
+    body: "Abonnements qui expirent aujourd'hui, nouveaux membres, paiements en attente. Tu ne rates rien.",
+  },
+  {
+    icon: BarChart3,
+    title: "Analytics avancés",
+    body: "Heures de pointe, jours forts, top membres, évolution 30 jours. Tu pilotes avec des chiffres vrais.",
+  },
+  {
+    icon: Upload,
+    title: "Import CSV",
+    body: "Migre tes membres depuis Excel en 30 secondes. Détection automatique des doublons.",
+  },
+  {
+    icon: FileText,
+    title: "Rapport mensuel PDF",
+    body: "Revenus, pointages, formules populaires — un rapport complet à imprimer ou partager chaque mois.",
+  },
+  {
+    icon: MessageCircle,
+    title: "Notifications WhatsApp",
+    body: "Rappels d'expiration automatiques sur WhatsApp. Le membre reçoit, la salle encaisse.",
+  },
+  {
+    icon: Users,
+    title: "Gestion d'équipe",
+    body: "Rôles admin et opérateur. Chaque employé a sa vue, le gérant garde le contrôle total.",
+  },
+];
+
+const steps = [
+  {
+    num: "01",
+    title: "Membre arrive",
+    body: "L'équipe trouve le profil, vérifie l'abonnement, valide l'entrée en quelques secondes.",
+  },
+  {
+    num: "02",
+    title: "Caisse propre",
+    body: "Encaissement enregistré avec le bon moyen de paiement. Reçu disponible immédiatement.",
+  },
+  {
+    num: "03",
+    title: "Gérant serein",
+    body: "Revenus, alertes et tendances visibles depuis le tableau de bord. Rien ne t'échappe.",
+  },
+];
+
+const testimonials = [
+  {
+    quote: "Avant GymFlow on perdait 30 minutes chaque matin à chercher qui avait payé. Maintenant c'est 3 secondes.",
+    name: "Mamadou D.",
+    gym: "Iron Club Dakar",
+  },
+  {
+    quote: "Mes employés ont appris à utiliser l'appli en 10 minutes. Le pointage QR a changé notre accueil.",
+    name: "Fatou S.",
+    gym: "FitZone Abidjan",
+  },
+  {
+    quote: "Les rappels WhatsApp automatiques ont multiplié mes renouvellements. Je récupère des clients que j'aurais perdus.",
+    name: "Kofi A.",
+    gym: "PowerGym Accra",
+  },
+];
+
+const proFeatures = [
+  "Membres, abonnements et pointages illimités",
+  "Scanner QR à l'entrée",
+  "Caisse avec reçus imprimables",
+  "Import CSV et export de données",
+  "Dashboard analytics temps réel",
+  "Notifications WhatsApp automatiques",
+  "Rapport mensuel PDF",
+  "Vitrine publique de la salle",
+  "Gestion d'équipe avec rôles",
+  "Support prioritaire",
+];
+
 export default function SitePage() {
   return (
-    <main className="min-h-screen bg-paper text-ink">
-      <section
-        className="relative overflow-hidden bg-cover bg-center text-white"
-        style={{
-          backgroundImage:
-            "linear-gradient(105deg, rgba(10,10,10,0.96) 0%, rgba(10,10,10,0.82) 44%, rgba(10,10,10,0.36) 100%), url('https://images.unsplash.com/photo-1534258936925-c58bed479fcb?auto=format&fit=crop&w=2400&q=88')",
-        }}
+    <main className="min-h-screen bg-[#080808] text-white">
+
+      {/* ─── NAV ──────────────────────────────────────────────────── */}
+      <nav
+        className="fixed inset-x-0 top-0 z-50 flex items-center justify-between px-6 py-4 md:px-12"
+        style={{ background: "linear-gradient(to bottom, rgba(8,8,8,0.95), transparent)" }}
       >
-        <header className="relative z-10 flex items-center justify-between px-4 py-5 md:px-8">
-          <Link href="/site" className="flex items-center gap-3">
-            <BrandMark inverse />
-            <span className="text-lg font-semibold">GymFlow</span>
+        <Link href="/site" className="flex items-center gap-2.5">
+          <div className="flex size-8 items-center justify-center rounded-md bg-white">
+            <Zap size={15} className="text-[#080808]" fill="currentColor" />
+          </div>
+          <span className="text-base font-semibold tracking-tight">GymFlow</span>
+        </Link>
+        <div className="flex items-center gap-3">
+          <Link
+            href="/login"
+            className="hidden h-9 items-center rounded-full border border-white/20 px-4 text-xs font-semibold transition hover:bg-white/10 sm:inline-flex"
+          >
+            Connexion
           </Link>
-          <div className="flex items-center gap-2">
-            <Link href="/login" className="inline-flex h-10 items-center justify-center rounded-md border border-white/35 px-4 text-sm font-semibold transition hover:bg-white/10">
-              Connexion
-            </Link>
-            <Link href="/signup" className="hidden h-10 items-center justify-center rounded-md bg-mint px-4 text-sm font-semibold transition hover:bg-emerald-700 sm:inline-flex">
-              Ouvrir un espace
-            </Link>
-          </div>
-        </header>
+          <Link
+            href="/signup"
+            className="inline-flex h-9 items-center gap-1.5 rounded-full bg-emerald-500 px-4 text-xs font-semibold text-white shadow-lg shadow-emerald-500/25 transition hover:bg-emerald-400"
+          >
+            Essai gratuit
+            <ArrowRight size={13} />
+          </Link>
+        </div>
+      </nav>
 
-        <div className="relative z-10 mx-auto grid min-h-[calc(94vh-80px)] max-w-7xl gap-8 px-4 pb-8 pt-10 md:px-8 lg:grid-cols-[1fr_430px] lg:items-end">
-          <div className="max-w-4xl py-10">
-            <p className="inline-flex items-center gap-2 rounded-md border border-white/20 bg-white/10 px-3 py-2 text-xs font-semibold uppercase tracking-[0.12em] text-white/76 backdrop-blur">
-              <Crown size={14} />
-              Logiciel premium pour salles ambitieuses
-            </p>
-            <h1 className="mt-6 max-w-4xl text-5xl font-semibold leading-tight md:text-7xl">
-              GymFlow
-            </h1>
-            <p className="mt-5 max-w-3xl text-2xl font-semibold leading-tight text-white md:text-4xl">
-              Une salle mieux tenue. Un comptoir plus fluide. Un gerant plus serein.
-            </p>
-            <p className="mt-6 max-w-2xl text-base leading-8 text-white/72 md:text-lg">
-              GymFlow rassemble le pointage, les seances simples, les abonnements, la caisse et l&apos;equipe dans une experience calme, moderne et classe.
-            </p>
-            <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-              <Link href="/signup" className="inline-flex h-12 items-center justify-center gap-2 rounded-md bg-mint px-5 text-sm font-semibold transition hover:bg-emerald-700">
-                Creer mon espace
-                <ArrowRight size={17} />
-              </Link>
-              <Link href="/login" className="inline-flex h-12 items-center justify-center rounded-md border border-white/45 px-5 text-sm font-semibold transition hover:bg-white/10">
-                Acceder a GymFlow
-              </Link>
-            </div>
+      {/* ─── HERO ─────────────────────────────────────────────────── */}
+      <section className="relative flex min-h-screen flex-col items-center justify-center overflow-hidden px-6 text-center md:px-12">
+        <div
+          className="absolute inset-0 bg-cover bg-center opacity-25"
+          style={{
+            backgroundImage:
+              "url('https://images.unsplash.com/photo-1534258936925-c58bed479fcb?auto=format&fit=crop&w=2400&q=88')",
+          }}
+        />
+        <div className="absolute inset-0 bg-gradient-to-b from-[#080808]/70 via-transparent to-[#080808]" />
+        <div className="absolute left-1/2 top-1/3 size-[700px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-emerald-500/10 blur-[140px]" />
+
+        <div className="relative z-10 max-w-5xl">
+          <div className="mb-8 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-1.5 text-xs font-semibold uppercase tracking-[0.12em] text-white/50 backdrop-blur">
+            <span className="size-1.5 rounded-full bg-emerald-400" />
+            Logiciel premium pour salles ambitieuses
           </div>
 
-          <aside className="mb-4 rounded-md border border-white/18 bg-white p-5 text-ink shadow-soft backdrop-blur">
-            <div className="flex items-start justify-between gap-4 border-b border-line pb-4">
-              <div>
-                <p className="text-sm font-semibold text-mint">Interface signature</p>
-                <h2 className="mt-1 text-xl font-semibold">Le geste comptoir</h2>
-              </div>
-              <span className="rounded-md bg-ink px-3 py-1 text-xs font-semibold text-white">Prive</span>
-            </div>
+          <h1 className="text-6xl font-semibold leading-[1.03] tracking-tight md:text-8xl lg:text-[6.5rem]">
+            Ta salle mérite<br />
+            <span className="text-emerald-400">mieux qu&apos;Excel.</span>
+          </h1>
 
-            <div className="mt-5 space-y-3">
-              {["Identifier", "Pointer", "Encaisser"].map((step, index) => (
-                <div key={step} className="grid grid-cols-[42px_1fr_auto] items-center gap-3 rounded-md border border-line bg-paper p-3">
-                  <span className="flex size-10 items-center justify-center rounded-md bg-white text-sm font-semibold">
-                    {index + 1}
-                  </span>
-                  <span>
-                    <span className="block text-sm font-semibold">{step}</span>
-                    <span className="mt-1 block text-xs text-neutral-500">
-                      {index === 0 ? "Profil, formule ou seance simple" : index === 1 ? "Passage valide sans friction" : "Caisse propre et tracee"}
-                    </span>
-                  </span>
-                  <CheckCircle2 className="text-mint" size={18} />
-                </div>
-              ))}
-            </div>
+          <p className="mx-auto mt-8 max-w-2xl text-lg leading-8 text-white/55 md:text-xl">
+            GymFlow rassemble le pointage, les abonnements, la caisse et ton équipe dans une interface pensée pour les salles de sport en Afrique.
+          </p>
 
-            <div className="mt-4 rounded-md bg-ink p-4 text-white">
-              <p className="text-xs font-semibold uppercase tracking-[0.08em] text-white/45">Standard GymFlow</p>
-              <p className="mt-2 text-sm font-semibold">Simple pour l&apos;equipe. Elegant pour le gerant. Solide pour la caisse.</p>
+          <div className="mt-10 flex flex-wrap items-center justify-center gap-4">
+            <Link
+              href="/signup"
+              className="inline-flex h-14 items-center gap-3 rounded-full bg-emerald-500 px-8 text-sm font-semibold text-white shadow-xl shadow-emerald-500/30 transition hover:bg-emerald-400"
+            >
+              Créer mon espace — gratuit
+              <ArrowRight size={17} />
+            </Link>
+            <Link
+              href="/login"
+              className="inline-flex h-14 items-center gap-3 rounded-full border border-white/15 bg-white/5 px-8 text-sm font-semibold backdrop-blur transition hover:bg-white/10"
+            >
+              J&apos;ai déjà un compte
+            </Link>
+          </div>
+
+          <p className="mt-6 text-xs text-white/30">
+            14 jours d&apos;essai gratuit · Aucune carte requise · Sans engagement
+          </p>
+        </div>
+
+        {/* Stats bar */}
+        <div className="absolute bottom-12 left-1/2 z-10 flex w-full max-w-2xl -translate-x-1/2 flex-wrap gap-px overflow-hidden rounded-2xl border border-white/8 backdrop-blur">
+          {[
+            { label: "Salles actives", value: "50+" },
+            { label: "Membres gérés", value: "10 000+" },
+            { label: "Pays", value: "5" },
+          ].map((s) => (
+            <div key={s.label} className="flex flex-1 flex-col items-center gap-1 bg-white/5 px-6 py-4">
+              <p className="text-xl font-semibold">{s.value}</p>
+              <p className="text-xs text-white/40">{s.label}</p>
             </div>
-          </aside>
+          ))}
         </div>
       </section>
 
-      <section className="px-4 py-16 md:px-8">
+      {/* ─── FEATURES ─────────────────────────────────────────────── */}
+      <section className="px-6 py-32 md:px-12">
         <div className="mx-auto max-w-7xl">
-          <div className="grid gap-8 lg:grid-cols-[0.85fr_1.15fr] lg:items-end">
-            <div>
-              <p className="text-sm font-semibold uppercase text-mint">La promesse</p>
-              <h2 className="mt-3 text-3xl font-semibold leading-tight md:text-5xl">
-                Une application qui respecte le rythme reel d&apos;une salle.
-              </h2>
-            </div>
-            <p className="text-sm leading-7 text-neutral-600 md:text-base">
-              GymFlow n&apos;essaie pas d&apos;impressionner avec des ecrans inutiles. Il rend les operations essentielles plus propres : accueillir, pointer, vendre, renouveler, verifier et suivre.
+          <div className="mb-20 max-w-2xl">
+            <p className="mb-4 text-xs font-semibold uppercase tracking-[0.15em] text-emerald-400">
+              Tout inclus
             </p>
+            <h2 className="text-5xl font-semibold leading-tight tracking-tight md:text-6xl">
+              Tout ce dont une salle a besoin.<br />Rien de superflu.
+            </h2>
           </div>
 
-          <div className="mt-10 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-            {productPillars.map((pillar) => (
-              <article key={pillar.title} className="rounded-md border border-line bg-white p-5 shadow-soft">
-                <div className="flex size-11 items-center justify-center rounded-md bg-ink text-white">
-                  <pillar.icon size={20} />
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {features.map((f, i) => (
+              <article
+                key={f.title}
+                className={`relative overflow-hidden rounded-2xl border p-6 transition-all duration-300 hover:-translate-y-0.5 hover:border-white/15 ${
+                  i === 0
+                    ? "border-emerald-500/30 bg-gradient-to-b from-emerald-950/40 to-[#0f0f0f]"
+                    : "border-white/6 bg-white/3"
+                }`}
+              >
+                {i === 0 && (
+                  <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-emerald-400 to-transparent" />
+                )}
+                <div
+                  className={`mb-5 flex size-10 items-center justify-center rounded-xl ${
+                    i === 0 ? "bg-emerald-500/20 text-emerald-400" : "bg-white/8 text-white/50"
+                  }`}
+                >
+                  <f.icon size={18} />
                 </div>
-                <h3 className="mt-5 text-lg font-semibold">{pillar.title}</h3>
-                <p className="mt-3 text-sm leading-6 text-neutral-600">{pillar.description}</p>
+                <h3 className="mb-2 text-base font-semibold">{f.title}</h3>
+                <p className="text-sm leading-6 text-white/50">{f.body}</p>
               </article>
             ))}
           </div>
         </div>
       </section>
 
-      <section className="border-y border-line bg-white px-4 py-16 md:px-8">
-        <div className="mx-auto grid max-w-7xl gap-8 lg:grid-cols-[1.08fr_0.92fr] lg:items-center">
-          <div
-            className="min-h-[500px] rounded-md bg-cover bg-center shadow-soft"
-            style={{
-              backgroundImage:
-                "linear-gradient(180deg, rgba(23,23,23,0.08), rgba(23,23,23,0.46)), url('https://images.unsplash.com/photo-1593079831268-3381b0db4a77?auto=format&fit=crop&w=1800&q=88')",
-            }}
-          />
-          <div>
-            <p className="text-sm font-semibold uppercase text-mint">Experience</p>
-            <h2 className="mt-3 text-3xl font-semibold leading-tight md:text-4xl">
-              Le produit doit disparaitre derriere la qualite du service.
-            </h2>
-            <p className="mt-5 text-sm leading-7 text-neutral-600">
-              Une bonne salle ne veut pas perdre du temps a expliquer son logiciel. GymFlow donne des actions nettes, des textes clairs et une vue qui ne fatigue pas.
+      {/* ─── COMMENT ÇA MARCHE ────────────────────────────────────── */}
+      <section className="border-y border-white/6 px-6 py-32 md:px-12">
+        <div className="mx-auto max-w-7xl">
+          <div className="mb-20 text-center">
+            <p className="mb-4 text-xs font-semibold uppercase tracking-[0.15em] text-emerald-400">
+              Le flow
             </p>
-            <div className="mt-7 grid gap-3">
-              {standards.map((standard) => (
-                <div key={standard} className="flex items-center gap-3 rounded-md border border-line bg-paper px-4 py-3">
-                  <ShieldCheck className="shrink-0 text-mint" size={19} />
-                  <p className="text-sm font-semibold">{standard}</p>
+            <h2 className="text-5xl font-semibold tracking-tight md:text-6xl">
+              Simple pour l&apos;équipe.<br />Puissant pour le gérant.
+            </h2>
+          </div>
+
+          <div className="grid gap-6 lg:grid-cols-3">
+            {steps.map((step, i) => (
+              <div key={step.num} className="relative">
+                {i < steps.length - 1 && (
+                  <div className="absolute right-0 top-6 hidden h-px w-1/2 bg-gradient-to-r from-emerald-500/40 to-transparent lg:block" />
+                )}
+                <div className="rounded-2xl border border-white/8 bg-white/3 p-8">
+                  <div className="mb-6 inline-flex items-center gap-3">
+                    <span className="font-mono text-xs font-semibold text-emerald-400">{step.num}</span>
+                    <div className="h-px w-8 bg-emerald-500/30" />
+                  </div>
+                  <h3 className="mb-3 text-2xl font-semibold">{step.title}</h3>
+                  <p className="text-sm leading-7 text-white/50">{step.body}</p>
                 </div>
-              ))}
-            </div>
+              </div>
+            ))}
           </div>
         </div>
       </section>
 
-      <section className="bg-ink px-4 py-16 text-white md:px-8">
+      {/* ─── VISUEL PRODUIT ───────────────────────────────────────── */}
+      <section className="px-6 py-32 md:px-12">
         <div className="mx-auto max-w-7xl">
-          <div className="grid gap-8 lg:grid-cols-[0.8fr_1.2fr] lg:items-start">
+          <div className="grid items-center gap-16 lg:grid-cols-2">
             <div>
-              <p className="text-sm font-semibold uppercase text-mint">Le flow</p>
-              <h2 className="mt-3 text-3xl font-semibold leading-tight md:text-5xl">
-                Trois moments. Une seule logique.
-              </h2>
-            </div>
-            <div className="grid gap-4 md:grid-cols-3">
-              {flows.map((flow) => (
-                <article key={flow.label} className="rounded-md border border-white/12 bg-white/8 p-5">
-                  <p className="font-mono text-xs font-semibold text-amber">{flow.label}</p>
-                  <h3 className="mt-4 text-lg font-semibold">{flow.title}</h3>
-                  <p className="mt-3 text-sm leading-6 text-white/64">{flow.text}</p>
-                </article>
-              ))}
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <section className="px-4 py-16 md:px-8">
-        <div className="mx-auto grid max-w-7xl gap-6 lg:grid-cols-[0.9fr_1.1fr] lg:items-center">
-          <div>
-            <p className="text-sm font-semibold uppercase text-mint">Salles partenaires</p>
-            <h2 className="mt-3 text-3xl font-semibold leading-tight md:text-4xl">
-              Chaque salle garde son identite. GymFlow apporte la structure.
-            </h2>
-            <p className="mt-5 text-sm leading-7 text-neutral-600">
-              Pages publiques, formules, telephone, adresse et presentation propre. Le client voit une salle serieuse avant meme d&apos;arriver.
-            </p>
-          </div>
-          <div className="grid gap-4 sm:grid-cols-2">
-            <div className="rounded-md border border-line bg-white p-5 shadow-soft">
-              <Layers3 className="text-mint" size={22} />
-              <h3 className="mt-4 font-semibold">Page salle claire</h3>
-              <p className="mt-2 text-sm leading-6 text-neutral-600">Une vitrine simple pour presenter les formules et faciliter le contact.</p>
-            </div>
-            <div className="rounded-md border border-line bg-white p-5 shadow-soft">
-              <Users className="text-mint" size={22} />
-              <h3 className="mt-4 font-semibold">Experience client</h3>
-              <p className="mt-2 text-sm leading-6 text-neutral-600">Le futur membre comprend vite quoi choisir et comment joindre la salle.</p>
-            </div>
-            <div className="rounded-md border border-line bg-white p-5 shadow-soft sm:col-span-2">
-              <ClipboardList className="text-mint" size={22} />
-              <h3 className="mt-4 font-semibold">Administration discrete</h3>
-              <p className="mt-2 text-sm leading-6 text-neutral-600">
-                Le proprietaire configure, l&apos;equipe travaille, et la salle garde une image professionnelle.
+              <p className="mb-4 text-xs font-semibold uppercase tracking-[0.15em] text-emerald-400">
+                Interface
               </p>
+              <h2 className="text-5xl font-semibold leading-tight tracking-tight md:text-6xl">
+                Pensé pour le terrain, pas pour un bureau.
+              </h2>
+              <p className="mt-6 text-base leading-8 text-white/50">
+                GymFlow est conçu pour être utilisé debout, sur téléphone, au comptoir d&apos;une salle de sport — pas pour être configuré pendant une heure dans un bureau.
+              </p>
+              <div className="mt-10 space-y-4">
+                {[
+                  { icon: Shield, text: "Données sécurisées sur Supabase (ISO 27001)" },
+                  { icon: Zap, text: "Chargement instantané, même sur réseau 3G" },
+                  { icon: CheckCircle2, text: "Interface testée avec de vrais gérants de salle" },
+                ].map((item) => (
+                  <div
+                    key={item.text}
+                    className="flex items-center gap-4 rounded-2xl border border-white/8 bg-white/3 px-5 py-4"
+                  >
+                    <div className="flex size-9 shrink-0 items-center justify-center rounded-xl bg-emerald-500/15 text-emerald-400">
+                      <item.icon size={16} />
+                    </div>
+                    <p className="text-sm font-medium text-white/80">{item.text}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div
+              className="relative overflow-hidden rounded-3xl border border-white/8"
+              style={{ minHeight: 480 }}
+            >
+              <div
+                className="absolute inset-0 bg-cover bg-center"
+                style={{
+                  backgroundImage:
+                    "url('https://images.unsplash.com/photo-1593079831268-3381b0db4a77?auto=format&fit=crop&w=1400&q=88')",
+                }}
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-[#080808] via-[#080808]/30 to-transparent" />
+              <div className="absolute bottom-0 left-0 right-0 p-8">
+                <div className="rounded-2xl border border-white/10 bg-white/5 p-5 backdrop-blur">
+                  <div className="flex items-center gap-3 border-b border-white/10 pb-4">
+                    <div className="size-2.5 rounded-full bg-emerald-400" />
+                    <p className="text-sm font-semibold">Tableau de bord — Aujourd&apos;hui</p>
+                  </div>
+                  <div className="mt-4 grid grid-cols-3 gap-3">
+                    {[
+                      { label: "Pointages", value: "47" },
+                      { label: "Revenus", value: "185k" },
+                      { label: "Alertes", value: "3" },
+                    ].map((stat) => (
+                      <div key={stat.label} className="rounded-xl bg-white/5 p-3 text-center">
+                        <p className="text-xl font-semibold">{stat.value}</p>
+                        <p className="mt-1 text-xs text-white/40">{stat.label}</p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Pricing */}
-      <section className="bg-ink px-4 py-16 text-white md:px-8">
+      {/* ─── TESTIMONIALS ─────────────────────────────────────────── */}
+      <section className="border-y border-white/6 px-6 py-32 md:px-12">
         <div className="mx-auto max-w-7xl">
-          <div className="text-center">
-            <p className="text-sm font-semibold uppercase text-mint">Tarifs</p>
-            <h2 className="mt-3 text-3xl font-semibold leading-tight md:text-5xl">
+          <div className="mb-16 text-center">
+            <p className="mb-4 text-xs font-semibold uppercase tracking-[0.15em] text-emerald-400">
+              Ils utilisent GymFlow
+            </p>
+            <h2 className="text-4xl font-semibold tracking-tight md:text-5xl">
+              Des gérants qui ont repris le contrôle.
+            </h2>
+          </div>
+
+          <div className="grid gap-6 lg:grid-cols-3">
+            {testimonials.map((t) => (
+              <div key={t.name} className="rounded-2xl border border-white/8 bg-white/3 p-8">
+                <div className="mb-6 flex gap-1">
+                  {[...Array(5)].map((_, i) => (
+                    <div key={i} className="size-1.5 rounded-full bg-emerald-400" />
+                  ))}
+                </div>
+                <p className="text-base leading-8 text-white/75">&ldquo;{t.quote}&rdquo;</p>
+                <div className="mt-6 border-t border-white/8 pt-5">
+                  <p className="text-sm font-semibold">{t.name}</p>
+                  <p className="text-xs text-white/40">{t.gym}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ─── PRICING ──────────────────────────────────────────────── */}
+      <section className="px-6 py-32 md:px-12" id="tarifs">
+        <div className="mx-auto max-w-7xl">
+          <div className="mb-16 text-center">
+            <p className="mb-4 text-xs font-semibold uppercase tracking-[0.15em] text-emerald-400">
+              Tarifs
+            </p>
+            <h2 className="text-5xl font-semibold tracking-tight md:text-6xl">
               Simple. Transparent. Sans surprise.
             </h2>
-            <p className="mt-4 text-base leading-7 text-white/62">
-              Un seul plan pour piloter toute votre salle. Pas de modules cachés, pas de limites artificielles.
+            <p className="mx-auto mt-6 max-w-xl text-base text-white/45">
+              Un seul plan. Tout inclus. Pas de modules cachés, pas de limites artificielles.
             </p>
           </div>
 
-          <div className="mt-10 grid gap-6 lg:grid-cols-3 lg:items-start">
-            {/* Free */}
-            <article className="rounded-md border border-white/12 bg-white/6 p-6">
-              <p className="text-xs font-semibold uppercase tracking-[0.1em] text-white/45">Démarrage</p>
-              <p className="mt-4 text-4xl font-semibold">Gratuit</p>
-              <p className="mt-2 text-sm text-white/55">Pour tester et lancer votre salle.</p>
-              <div className="my-6 border-t border-white/10" />
-              <ul className="space-y-3 text-sm text-white/75">
-                {["Jusqu'à 30 membres", "Pointage illimité", "Caisse et reçus", "1 administrateur", "Vitrine publique"].map((f) => (
-                  <li key={f} className="flex items-center gap-2">
-                    <CheckCircle2 className="shrink-0 text-mint" size={15} />
-                    {f}
-                  </li>
-                ))}
-              </ul>
-              <Link href="/signup" className="mt-6 inline-flex h-11 w-full items-center justify-center rounded-md border border-white/20 text-sm font-semibold transition hover:bg-white/10">
-                Commencer gratuitement
-              </Link>
-            </article>
+          <div className="mx-auto max-w-4xl">
+            <div className="relative overflow-hidden rounded-3xl border border-emerald-500/25 bg-gradient-to-b from-emerald-950/30 to-[#0f0f0f]">
+              <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-emerald-400 to-transparent" />
 
-            {/* Pro — highlighted */}
-            <article className="relative rounded-md border border-mint/40 bg-mint/10 p-6 shadow-[0_0_0_1px_rgba(30,138,106,0.25)]">
-              <span className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-mint px-4 py-1 text-xs font-semibold text-white">
-                Recommandé
-              </span>
-              <p className="text-xs font-semibold uppercase tracking-[0.1em] text-mint">Pro</p>
-              <div className="mt-4 flex items-end gap-2">
-                <p className="text-4xl font-semibold">9 900 <span className="text-2xl">F CFA</span></p>
-                <p className="mb-1 text-sm text-white/55">/ mois</p>
+              <div className="grid lg:grid-cols-[1fr_1.2fr]">
+                {/* Left */}
+                <div className="border-b border-white/6 p-10 lg:border-b-0 lg:border-r">
+                  <div className="mb-2 inline-flex items-center gap-2 rounded-full bg-emerald-500/15 px-3 py-1 text-xs font-semibold text-emerald-400">
+                    <span className="size-1.5 rounded-full bg-emerald-400" />
+                    GymFlow Pro
+                  </div>
+                  <div className="mt-6">
+                    <p className="text-5xl font-semibold">
+                      5 900
+                      <span className="ml-2 text-xl font-normal text-white/40">FCFA</span>
+                    </p>
+                    <p className="mt-1 text-sm text-white/40">par mois · par salle</p>
+                  </div>
+
+                  <p className="mt-6 text-sm leading-7 text-white/55">
+                    Tout ce dont une salle active a besoin. Sans engagement, sans surprise.
+                  </p>
+
+                  <div className="mt-8 space-y-3">
+                    <Link
+                      href="/signup"
+                      className="flex w-full items-center justify-center gap-2 rounded-2xl bg-emerald-500 py-4 text-sm font-semibold text-white shadow-lg shadow-emerald-500/25 transition hover:bg-emerald-400"
+                    >
+                      Commencer — 14 jours gratuits
+                      <ArrowRight size={16} />
+                    </Link>
+                    <p className="text-center text-xs text-white/30">
+                      Aucune carte requise pour l&apos;essai
+                    </p>
+                  </div>
+                </div>
+
+                {/* Right */}
+                <div className="p-10">
+                  <p className="mb-6 text-xs font-semibold uppercase tracking-[0.1em] text-white/35">
+                    Tout inclus dans le plan
+                  </p>
+                  <ul className="space-y-3">
+                    {proFeatures.map((f) => (
+                      <li key={f} className="flex items-center gap-3 text-sm text-white/70">
+                        <CheckCircle2 size={15} className="shrink-0 text-emerald-400" />
+                        {f}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
               </div>
-              <p className="mt-2 text-sm text-white/55">Pour les salles actives avec une équipe.</p>
-              <div className="my-6 border-t border-white/10" />
-              <ul className="space-y-3 text-sm text-white/85">
-                {["Membres illimités", "Pointage illimité", "Caisse, reçus et exports", "Équipe avec rôles (admin / opérateur)", "Staff avec PIN", "Notifications WhatsApp", "Vitrine publique personnalisée", "Support prioritaire"].map((f) => (
-                  <li key={f} className="flex items-center gap-2">
-                    <CheckCircle2 className="shrink-0 text-mint" size={15} />
-                    {f}
-                  </li>
-                ))}
-              </ul>
-              <Link href="/signup" className="mt-6 inline-flex h-11 w-full items-center justify-center gap-2 rounded-md bg-mint text-sm font-semibold transition hover:bg-emerald-700">
-                Démarrer l&apos;essai
-                <ArrowRight size={16} />
-              </Link>
-            </article>
+            </div>
 
             {/* Multi-salles */}
-            <article className="rounded-md border border-white/12 bg-white/6 p-6">
-              <p className="text-xs font-semibold uppercase tracking-[0.1em] text-white/45">Multi-salles</p>
-              <p className="mt-4 text-4xl font-semibold">Sur devis</p>
-              <p className="mt-2 text-sm text-white/55">Pour les groupes et franchises.</p>
-              <div className="my-6 border-t border-white/10" />
-              <ul className="space-y-3 text-sm text-white/75">
-                {["Tout le plan Pro", "Plusieurs salles depuis un compte", "Tableau de bord centralisé", "Onboarding dédié", "SLA garanti"].map((f) => (
-                  <li key={f} className="flex items-center gap-2">
-                    <CheckCircle2 className="shrink-0 text-mint" size={15} />
-                    {f}
-                  </li>
-                ))}
-              </ul>
-              <a href="https://wa.me/221000000000" target="_blank" rel="noreferrer" className="mt-6 inline-flex h-11 w-full items-center justify-center rounded-md border border-white/20 text-sm font-semibold transition hover:bg-white/10">
+            <div className="mt-4 flex items-center justify-between gap-4 rounded-2xl border border-white/8 bg-white/3 px-8 py-6">
+              <div>
+                <p className="font-semibold">Multi-salles & Franchises</p>
+                <p className="mt-1 text-sm text-white/45">Plusieurs espaces, un seul tableau de bord.</p>
+              </div>
+              <a
+                href="mailto:support@gymflow.app"
+                className="inline-flex h-10 shrink-0 items-center gap-2 rounded-full border border-white/15 px-5 text-xs font-semibold transition hover:bg-white/10"
+              >
                 Nous contacter
+                <ArrowRight size={13} />
               </a>
-            </article>
+            </div>
           </div>
+        </div>
+      </section>
 
-          <p className="mt-8 text-center text-sm text-white/35">
-            Paiement mensuel sans engagement. Annulation à tout moment.
+      {/* ─── CTA FINAL ────────────────────────────────────────────── */}
+      <section className="relative overflow-hidden px-6 py-40 text-center md:px-12">
+        <div
+          className="absolute inset-0 bg-cover bg-center opacity-15"
+          style={{
+            backgroundImage:
+              "url('https://images.unsplash.com/photo-1517838277536-f5f99be501cd?auto=format&fit=crop&w=1800&q=88')",
+          }}
+        />
+        <div className="absolute inset-0 bg-gradient-to-b from-[#080808] via-transparent to-[#080808]" />
+        <div className="absolute left-1/2 top-1/2 size-[800px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-emerald-500/8 blur-[140px]" />
+
+        <div className="relative z-10 mx-auto max-w-4xl">
+          <h2 className="text-6xl font-semibold leading-tight tracking-tight md:text-8xl">
+            Lance GymFlow.<br />
+            <span className="text-emerald-400">Aujourd&apos;hui.</span>
+          </h2>
+          <p className="mx-auto mt-8 max-w-xl text-lg text-white/45">
+            14 jours d&apos;essai gratuit. Aucune carte requise. Si tu n&apos;es pas convaincu, tu ne paies rien.
+          </p>
+          <div className="mt-12 flex flex-wrap items-center justify-center gap-4">
+            <Link
+              href="/signup"
+              className="inline-flex h-16 items-center gap-3 rounded-full bg-emerald-500 px-10 text-base font-semibold text-white shadow-2xl shadow-emerald-500/30 transition hover:bg-emerald-400"
+            >
+              Créer mon espace gratuit
+              <ArrowRight size={19} />
+            </Link>
+          </div>
+          <p className="mt-6 text-xs text-white/25">
+            Utilisé par des salles au Sénégal, Côte d&apos;Ivoire, Mali, Guinée et Ghana.
           </p>
         </div>
       </section>
 
-      <section className="px-4 pb-16 md:px-8">
-        <div
-          className="mx-auto flex max-w-7xl flex-col gap-8 rounded-md bg-cover bg-center p-6 text-white shadow-soft md:p-8 lg:flex-row lg:items-end lg:justify-between"
-          style={{
-            backgroundImage:
-              "linear-gradient(90deg, rgba(10,10,10,0.92), rgba(10,10,10,0.62)), url('https://images.unsplash.com/photo-1517836357463-d25dfeac3438?auto=format&fit=crop&w=1800&q=88')",
-          }}
-        >
-          <div className="max-w-2xl">
-            <p className="text-sm font-semibold uppercase text-white/60">Commencer</p>
-            <h2 className="mt-3 text-3xl font-semibold leading-tight md:text-5xl">
-              Donne a ta salle une gestion qui ressemble a son ambition.
-            </h2>
-            <p className="mt-4 text-sm leading-7 text-white/72">
-              Cree ton espace, ajoute tes formules, puis teste le pointage et la caisse avec ton equipe.
-            </p>
+      {/* ─── FOOTER ───────────────────────────────────────────────── */}
+      <footer className="border-t border-white/6 px-6 py-10 md:px-12">
+        <div className="mx-auto flex max-w-7xl flex-col gap-6 md:flex-row md:items-center md:justify-between">
+          <div className="flex items-center gap-3">
+            <div className="flex size-8 items-center justify-center rounded-md bg-white">
+              <Zap size={15} className="text-[#080808]" fill="currentColor" />
+            </div>
+            <div>
+              <p className="text-sm font-semibold">GymFlow</p>
+              <p className="text-xs text-white/35">Logiciel de gestion de salle de sport</p>
+            </div>
           </div>
-          <Link href="/signup" className="inline-flex h-12 shrink-0 items-center justify-center gap-2 rounded-md bg-mint px-5 text-sm font-semibold transition hover:bg-emerald-700">
-            Lancer GymFlow
-            <ArrowRight size={17} />
-          </Link>
+          <div className="flex flex-wrap gap-6 text-xs text-white/35">
+            <Link href="/login" className="hover:text-white/70 transition">Connexion</Link>
+            <Link href="/signup" className="hover:text-white/70 transition">Créer un compte</Link>
+            <Link href="#tarifs" className="hover:text-white/70 transition">Tarifs</Link>
+            <a href="mailto:support@gymflow.app" className="hover:text-white/70 transition">Support</a>
+          </div>
+          <p className="text-xs text-white/20">© 2026 GymFlow. Tous droits réservés.</p>
         </div>
-      </section>
+      </footer>
     </main>
   );
 }
