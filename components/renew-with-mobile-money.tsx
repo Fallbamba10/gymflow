@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { CheckCircle2, ExternalLink, Loader2, RotateCcw, Smartphone } from "lucide-react";
+import { CheckCircle2, ExternalLink, Loader2, Smartphone } from "lucide-react";
 import { SubmitButton } from "@/components/submit-button";
 import { renewMemberSubscription } from "@/app/(app)/members/actions";
 import { formatCurrency } from "@/lib/demo-data";
@@ -29,20 +29,18 @@ type MobileResult = {
 export function RenewWithMobileMoney({ memberId, subscriptionTypes, memberPhone, isArchived }: Props) {
   const [selectedTypeId, setSelectedTypeId] = useState(subscriptionTypes[0]?.id ?? "");
   const [paymentMethod, setPaymentMethod] = useState("cash");
-  const [mmLoading, setMmLoading] = useState<"wave" | "orange" | null>(null);
+  const [mmLoading, setMmLoading] = useState(false);
   const [mmResult, setMmResult] = useState<MobileResult | null>(null);
 
   const selectedType = subscriptionTypes.find((t) => t.id === selectedTypeId);
 
-  async function initiateMobileMoney(provider: "wave" | "orange") {
+  async function initiateMobileMoney() {
     if (!selectedTypeId) return;
-    setMmLoading(provider);
+    setMmLoading(true);
     setMmResult(null);
 
-    const endpoint = provider === "wave" ? "/api/payments/wave" : "/api/payments/orange";
-
     try {
-      const res = await fetch(endpoint, {
+      const res = await fetch("/api/payments/paydunya", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ member_id: memberId, subscription_type_id: selectedTypeId }),
@@ -60,7 +58,7 @@ export function RenewWithMobileMoney({ memberId, subscriptionTypes, memberPhone,
     } catch {
       setMmResult({ payment_url: null, error: "Erreur réseau" });
     } finally {
-      setMmLoading(null);
+      setMmLoading(false);
     }
   }
 
@@ -90,7 +88,7 @@ export function RenewWithMobileMoney({ memberId, subscriptionTypes, memberPhone,
         </select>
       </label>
 
-      {/* Renouvellement cash/carte classique */}
+      {/* Renouvellement cash/carte */}
       <form action={renewMemberSubscription}>
         <input type="hidden" name="member_id" value={memberId} />
         <input type="hidden" name="subscription_type_id" value={selectedTypeId} />
@@ -125,60 +123,42 @@ export function RenewWithMobileMoney({ memberId, subscriptionTypes, memberPhone,
         </SubmitButton>
       </form>
 
-      {/* Séparateur mobile money */}
+      {/* Séparateur */}
       <div className="relative flex items-center gap-3">
         <div className="h-px flex-1 bg-line" />
-        <span className="text-xs font-semibold text-neutral-400">ou payer par mobile money</span>
+        <span className="text-xs font-semibold text-neutral-400">ou mobile money</span>
         <div className="h-px flex-1 bg-line" />
       </div>
 
-      {/* Boutons Wave / Orange */}
+      {/* Bouton PayDunya — Wave / Orange / Free Money */}
       <div className="space-y-2">
-        <div className="flex items-center gap-2 text-xs font-semibold text-neutral-500">
-          <Smartphone size={13} />
-          Génère un lien de paiement — abonnement activé automatiquement
-        </div>
-        <div className="grid grid-cols-2 gap-2">
-          <button
-            type="button"
-            onClick={() => initiateMobileMoney("wave")}
-            disabled={mmLoading !== null || isArchived || !selectedTypeId}
-            className="inline-flex h-11 items-center justify-center gap-2 rounded-md border border-sky-200 bg-sky-50 px-3 text-sm font-semibold text-sky-700 transition hover:bg-sky-100 disabled:cursor-not-allowed disabled:opacity-50"
-          >
-            {mmLoading === "wave"
-              ? <Loader2 size={15} className="animate-spin" />
-              : <span className="text-base font-black text-sky-500 leading-none">W</span>
-            }
-            Wave
-          </button>
-
-          <button
-            type="button"
-            onClick={() => initiateMobileMoney("orange")}
-            disabled={mmLoading !== null || isArchived || !selectedTypeId}
-            className="inline-flex h-11 items-center justify-center gap-2 rounded-md border border-orange-200 bg-orange-50 px-3 text-sm font-semibold text-orange-700 transition hover:bg-orange-100 disabled:cursor-not-allowed disabled:opacity-50"
-          >
-            {mmLoading === "orange"
-              ? <Loader2 size={15} className="animate-spin" />
-              : <span className="text-base font-black text-orange-500 leading-none">O</span>
-            }
-            Orange
-          </button>
-        </div>
-
-        {selectedType && (
+        <p className="text-xs text-neutral-500">
+          Génère un lien de paiement — l&apos;abonnement s&apos;active automatiquement après confirmation.
+        </p>
+        {selectedType && memberPhone && (
           <p className="text-xs text-neutral-400">
-            Montant : <span className="font-semibold text-neutral-600">{formatCurrency(selectedType.price)}</span>
-            {memberPhone ? <> · Tél : <span className="font-semibold text-neutral-600">{memberPhone}</span></> : null}
+            {formatCurrency(selectedType.price)} · {memberPhone}
           </p>
         )}
+        <button
+          type="button"
+          onClick={initiateMobileMoney}
+          disabled={mmLoading || isArchived || !selectedTypeId}
+          className="inline-flex h-12 w-full items-center justify-center gap-2 rounded-md border border-line bg-paper px-4 text-sm font-semibold text-neutral-700 transition hover:bg-neutral-50 disabled:cursor-not-allowed disabled:opacity-50"
+        >
+          {mmLoading
+            ? <Loader2 size={16} className="animate-spin" />
+            : <Smartphone size={16} className="text-mint" />
+          }
+          Payer par Wave / Orange / Free Money
+        </button>
       </div>
 
-      {/* Résultat mobile money */}
+      {/* Résultat */}
       {mmResult?.payment_url && (
         <div className="rounded-md border border-emerald-200 bg-emerald-50 p-3 text-sm">
-          <p className="font-semibold text-emerald-700">Lien ouvert !</p>
-          <p className="mt-1 text-emerald-600">L&apos;abonnement sera activé automatiquement après confirmation du paiement.</p>
+          <p className="font-semibold text-emerald-700">Page de paiement ouverte</p>
+          <p className="mt-1 text-emerald-600">L&apos;abonnement sera activé automatiquement après confirmation.</p>
           <a
             href={mmResult.payment_url}
             target="_blank"

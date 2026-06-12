@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { ExternalLink, Loader2 } from "lucide-react";
+import { ExternalLink, Loader2, Smartphone } from "lucide-react";
 
 type Result = {
   payment_url: string | null;
@@ -11,16 +11,15 @@ type Result = {
 };
 
 export function BillingMobileMoneyButtons() {
-  const [loading, setLoading] = useState<"wave" | "orange" | null>(null);
+  const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<Result | null>(null);
 
-  async function initiate(provider: "wave" | "orange") {
-    setLoading(provider);
+  async function initiate() {
+    setLoading(true);
     setResult(null);
-    const endpoint = provider === "wave" ? "/api/billing/wave" : "/api/billing/orange";
 
     try {
-      const res = await fetch(endpoint, { method: "POST" });
+      const res = await fetch("/api/billing/paydunya", { method: "POST" });
       const data = (await res.json()) as Result;
 
       if (!res.ok || data.error) {
@@ -34,51 +33,40 @@ export function BillingMobileMoneyButtons() {
     } catch {
       setResult({ payment_url: null, error: "Erreur réseau" });
     } finally {
-      setLoading(null);
+      setLoading(false);
     }
   }
 
   return (
     <div className="space-y-3">
-      <p className="text-xs font-semibold text-neutral-500 uppercase tracking-wide">ou payer par mobile money</p>
-
-      <div className="grid grid-cols-2 gap-2">
-        <button
-          type="button"
-          onClick={() => initiate("wave")}
-          disabled={loading !== null}
-          className="inline-flex h-11 items-center justify-center gap-2 rounded-md border border-sky-200 bg-sky-50 px-3 text-sm font-semibold text-sky-700 transition hover:bg-sky-100 disabled:cursor-not-allowed disabled:opacity-50"
-        >
-          {loading === "wave"
-            ? <Loader2 size={15} className="animate-spin" />
-            : <span className="text-base font-black text-sky-500 leading-none">W</span>
-          }
-          Wave
-        </button>
-
-        <button
-          type="button"
-          onClick={() => initiate("orange")}
-          disabled={loading !== null}
-          className="inline-flex h-11 items-center justify-center gap-2 rounded-md border border-orange-200 bg-orange-50 px-3 text-sm font-semibold text-orange-700 transition hover:bg-orange-100 disabled:cursor-not-allowed disabled:opacity-50"
-        >
-          {loading === "orange"
-            ? <Loader2 size={15} className="animate-spin" />
-            : <span className="text-base font-black text-orange-500 leading-none">O</span>
-          }
-          Orange Money
-        </button>
+      <div className="relative flex items-center gap-3">
+        <div className="h-px flex-1 bg-white/15" />
+        <span className="text-xs font-semibold text-white/50">ou mobile money</span>
+        <div className="h-px flex-1 bg-white/15" />
       </div>
 
+      <button
+        type="button"
+        onClick={initiate}
+        disabled={loading}
+        className="inline-flex h-11 w-full items-center justify-center gap-2 rounded-md border border-white/15 bg-white/10 px-4 text-sm font-semibold text-white transition hover:bg-white/20 disabled:cursor-not-allowed disabled:opacity-50"
+      >
+        {loading
+          ? <Loader2 size={16} className="animate-spin" />
+          : <Smartphone size={16} />
+        }
+        Payer par Wave / Orange / Free Money
+      </button>
+
       {result?.payment_url && (
-        <div className="rounded-md border border-emerald-200 bg-emerald-50 p-3 text-sm">
-          <p className="font-semibold text-emerald-700">Lien ouvert !</p>
-          <p className="mt-1 text-emerald-600">Une fois le paiement confirmé, ton accès sera activé.</p>
+        <div className="rounded-md border border-emerald-500/30 bg-emerald-500/10 p-3 text-sm text-emerald-300">
+          <p className="font-semibold">Page de paiement ouverte</p>
+          <p className="mt-1 opacity-80">Ton accès sera activé après confirmation du paiement.</p>
           <a
             href={result.payment_url}
             target="_blank"
             rel="noopener noreferrer"
-            className="mt-2 inline-flex items-center gap-1 text-xs font-semibold text-emerald-700 underline"
+            className="mt-2 inline-flex items-center gap-1 text-xs font-semibold underline"
           >
             Rouvrir le lien <ExternalLink size={11} />
           </a>
@@ -86,14 +74,14 @@ export function BillingMobileMoneyButtons() {
       )}
 
       {result?.demo && !result.payment_url && (
-        <div className="rounded-md border border-amber-200 bg-amber-50 p-3 text-sm text-amber-700">
+        <div className="rounded-md border border-amber-500/30 bg-amber-500/10 p-3 text-sm text-amber-300">
           <p className="font-semibold">Mode démo</p>
           <p className="mt-1">{result.message}</p>
         </div>
       )}
 
       {result?.error && (
-        <div className="rounded-md border border-red-200 bg-red-50 p-3 text-sm text-red-700">
+        <div className="rounded-md border border-red-500/30 bg-red-500/10 p-3 text-sm text-red-300">
           {result.error}
         </div>
       )}

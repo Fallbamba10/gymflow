@@ -1,5 +1,5 @@
 -- Table pour tracker les demandes de paiement mobile money en attente
--- Couvre Wave et Orange Money pour les membres (abonnements) et le billing GymFlow
+-- Agrégateur : PayDunya (Wave, Orange Money, Free Money, carte)
 
 create table if not exists mobile_money_requests (
   id uuid primary key default gen_random_uuid(),
@@ -7,7 +7,7 @@ create table if not exists mobile_money_requests (
 
   -- Qui paye quoi
   kind text not null check (kind in ('member_subscription', 'gymflow_billing')),
-  provider text not null check (provider in ('wave', 'orange_money')),
+  provider text not null check (provider in ('paydunya', 'wave', 'orange_money')),
   status text not null default 'pending' check (status in ('pending', 'complete', 'failed', 'expired')),
 
   -- Pour member_subscription
