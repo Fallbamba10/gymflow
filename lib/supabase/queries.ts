@@ -1347,3 +1347,155 @@ export async function getMonthlyReportData(
     payments,
   };
 }
+
+// ─── Analytics de fréquentation ────────────────────────────────────────────
+
+export type AnalyticsData = {
+  // KPIs 30 jours
+  totalCheckins30d: number;
+  avgCheckinsPerDay: number;
+  peakHour: number;
+  peakDay: string;
+  // Fréquentation par heure (0–23)
+  byHour: { hour: number; count: number }[];
+  // Fréquentation par jour de semaine (0=Lun … 6=Dim)
+  byWeekday: { day: number; label: string; count: number }[];
+  // Évolution sur 30 jours (date → count)
+  last30Days: { date: string; count: number }[];
+  // Top 10 membres les plus assidus
+  topMembers: { id: string; name: string; count: number }[];
+  // Nouveaux membres par semaine (4 dernières semaines)
+  newMembersByWeek: { week: string; count: number }[];
+};
+
+const WEEKDAY_LABELS = ["Lun", "Mar", "Mer", "Jeu", "Ven", "Sam", "Dim"];
+
+export async function getAnalyticsData(gymId: string): Promise<AnalyticsData> {
+  const supabase = await createClient();
+
+  const since = new Date();
+  since.setDate(since.getDate() - 30);
+  const sinceIso = since.toISOString();
+
+  // Checkins des 30 derniers jours
+  const { data: checkins } = await supabase
+    .from("checkins")
+    .select("checked_in_at, member_id, members(full_name)")
+    .eq("gym_id", gymId)
+    .gte("checked_in_at", sinceIso)
+    .order("checked_in_at", { ascending: true });
+
+  const rows = (checkins ?? []) as {
+    checked_in_at: string;
+    member_id: string | null;
+    members: { full_name: string | null } | { full_name: string | null }[] | null;
+  }[];
+
+  // Par heure
+  const hourMap: Record<number, number> = {};
+  for (let h = 0; h < 24; h++) hourMap[h] = 0;
+
+  // Par jour de semaine (JS: 0=Dim, convertir en 0=Lun)
+  const wdMap: Record<number, number> = {};
+  for (let d = 0; d < 7; d++) wdMap[d] = 0;
+
+  // Par date (YYYY-MM-DD)
+  const dateMap: Record<string, number> = {};
+
+  // Par membre
+  const memberMap: Record<string, { name: string; count: number }> = {};
+
+  for (const row of rows) {
+    const d = new Date(row.checked_in_at);
+    const hour = d.getHours();
+    const jsDay = d.getDay(); // 0=Sun
+    const isoDay = jsDay === 0 ? 6 : jsDay - 1; // 0=Mon
+    const dateStr = row.checked_in_at.slice(0, 10);
+
+    hourMap[hour] = (hourMap[hour] ?? 0) + 1;
+    wdMap[isoDay] = (wdMap[isoDay] ?? 0) + 1;
+    dateMap[dateStr] = (dateMap[dateStr] ?? 0) + 1;
+
+    if (row.member_id) {
+      const memberName = (() => {
+        const m = row.members;
+        if (!m) return "Inconnu";
+        const item = Array.isArray(m) ? m[0] : m;
+        return item?.full_name ?? "Inconnu";
+      })();
+      if (!memberMap[row.member_id]) {
+        memberMap[row.member_id] = { name: memberName, count: 0 };
+      }
+      memberMap[row.member_id].count++;
+    }
+  }
+
+  // Remplir les 30 derniers jours
+  const last30Days: { date: string; count: number }[] = [];
+  for (let i = 29; i >= 0; i--) {
+    const d = new Date();
+    d.setDate(d.getDate() - i);
+    const ds = d.toISOString().slice(0, 10);
+    last30Days.push({ date: ds, count: dateMap[ds] ?? 0 });
+  }
+
+  const byHour = Object.entries(hourMap).map(([h, count]) => ({
+    hour: Number(h),
+    count,
+  }));
+
+  const byWeekday = Object.entries(wdMap).map(([d, count]) => ({
+    day: Number(d),
+    label: WEEKDAY_LABELS[Number(d)],
+    count,
+  }));
+
+  const peakHour = byHour.reduce((a, b) => (b.count > a.count ? b : a), byHour[0]).hour;
+  const peakWeekday = byWeekday.reduce((a, b) => (b.count > a.count ? b : a), byWeekday[0]);
+
+  const topMembers = Object.entries(memberMap)
+    .map(([id, { name, count }]) => ({ id, name, count }))
+    .sort((a, b) => b.count - a.count)
+    .slice(0, 10);
+
+  // Nouveaux membres par semaine (4 dernières semaines)
+  const fourWeeksAgo = new Date();
+  fourWeeksAgo.setDate(fourWeeksAgo.getDate() - 28);
+  const { data: newMembersRaw } = await supabase
+    .from("members")
+    .select("created_at")
+    .eq("gym_id", gymId)
+    .gte("created_at", fourWeeksAgo.toISOString());
+
+  const weekMap: Record<string, number> = {};
+  for (let w = 3; w >= 0; w--) {
+    const d = new Date();
+    d.setDate(d.getDate() - w * 7);
+    const weekLabel = `S${d.getDate()}/${d.getMonth() + 1}`;
+    weekMap[weekLabel] = 0;
+  }
+  for (const m of newMembersRaw ?? []) {
+    const d = new Date(m.created_at as string);
+    const daysAgo = Math.floor((Date.now() - d.getTime()) / 86400000);
+    const weekIdx = Math.floor(daysAgo / 7);
+    if (weekIdx >= 0 && weekIdx < 4) {
+      const refDay = new Date();
+      refDay.setDate(refDay.getDate() - weekIdx * 7);
+      const label = `S${refDay.getDate()}/${refDay.getMonth() + 1}`;
+      weekMap[label] = (weekMap[label] ?? 0) + 1;
+    }
+  }
+  const newMembersByWeek = Object.entries(weekMap).map(([week, count]) => ({ week, count }));
+
+  return {
+    totalCheckins30d: rows.length,
+    avgCheckinsPerDay: Math.round((rows.length / 30) * 10) / 10,
+    peakHour,
+    peakDay: peakWeekday?.label ?? "-",
+    byHour,
+    byWeekday,
+    last30Days,
+    topMembers,
+    newMembersByWeek,
+  };
+}
