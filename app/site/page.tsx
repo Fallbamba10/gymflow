@@ -8,11 +8,15 @@ import {
   CreditCard,
   FileText,
   MessageCircle,
+  Minus,
+  Plus,
   QrCode,
   Shield,
+  Smartphone,
   Upload,
   UserCheck,
   Users,
+  X,
   Zap,
 } from "lucide-react";
 
@@ -113,16 +117,19 @@ const testimonials = [
     quote: "Avant GymFlow on perdait 30 minutes chaque matin à chercher qui avait payé. Maintenant c'est 3 secondes.",
     name: "Mamadou D.",
     gym: "Iron Club Dakar",
+    country: "🇸🇳",
   },
   {
     quote: "Mes employés ont appris à utiliser l'appli en 10 minutes. Le pointage QR a changé notre accueil.",
     name: "Fatou S.",
     gym: "FitZone Abidjan",
+    country: "🇨🇮",
   },
   {
     quote: "Les rappels WhatsApp automatiques ont multiplié mes renouvellements. Je récupère des clients que j'aurais perdus.",
     name: "Kofi A.",
     gym: "PowerGym Accra",
+    country: "🇬🇭",
   },
 ];
 
@@ -136,8 +143,63 @@ const proFeatures = [
   "Rapport mensuel PDF",
   "Vitrine publique de la salle",
   "Gestion d'équipe avec rôles",
+  "Application mobile installable (PWA)",
   "Support prioritaire",
 ];
+
+const faqs = [
+  {
+    q: "Est-ce que je peux importer mes membres depuis Excel ?",
+    a: "Oui. GymFlow accepte les fichiers CSV avec nom, téléphone et notes. L'import prend moins de 30 secondes et les doublons sont détectés automatiquement.",
+  },
+  {
+    q: "Est-ce que ça marche sans connexion internet ?",
+    a: "Les pages récemment visitées sont disponibles hors ligne grâce à la PWA. Pour les données en temps réel (pointages, paiements), une connexion est nécessaire.",
+  },
+  {
+    q: "Est-ce que mes employés peuvent l'utiliser ?",
+    a: "Oui. Tu crées des comptes opérateurs avec accès limité au pointage et à la caisse. Les données sensibles (revenus, analytics) restent réservées à l'admin.",
+  },
+  {
+    q: "Comment fonctionnent les paiements Wave et Orange Money ?",
+    a: "GymFlow s'intègre avec PayDunya pour accepter Wave, Orange Money, Free Money et carte bancaire. Un lien de paiement est envoyé au membre, tu reçois la confirmation automatiquement.",
+  },
+  {
+    q: "Puis-je annuler à tout moment ?",
+    a: "Oui, sans engagement ni frais de résiliation. Tes données restent exportables avant toute résiliation.",
+  },
+  {
+    q: "Est-ce que GymFlow fonctionne sur téléphone ?",
+    a: "Oui. GymFlow est une application web installable sur Android et iPhone (sans passer par le Play Store). Une fois installée, elle fonctionne comme une vraie application.",
+  },
+];
+
+const compareRows = [
+  { label: "Pointage rapide", gymflow: true, excel: false, cahier: false },
+  { label: "Caisse & reçus", gymflow: true, excel: "Partiel", cahier: false },
+  { label: "Alertes expiration", gymflow: true, excel: false, cahier: false },
+  { label: "Rappels WhatsApp auto", gymflow: true, excel: false, cahier: false },
+  { label: "Analytics & rapports", gymflow: true, excel: "Manuel", cahier: false },
+  { label: "Multi-utilisateurs", gymflow: true, excel: false, cahier: false },
+  { label: "Application mobile", gymflow: true, excel: false, cahier: false },
+  { label: "Scanner QR", gymflow: true, excel: false, cahier: false },
+];
+
+function Star() {
+  return (
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" className="text-emerald-400">
+      <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+    </svg>
+  );
+}
+
+function CheckCell({ value }: { value: boolean | string }) {
+  if (value === true)
+    return <CheckCircle2 size={18} className="mx-auto text-emerald-400" />;
+  if (value === false)
+    return <X size={18} className="mx-auto text-white/20" />;
+  return <span className="text-xs text-white/40">{value}</span>;
+}
 
 export default function SitePage() {
   return (
@@ -155,6 +217,12 @@ export default function SitePage() {
           <span className="text-base font-semibold tracking-tight">GymFlow</span>
         </Link>
         <div className="flex items-center gap-3">
+          <Link href="#tarifs" className="hidden text-xs font-semibold text-white/50 transition hover:text-white sm:block">
+            Tarifs
+          </Link>
+          <Link href="#faq" className="hidden text-xs font-semibold text-white/50 transition hover:text-white sm:block">
+            FAQ
+          </Link>
           <Link
             href="/login"
             className="hidden h-9 items-center rounded-full border border-white/20 px-4 text-xs font-semibold transition hover:bg-white/10 sm:inline-flex"
@@ -274,8 +342,47 @@ export default function SitePage() {
         </div>
       </section>
 
-      {/* ─── COMMENT ÇA MARCHE ────────────────────────────────────── */}
+      {/* ─── COMPARAISON ──────────────────────────────────────────── */}
       <section className="border-y border-white/6 px-6 py-32 md:px-12">
+        <div className="mx-auto max-w-5xl">
+          <div className="mb-16 text-center">
+            <p className="mb-4 text-xs font-semibold uppercase tracking-[0.15em] text-emerald-400">
+              Comparaison
+            </p>
+            <h2 className="text-5xl font-semibold tracking-tight md:text-6xl">
+              Pourquoi pas Excel ?
+            </h2>
+            <p className="mx-auto mt-6 max-w-xl text-base text-white/45">
+              Excel gère des chiffres. GymFlow gère une salle.
+            </p>
+          </div>
+
+          <div className="overflow-hidden rounded-2xl border border-white/8">
+            <div className="grid grid-cols-[1fr_auto_auto_auto] border-b border-white/8 bg-white/5 px-6 py-4 text-xs font-semibold uppercase tracking-[0.1em]">
+              <span className="text-white/40">Fonctionnalité</span>
+              <span className="w-28 text-center text-emerald-400">GymFlow</span>
+              <span className="w-28 text-center text-white/40">Excel</span>
+              <span className="w-28 text-center text-white/40">Cahier</span>
+            </div>
+            {compareRows.map((row, i) => (
+              <div
+                key={row.label}
+                className={`grid grid-cols-[1fr_auto_auto_auto] items-center px-6 py-4 text-sm ${
+                  i % 2 === 0 ? "bg-white/2" : ""
+                }`}
+              >
+                <span className="font-medium text-white/70">{row.label}</span>
+                <span className="flex w-28 justify-center"><CheckCell value={row.gymflow} /></span>
+                <span className="flex w-28 justify-center"><CheckCell value={row.excel} /></span>
+                <span className="flex w-28 justify-center"><CheckCell value={row.cahier} /></span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ─── COMMENT ÇA MARCHE ────────────────────────────────────── */}
+      <section className="px-6 py-32 md:px-12">
         <div className="mx-auto max-w-7xl">
           <div className="mb-20 text-center">
             <p className="mb-4 text-xs font-semibold uppercase tracking-[0.15em] text-emerald-400">
@@ -306,25 +413,25 @@ export default function SitePage() {
         </div>
       </section>
 
-      {/* ─── VISUEL PRODUIT ───────────────────────────────────────── */}
-      <section className="px-6 py-32 md:px-12">
+      {/* ─── PWA ──────────────────────────────────────────────────── */}
+      <section className="border-y border-white/6 px-6 py-32 md:px-12">
         <div className="mx-auto max-w-7xl">
           <div className="grid items-center gap-16 lg:grid-cols-2">
             <div>
               <p className="mb-4 text-xs font-semibold uppercase tracking-[0.15em] text-emerald-400">
-                Interface
+                Application mobile
               </p>
               <h2 className="text-5xl font-semibold leading-tight tracking-tight md:text-6xl">
-                Pensé pour le terrain, pas pour un bureau.
+                Sur ton téléphone.<br />Sans le Play Store.
               </h2>
               <p className="mt-6 text-base leading-8 text-white/50">
-                GymFlow est conçu pour être utilisé debout, sur téléphone, au comptoir d&apos;une salle de sport — pas pour être configuré pendant une heure dans un bureau.
+                GymFlow s&apos;installe sur Android et iPhone depuis le navigateur. Accès depuis l&apos;écran d&apos;accueil, pointage hors ligne, expérience native — sans passer par aucun store.
               </p>
               <div className="mt-10 space-y-4">
                 {[
-                  { icon: Shield, text: "Données sécurisées sur Supabase (ISO 27001)" },
-                  { icon: Zap, text: "Chargement instantané, même sur réseau 3G" },
-                  { icon: CheckCircle2, text: "Interface testée avec de vrais gérants de salle" },
+                  { icon: Smartphone, text: "Installable sur Android et iPhone en 2 secondes" },
+                  { icon: Zap, text: "Fonctionne sur réseau 3G et hors connexion" },
+                  { icon: Shield, text: "Mises à jour automatiques, rien à télécharger" },
                 ].map((item) => (
                   <div
                     key={item.text}
@@ -339,10 +446,7 @@ export default function SitePage() {
               </div>
             </div>
 
-            <div
-              className="relative overflow-hidden rounded-3xl border border-white/8"
-              style={{ minHeight: 480 }}
-            >
+            <div className="relative overflow-hidden rounded-3xl border border-white/8" style={{ minHeight: 480 }}>
               <div
                 className="absolute inset-0 bg-cover bg-center"
                 style={{
@@ -377,7 +481,7 @@ export default function SitePage() {
       </section>
 
       {/* ─── TESTIMONIALS ─────────────────────────────────────────── */}
-      <section className="border-y border-white/6 px-6 py-32 md:px-12">
+      <section className="px-6 py-32 md:px-12">
         <div className="mx-auto max-w-7xl">
           <div className="mb-16 text-center">
             <p className="mb-4 text-xs font-semibold uppercase tracking-[0.15em] text-emerald-400">
@@ -392,14 +496,17 @@ export default function SitePage() {
             {testimonials.map((t) => (
               <div key={t.name} className="rounded-2xl border border-white/8 bg-white/3 p-8">
                 <div className="mb-6 flex gap-1">
-                  {[...Array(5)].map((_, i) => (
-                    <div key={i} className="size-1.5 rounded-full bg-emerald-400" />
-                  ))}
+                  {[...Array(5)].map((_, i) => <Star key={i} />)}
                 </div>
                 <p className="text-base leading-8 text-white/75">&ldquo;{t.quote}&rdquo;</p>
-                <div className="mt-6 border-t border-white/8 pt-5">
-                  <p className="text-sm font-semibold">{t.name}</p>
-                  <p className="text-xs text-white/40">{t.gym}</p>
+                <div className="mt-6 flex items-center gap-3 border-t border-white/8 pt-5">
+                  <div className="flex size-9 items-center justify-center rounded-full bg-white/8 text-lg">
+                    {t.country}
+                  </div>
+                  <div>
+                    <p className="text-sm font-semibold">{t.name}</p>
+                    <p className="text-xs text-white/40">{t.gym}</p>
+                  </div>
                 </div>
               </div>
             ))}
@@ -408,7 +515,7 @@ export default function SitePage() {
       </section>
 
       {/* ─── PRICING ──────────────────────────────────────────────── */}
-      <section className="px-6 py-32 md:px-12" id="tarifs">
+      <section className="border-y border-white/6 px-6 py-32 md:px-12" id="tarifs">
         <div className="mx-auto max-w-7xl">
           <div className="mb-16 text-center">
             <p className="mb-4 text-xs font-semibold uppercase tracking-[0.15em] text-emerald-400">
@@ -434,11 +541,15 @@ export default function SitePage() {
                     GymFlow Pro
                   </div>
                   <div className="mt-6">
-                    <p className="text-5xl font-semibold">
-                      5 900
-                      <span className="ml-2 text-xl font-normal text-white/40">FCFA</span>
-                    </p>
+                    <div className="flex items-end gap-2">
+                      <p className="text-5xl font-semibold">14 900</p>
+                      <span className="mb-1 text-xl font-normal text-white/40">FCFA</span>
+                    </div>
                     <p className="mt-1 text-sm text-white/40">par mois · par salle</p>
+                    <p className="mt-2 inline-flex items-center gap-1.5 rounded-full bg-emerald-500/10 px-3 py-1 text-xs font-semibold text-emerald-400">
+                      <CheckCircle2 size={11} />
+                      Équivalent à 1 abonnement membre
+                    </p>
                   </div>
 
                   <p className="mt-6 text-sm leading-7 text-white/55">
@@ -494,8 +605,37 @@ export default function SitePage() {
         </div>
       </section>
 
+      {/* ─── FAQ ──────────────────────────────────────────────────── */}
+      <section className="px-6 py-32 md:px-12" id="faq">
+        <div className="mx-auto max-w-3xl">
+          <div className="mb-16 text-center">
+            <p className="mb-4 text-xs font-semibold uppercase tracking-[0.15em] text-emerald-400">
+              FAQ
+            </p>
+            <h2 className="text-4xl font-semibold tracking-tight md:text-5xl">
+              Questions fréquentes.
+            </h2>
+          </div>
+
+          <div className="space-y-3">
+            {faqs.map((faq) => (
+              <details key={faq.q} className="group rounded-2xl border border-white/8 bg-white/3">
+                <summary className="flex cursor-pointer list-none items-center justify-between gap-4 px-6 py-5 text-sm font-semibold">
+                  {faq.q}
+                  <span className="shrink-0 text-emerald-400">
+                    <Plus size={16} className="group-open:hidden" />
+                    <Minus size={16} className="hidden group-open:block" />
+                  </span>
+                </summary>
+                <p className="px-6 pb-5 text-sm leading-7 text-white/55">{faq.a}</p>
+              </details>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* ─── CTA FINAL ────────────────────────────────────────────── */}
-      <section className="relative overflow-hidden px-6 py-40 text-center md:px-12">
+      <section className="relative overflow-hidden border-t border-white/6 px-6 py-40 text-center md:px-12">
         <div
           className="absolute inset-0 bg-cover bg-center opacity-15"
           style={{
@@ -522,6 +662,12 @@ export default function SitePage() {
               Créer mon espace gratuit
               <ArrowRight size={19} />
             </Link>
+            <a
+              href="mailto:support@gymflow.app"
+              className="inline-flex h-16 items-center gap-3 rounded-full border border-white/15 bg-white/5 px-10 text-base font-semibold backdrop-blur transition hover:bg-white/10"
+            >
+              Parler à l&apos;équipe
+            </a>
           </div>
           <p className="mt-6 text-xs text-white/25">
             Utilisé par des salles au Sénégal, Côte d&apos;Ivoire, Mali, Guinée et Ghana.
@@ -542,10 +688,11 @@ export default function SitePage() {
             </div>
           </div>
           <div className="flex flex-wrap gap-6 text-xs text-white/35">
-            <Link href="/login" className="hover:text-white/70 transition">Connexion</Link>
-            <Link href="/signup" className="hover:text-white/70 transition">Créer un compte</Link>
-            <Link href="#tarifs" className="hover:text-white/70 transition">Tarifs</Link>
-            <a href="mailto:support@gymflow.app" className="hover:text-white/70 transition">Support</a>
+            <Link href="/login" className="transition hover:text-white/70">Connexion</Link>
+            <Link href="/signup" className="transition hover:text-white/70">Créer un compte</Link>
+            <Link href="#tarifs" className="transition hover:text-white/70">Tarifs</Link>
+            <Link href="#faq" className="transition hover:text-white/70">FAQ</Link>
+            <a href="mailto:support@gymflow.app" className="transition hover:text-white/70">Support</a>
           </div>
           <p className="text-xs text-white/20">© 2026 GymFlow. Tous droits réservés.</p>
         </div>
