@@ -10,7 +10,7 @@ import { StatusBadge } from "@/components/status-badge";
 import { SubmitButton } from "@/components/submit-button";
 import { RenewWithMobileMoney } from "@/components/renew-with-mobile-money";
 import { performMemberCheckin } from "@/app/(app)/checkin/actions";
-import { archiveMember, restoreMember } from "@/app/(app)/members/actions";
+import { archiveMember, restoreMember, sendWhatsAppReminder } from "@/app/(app)/members/actions";
 import { formatCurrency } from "@/lib/demo-data";
 import { requireAdminGym } from "@/lib/supabase/guards";
 import {
@@ -301,6 +301,22 @@ export default async function MemberDetailPage({ params }: MemberDetailPageProps
             />
           </div>
 
+          {member.phone && !isArchived && (
+            <div className="mt-6 border-t border-line pt-5">
+              <form action={sendWhatsAppReminder}>
+                <input type="hidden" name="member_id" value={member.id} />
+                <SubmitButton
+                  variant="secondary"
+                  className="h-10 w-full border-emerald-200 bg-emerald-50 text-mint hover:bg-emerald-100"
+                  pendingLabel="Envoi..."
+                >
+                  <Phone size={17} />
+                  Envoyer rappel WhatsApp
+                </SubmitButton>
+              </form>
+            </div>
+          )}
+
           <div className="mt-6 border-t border-line pt-5">
             {isArchived ? (
               <form action={restoreMember}>
@@ -344,6 +360,34 @@ export default async function MemberDetailPage({ params }: MemberDetailPageProps
               memberName={member.full_name}
               gymName={gym.name}
             />
+            <div className="mt-4 grid grid-cols-2 gap-2">
+              <a
+                href={`/m/${member.id}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex h-10 items-center justify-center gap-2 rounded-md border border-line bg-paper text-sm font-semibold text-neutral-700 transition hover:bg-neutral-50"
+              >
+                <ReceiptText size={15} className="text-mint" />
+                Portail
+              </a>
+              {member.phone && (() => {
+                const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://gymflow.app";
+                const portalUrl = `${siteUrl}/m/${member.id}`;
+                const waPhone = member.phone.replace(/[\s\-\(\)\.]/g, "").replace(/^\+/, "");
+                const waText = encodeURIComponent(`Bonjour ${member.full_name.split(" ")[0]} ! Voici votre fiche membre GymFlow : ${portalUrl}`);
+                return (
+                  <a
+                    href={`https://wa.me/${waPhone}?text=${waText}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex h-10 items-center justify-center gap-2 rounded-md border border-emerald-200 bg-emerald-50 text-sm font-semibold text-mint transition hover:bg-emerald-100"
+                  >
+                    <Phone size={15} />
+                    Partager
+                  </a>
+                );
+              })()}
+            </div>
           </div>
         </aside>
       </div>
