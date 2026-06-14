@@ -3,7 +3,6 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import {
   Activity,
-  CalendarClock,
   CheckCircle2,
   Clock3,
   MapPin,

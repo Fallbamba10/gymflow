@@ -1,14 +1,14 @@
 // POST /api/billing/paydunya
 // Crée une facture PayDunya pour l'abonnement GymFlow mensuel (5900 FCFA)
 
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import { createPayDunyaInvoice, isPayDunyaConfigured } from "@/lib/paydunya";
 import { createClient } from "@/lib/supabase/server";
 import { getCurrentGym } from "@/lib/supabase/queries";
 
 const GYMFLOW_MONTHLY_PRICE = 5900;
 
-export async function POST(_req: NextRequest) {
+export async function POST(/* _req: NextRequest */) {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return NextResponse.json({ error: "Non authentifié" }, { status: 401 });

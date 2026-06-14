@@ -74,11 +74,11 @@ export function PwaInstallBanner() {
           <p className="font-semibold text-sm">Installer GymFlow</p>
           {isIos ? (
             <p className="mt-0.5 text-xs leading-5 text-neutral-500">
-              Appuie sur <Share size={12} className="inline-block align-middle" /> puis <strong>« Sur l'écran d'accueil »</strong> pour accéder en un geste.
+              Appuie sur <Share size={12} className="inline-block align-middle" /> puis <strong>« Sur l&apos;écran d&apos;accueil »</strong> pour accéder en un geste.
             </p>
           ) : (
             <p className="mt-0.5 text-xs leading-5 text-neutral-500">
-              Ajoute l'app à ton écran d'accueil pour un accès rapide sans navigateur.
+              Ajoute l&apos;app à ton écran d&apos;accueil pour un accès rapide sans navigateur.
             </p>
           )}
         </div>
