@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState, Suspense } from "react";
-import { Activity, Banknote, CreditCard, LayoutDashboard, LogOut, Menu, Settings, UserCheck, Users, UsersRound, X } from "lucide-react";
+import { Activity, Banknote, CreditCard, Dumbbell, LayoutDashboard, LogOut, Menu, Settings, UserCheck, Users, UsersRound, X } from "lucide-react";
 import { signOut } from "@/app/auth/actions";
 import { BrandMark } from "@/components/brand-mark";
 import { GlobalSearch } from "@/components/global-search";
@@ -18,6 +18,7 @@ const navItems = [
   { label: "Membres", href: "/members", icon: Users, adminOnly: true },
   { label: "Abonnements", href: "/subscriptions", icon: CreditCard, adminOnly: true },
   { label: "Caisse", href: "/payments", icon: Banknote, adminOnly: true },
+  { label: "Cours", href: "/classes", icon: Dumbbell, adminOnly: true },
   { label: "Pointage", href: "/checkin", icon: UserCheck },
   { label: "Analytics", href: "/analytics", icon: Activity, adminOnly: true },
   { label: "Equipe", href: "/team", icon: UsersRound, adminOnly: true },

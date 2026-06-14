@@ -1829,3 +1829,151 @@ export async function getMemberPortal(memberId: string): Promise<MemberPortal | 
     checkins_count: checkinsResult.count ?? 0,
   };
 }
+
+// ─── COURS COLLECTIFS ───────────────────────────────────────────────────────
+
+export type GymClass = {
+  id: string;
+  name: string;
+  description: string | null;
+  instructor: string | null;
+  color: string;
+  capacity: number;
+  duration_minutes: number;
+  active: boolean;
+  created_at: string;
+};
+
+export type ClassSession = {
+  id: string;
+  class_id: string;
+  class_name: string;
+  class_color: string;
+  starts_at: string;
+  ends_at: string;
+  instructor: string | null;
+  capacity: number;
+  status: string;
+  notes: string | null;
+  bookings_count: number;
+};
+
+export type ClassBooking = {
+  id: string;
+  session_id: string;
+  member_id: string;
+  member_name: string;
+  member_phone: string | null;
+  checked_in: boolean;
+  checked_in_at: string | null;
+  booked_at: string;
+};
+
+export async function getClasses(gymId: string): Promise<GymClass[]> {
+  const supabase = await createClient();
+  const { data } = await supabase
+    .from("classes")
+    .select("*")
+    .eq("gym_id", gymId)
+    .order("name");
+  return (data ?? []) as GymClass[];
+}
+
+export async function getClass(classId: string, gymId: string): Promise<GymClass | null> {
+  const supabase = await createClient();
+  const { data } = await supabase
+    .from("classes")
+    .select("*")
+    .eq("gym_id", gymId)
+    .eq("id", classId)
+    .single();
+  return data as GymClass | null;
+}
+
+export async function getClassSessions(gymId: string, options?: { from?: string; to?: string; classId?: string; upcoming?: boolean; limit?: number }): Promise<ClassSession[]> {
+  const supabase = await createClient();
+  let query = supabase
+    .from("class_sessions")
+    .select("id, class_id, starts_at, ends_at, instructor, capacity, status, notes, classes(name, color, capacity), class_bookings(count)")
+    .eq("gym_id", gymId)
+    .neq("status", "cancelled")
+    .order("starts_at", { ascending: true });
+
+  if (options?.from) query = query.gte("starts_at", options.from);
+  if (options?.to) query = query.lte("starts_at", options.to);
+  if (options?.classId) query = query.eq("class_id", options.classId);
+  if (options?.upcoming) query = query.gte("starts_at", new Date().toISOString());
+  if (options?.limit) query = query.limit(options.limit);
+
+  const { data } = await query;
+  return (data ?? []).map((row) => {
+    const cls = Array.isArray(row.classes) ? row.classes[0] : row.classes as { name: string; color: string; capacity: number } | null;
+    const countArr = row.class_bookings as Array<{ count: number }> | null;
+    const bookingsCount = countArr?.[0]?.count ?? 0;
+    return {
+      id: row.id as string,
+      class_id: row.class_id as string,
+      class_name: (cls as { name: string } | null)?.name ?? "Cours",
+      class_color: (cls as { color: string } | null)?.color ?? "#1E8A6A",
+      starts_at: row.starts_at as string,
+      ends_at: row.ends_at as string,
+      instructor: (row.instructor as string | null) ?? (cls as { instructor?: string } | null)?.instructor ?? null,
+      capacity: (row.capacity as number | null) ?? (cls as { capacity: number } | null)?.capacity ?? 20,
+      status: row.status as string,
+      notes: row.notes as string | null,
+      bookings_count: Number(bookingsCount),
+    };
+  });
+}
+
+export async function getClassSession(sessionId: string, gymId: string): Promise<ClassSession | null> {
+  const supabase = await createClient();
+  const { data } = await supabase
+    .from("class_sessions")
+    .select("id, class_id, starts_at, ends_at, instructor, capacity, status, notes, classes(name, color, capacity), class_bookings(count)")
+    .eq("gym_id", gymId)
+    .eq("id", sessionId)
+    .single();
+
+  if (!data) return null;
+  const cls = Array.isArray(data.classes) ? data.classes[0] : data.classes as { name: string; color: string; capacity: number } | null;
+  const countArr = data.class_bookings as Array<{ count: number }> | null;
+  const bookingsCount = countArr?.[0]?.count ?? 0;
+  return {
+    id: data.id as string,
+    class_id: data.class_id as string,
+    class_name: (cls as { name: string } | null)?.name ?? "Cours",
+    class_color: (cls as { color: string } | null)?.color ?? "#1E8A6A",
+    starts_at: data.starts_at as string,
+    ends_at: data.ends_at as string,
+    instructor: (data.instructor as string | null) ?? (cls as { instructor?: string } | null)?.instructor ?? null,
+    capacity: (data.capacity as number | null) ?? (cls as { capacity: number } | null)?.capacity ?? 20,
+    status: data.status as string,
+    notes: data.notes as string | null,
+    bookings_count: Number(bookingsCount),
+  };
+}
+
+export async function getClassBookings(gymId: string, sessionId: string): Promise<ClassBooking[]> {
+  const supabase = await createClient();
+  const { data } = await supabase
+    .from("class_bookings")
+    .select("id, session_id, member_id, checked_in, checked_in_at, booked_at, members(full_name, phone)")
+    .eq("gym_id", gymId)
+    .eq("session_id", sessionId)
+    .order("booked_at");
+
+  return (data ?? []).map((row) => {
+    const member = Array.isArray(row.members) ? row.members[0] : row.members as { full_name: string; phone?: string } | null;
+    return {
+      id: row.id as string,
+      session_id: row.session_id as string,
+      member_id: row.member_id as string,
+      member_name: (member as { full_name: string } | null)?.full_name ?? "Membre",
+      member_phone: (member as { phone?: string } | null)?.phone ?? null,
+      checked_in: row.checked_in as boolean,
+      checked_in_at: row.checked_in_at as string | null,
+      booked_at: row.booked_at as string,
+    };
+  });
+}
