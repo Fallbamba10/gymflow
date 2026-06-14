@@ -158,3 +158,97 @@ export async function sendTrialEndingEmail({
 </html>`,
   });
 }
+
+export async function sendMonthlyReportEmail({
+  to,
+  gymName,
+  monthLabel,
+  totalRevenue,
+  totalCheckins,
+  totalPayments,
+  newMembers,
+  activeMembers,
+  topPlan,
+  currency,
+}: {
+  to: string;
+  gymName: string;
+  monthLabel: string;
+  totalRevenue: number;
+  totalCheckins: number;
+  totalPayments: number;
+  newMembers: number;
+  activeMembers: number;
+  topPlan: string | null;
+  currency: string;
+}) {
+  if (!resend) return;
+
+  const fmt = (n: number) =>
+    new Intl.NumberFormat("fr-FR", { style: "currency", currency, maximumFractionDigits: 0 }).format(n);
+
+  const rows = [
+    { label: "Revenus encaissés", value: fmt(totalRevenue), accent: true },
+    { label: "Paiements enregistrés", value: String(totalPayments), accent: false },
+    { label: "Entrées validées", value: String(totalCheckins), accent: false },
+    { label: "Nouveaux membres", value: String(newMembers), accent: false },
+    { label: "Membres actifs", value: String(activeMembers), accent: false },
+    ...(topPlan ? [{ label: "Formule la plus vendue", value: topPlan, accent: false }] : []),
+  ];
+
+  await resend.emails.send({
+    from: FROM,
+    to,
+    subject: `Rapport mensuel ${gymName} — ${monthLabel}`,
+    html: `
+<!DOCTYPE html>
+<html lang="fr">
+<head><meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" /></head>
+<body style="margin:0;padding:0;background:#f5f5f0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="background:#f5f5f0;padding:40px 16px;">
+    <tr><td align="center">
+      <table width="560" cellpadding="0" cellspacing="0" style="background:#ffffff;border-radius:12px;border:1px solid #e5e5e0;overflow:hidden;max-width:560px;width:100%;">
+        <tr>
+          <td style="background:#0a0a0a;padding:28px 32px;">
+            <p style="margin:0;font-size:20px;font-weight:700;color:#ffffff;">GymFlow</p>
+            <p style="margin:4px 0 0;font-size:13px;color:rgba(255,255,255,0.5);">Rapport mensuel</p>
+          </td>
+        </tr>
+        <tr>
+          <td style="padding:32px;">
+            <p style="margin:0;font-size:22px;font-weight:700;color:#0a0a0a;">${gymName}</p>
+            <p style="margin:6px 0 0;font-size:15px;color:#777;">${monthLabel}</p>
+
+            <table cellpadding="0" cellspacing="0" style="margin:24px 0;width:100%;">
+              ${rows.map((r) => `
+              <tr>
+                <td style="padding:10px 0;border-bottom:1px solid #f0f0eb;">
+                  <span style="font-size:14px;color:#777;">${r.label}</span>
+                </td>
+                <td style="padding:10px 0;border-bottom:1px solid #f0f0eb;text-align:right;">
+                  <span style="font-size:14px;font-weight:${r.accent ? "700" : "600"};color:${r.accent ? "#10b981" : "#0a0a0a"};">${r.value}</span>
+                </td>
+              </tr>`).join("")}
+            </table>
+
+            <table cellpadding="0" cellspacing="0" style="margin-top:20px;">
+              <tr><td>
+                <a href="https://gymflow-ten-tan.vercel.app/payments/report" style="display:inline-block;background:#0a0a0a;color:#ffffff;font-size:14px;font-weight:600;padding:12px 24px;border-radius:8px;text-decoration:none;">
+                  Voir le rapport complet →
+                </a>
+              </td></tr>
+            </table>
+
+            <p style="margin:24px 0 0;font-size:12px;color:#aaa;line-height:1.6;">
+              Ce rapport a été généré depuis GymFlow.<br/>
+              Questions ? <a href="mailto:support@gymflow.app" style="color:#10b981;">support@gymflow.app</a>
+            </p>
+          </td>
+        </tr>
+      </table>
+    </td></tr>
+  </table>
+</body>
+</html>`,
+  });
+}

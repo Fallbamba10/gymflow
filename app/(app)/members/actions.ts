@@ -7,6 +7,8 @@ import { requireAdminGym } from "@/lib/supabase/guards";
 import {
   notifyWelcome,
   notifySubscriptionConfirmed,
+  notifyExpiryReminder,
+  notifySessionsLow,
 } from "@/lib/whatsapp";
 
 function getString(formData: FormData, key: string) {
@@ -317,4 +319,88 @@ export async function restoreMember(formData: FormData) {
   revalidatePath("/members");
   revalidatePath("/");
   redirect(`/members/${memberId}?success=Membre restaure`);
+}
+
+export async function sendWhatsAppReminder(formData: FormData) {
+  const gym = await requireAdminGym();
+
+  const memberId = getString(formData, "member_id");
+  if (!memberId) {
+    redirect(`/members?error=Membre invalide`);
+  }
+
+  const supabase = await createClient();
+
+  const { data: member } = await supabase
+    .from("members")
+    .select("full_name, phone, id")
+    .eq("gym_id", gym.id)
+    .eq("id", memberId)
+    .single();
+
+  if (!member?.phone) {
+    redirect(`/members/${memberId}?error=Aucun telephone renseigne pour ce membre`);
+  }
+
+  const { data: gymData } = await supabase
+    .from("gyms")
+    .select("name, whatsapp_phone, phone")
+    .eq("id", gym.id)
+    .single();
+
+  if (!gymData) {
+    redirect(`/members/${memberId}?error=Salle introuvable`);
+  }
+
+  const gymContact = gymData.whatsapp_phone || gymData.phone || "";
+
+  // Check subscription state to pick the right template
+  const { data: subscriptions } = await supabase
+    .from("subscriptions")
+    .select("expires_at, sessions_left, status, subscription_types(name)")
+    .eq("gym_id", gym.id)
+    .eq("member_id", memberId)
+    .order("created_at", { ascending: false })
+    .limit(1);
+
+  const sub = subscriptions?.[0] ?? null;
+  const subType = sub
+    ? (Array.isArray(sub.subscription_types) ? sub.subscription_types[0] : sub.subscription_types)
+    : null;
+
+  const daysLeft = sub?.expires_at
+    ? Math.ceil((new Date(sub.expires_at).getTime() - Date.now()) / 86400000)
+    : null;
+
+  const sessionsLeft = sub?.sessions_left ?? null;
+
+  if (sessionsLeft !== null && sessionsLeft <= 3) {
+    await notifySessionsLow({
+      phone: member.phone,
+      memberName: member.full_name,
+      gymName: gymData.name,
+      sessionsLeft,
+      gymContact,
+    });
+  } else if (daysLeft !== null && daysLeft <= 7) {
+    await notifyExpiryReminder({
+      phone: member.phone,
+      memberName: member.full_name,
+      gymName: gymData.name,
+      daysLeft: Math.max(daysLeft, 0),
+      gymContact,
+    });
+  } else {
+    // Generic renewal reminder — reuse expiry template with 0 days as "now"
+    await notifyExpiryReminder({
+      phone: member.phone,
+      memberName: member.full_name,
+      gymName: gymData.name,
+      daysLeft: daysLeft ?? 0,
+      gymContact,
+    });
+  }
+
+  const planLabel = (subType as { name?: string } | null)?.name ?? "abonnement";
+  redirect(`/members/${memberId}?success=Rappel WhatsApp envoye pour ${planLabel}`);
 }

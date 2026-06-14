@@ -6,6 +6,7 @@ import { useEffect, useState, Suspense } from "react";
 import { Activity, Banknote, CreditCard, LayoutDashboard, LogOut, Menu, Settings, UserCheck, Users, UsersRound, X } from "lucide-react";
 import { signOut } from "@/app/auth/actions";
 import { BrandMark } from "@/components/brand-mark";
+import { GlobalSearch } from "@/components/global-search";
 import { ToastProvider } from "@/components/toast";
 import { NotificationsBell } from "@/components/notifications-bell";
 import { GymSwitcher } from "@/components/gym-switcher";
@@ -111,6 +112,11 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
       {mobileMenuOpen ? (
         <div className="fixed inset-x-0 top-[65px] z-30 border-b border-line bg-white px-4 py-4 shadow-soft lg:hidden">
+          {role === "admin" && (
+            <div className="mb-3">
+              <GlobalSearch />
+            </div>
+          )}
           <nav className="grid gap-2">
             {visibleNavItems.map((item) => {
               const active =
@@ -151,7 +157,13 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
         {gymId && <div className="mt-5"><GymSwitcher currentGymId={gymId} /></div>}
 
-        <nav className="mt-6 space-y-1">
+        {role === "admin" && (
+          <div className="mt-4">
+            <GlobalSearch />
+          </div>
+        )}
+
+        <nav className="mt-4 space-y-1">
           {visibleNavItems.map((item) => {
             const active =
               pathname === item.href || (item.href !== "/" && pathname.startsWith(`${item.href}/`));

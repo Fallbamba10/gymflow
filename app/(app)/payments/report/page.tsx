@@ -8,6 +8,7 @@ import {
   Calendar,
   CheckCircle2,
   CreditCard,
+  Mail,
   MapPin,
   Phone,
   ReceiptText,
@@ -20,9 +21,11 @@ import { AppShell } from "@/components/app-shell";
 import { BrandMark } from "@/components/brand-mark";
 import { PageHeader } from "@/components/page-header";
 import { PrintButton } from "@/components/print-button";
+import { SubmitButton } from "@/components/submit-button";
 import { formatCurrency } from "@/lib/demo-data";
 import { requireAdminGym } from "@/lib/supabase/guards";
 import { getMonthlyReportData, type PaymentMethod } from "@/lib/supabase/queries";
+import { emailMonthlyReport } from "./actions";
 
 type ReportPageProps = {
   searchParams: Promise<{ month?: string }>;
@@ -97,6 +100,13 @@ export default async function MonthlyReportPage({ searchParams }: ReportPageProp
               <ArrowLeft size={18} />
               Caisse
             </Link>
+            <form action={emailMonthlyReport}>
+              <input type="hidden" name="month" value={month} />
+              <SubmitButton variant="secondary" className="h-11" pendingLabel="Envoi…">
+                <Mail size={17} />
+                Envoyer par email
+              </SubmitButton>
+            </form>
             <PrintButton />
           </div>
         }

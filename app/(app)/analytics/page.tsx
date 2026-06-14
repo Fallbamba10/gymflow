@@ -1,8 +1,11 @@
+import Link from "next/link";
 import { redirect } from "next/navigation";
 import {
   Activity,
+  Banknote,
   Clock3,
   Crown,
+  Download,
   Flame,
   TrendingUp,
   UserCheck,
@@ -13,6 +16,7 @@ import { AppShell } from "@/components/app-shell";
 import { PageHeader } from "@/components/page-header";
 import { requireAdminGym } from "@/lib/supabase/guards";
 import { getAnalyticsData } from "@/lib/supabase/queries";
+import { formatCurrency } from "@/lib/demo-data";
 
 function formatHour(h: number) {
   return `${String(h).padStart(2, "0")}h`;
@@ -98,6 +102,14 @@ export default async function AnalyticsPage() {
       color: "text-blue-400",
       bg: "bg-blue-400/10",
     },
+    {
+      icon: Banknote,
+      label: "Revenus (30j)",
+      value: formatCurrency(data.totalRevenue30d),
+      sub: `Moy. ${formatCurrency(data.avgRevenuePerDay)}/jour`,
+      color: "text-mint",
+      bg: "bg-mint/10",
+    },
   ];
 
   return (
@@ -106,9 +118,18 @@ export default async function AnalyticsPage() {
         title="Analytics"
         eyebrow="Fréquentation & tendances"
         actions={
-          <div className="inline-flex items-center gap-2 rounded-md border border-line bg-white px-3 py-2 text-sm font-semibold text-neutral-500 shadow-soft">
-            <Activity size={15} className="text-mint" />
-            30 derniers jours
+          <div className="flex items-center gap-2">
+            <div className="inline-flex items-center gap-2 rounded-md border border-line bg-white px-3 py-2 text-sm font-semibold text-neutral-500 shadow-soft">
+              <Activity size={15} className="text-mint" />
+              30 derniers jours
+            </div>
+            <Link
+              href="/analytics/export?sheet=daily"
+              className="inline-flex h-10 items-center gap-2 rounded-md border border-line bg-white px-3 text-sm font-semibold text-neutral-700 shadow-soft transition hover:bg-neutral-50"
+            >
+              <Download size={15} />
+              Export CSV
+            </Link>
           </div>
         }
       />
@@ -116,7 +137,7 @@ export default async function AnalyticsPage() {
       <div className="space-y-6 px-4 py-6 md:px-8">
 
         {/* KPIs */}
-        <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+        <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-5">
           {kpis.map((kpi) => (
             <div key={kpi.label} className="rounded-xl border border-line bg-white p-5 shadow-soft">
               <div className={`mb-4 flex size-10 items-center justify-center rounded-xl ${kpi.bg}`}>
@@ -164,6 +185,51 @@ export default async function AnalyticsPage() {
                 </div>
               );
             })}
+          </div>
+
+          <div className="mt-3 flex justify-between text-[10px] text-neutral-400">
+            <span>{data.last30Days[0]?.date.slice(5)}</span>
+            <span>{data.last30Days[14]?.date.slice(5)}</span>
+            <span>Aujourd&apos;hui</span>
+          </div>
+        </div>
+
+        {/* Revenus 30 jours */}
+        <div className="rounded-xl border border-line bg-white p-6 shadow-soft">
+          <div className="mb-6 flex items-center justify-between gap-4">
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-[0.08em] text-neutral-500">
+                Revenus
+              </p>
+              <h2 className="mt-1 text-lg font-semibold">Encaissements — 30 derniers jours</h2>
+            </div>
+            <div className="flex items-center gap-2 rounded-md bg-emerald-50 px-3 py-1.5">
+              <Banknote size={14} className="text-mint" />
+              <span className="text-sm font-semibold text-mint">{formatCurrency(data.totalRevenue30d)}</span>
+            </div>
+          </div>
+
+          <div className="flex h-40 items-end gap-0.5">
+            {(() => {
+              const maxRev = Math.max(...data.last30Days.map((d) => d.revenue), 1);
+              return data.last30Days.map((d, i) => {
+                const pct = (d.revenue / maxRev) * 100;
+                const isToday = i === 29;
+                return (
+                  <div key={d.date} className="group relative flex flex-1 flex-col items-center gap-1">
+                    {d.revenue > 0 && (
+                      <div className="absolute -top-7 left-1/2 -translate-x-1/2 whitespace-nowrap rounded bg-ink px-1.5 py-0.5 text-[10px] font-semibold text-white opacity-0 transition group-hover:opacity-100">
+                        {formatCurrency(d.revenue)} · {d.date.slice(5)}
+                      </div>
+                    )}
+                    <div
+                      className={`w-full rounded-t transition-all ${isToday ? "bg-mint" : "bg-mint/40"} ${pct === 0 ? "opacity-20" : ""}`}
+                      style={{ height: `${Math.max(pct, 2)}%` }}
+                    />
+                  </div>
+                );
+              });
+            })()}
           </div>
 
           <div className="mt-3 flex justify-between text-[10px] text-neutral-400">

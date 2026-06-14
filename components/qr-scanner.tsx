@@ -78,12 +78,14 @@ export function QrScanner({ onScan }: QrScannerProps) {
         });
 
         if (result?.data) {
-          const data = result.data.trim();
-          // UUID v4 : identifiant Supabase des membres
-          if (/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(data)) {
+          const raw = result.data.trim();
+          const UUID_RE = /[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/i;
+          // Accept bare UUID or a URL containing /m/<uuid> (portail) or any path with uuid
+          const match = UUID_RE.exec(raw);
+          if (match) {
             stopCamera();
             setOpen(false);
-            onScanRef.current(data);
+            onScanRef.current(match[0]);
             return;
           }
         }

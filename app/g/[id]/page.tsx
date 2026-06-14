@@ -328,7 +328,7 @@ export default async function PublicGymProfilePage({ params }: PublicGymPageProp
                 className="inline-flex h-12 items-center gap-2.5 rounded-full border border-white/15 bg-white/5 px-6 text-sm font-semibold transition hover:bg-white/10"
               >
                 <IgIcon size={17} />
-                IgIcon
+                Instagram
               </a>
             )}
             {gym.tiktok_url && (

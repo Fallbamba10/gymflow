@@ -10,7 +10,10 @@ type MemberQRProps = {
 };
 
 export async function MemberQR({ memberId, memberNumber, memberName, gymName }: MemberQRProps) {
-  const svgString = await QRCode.toString(memberId, {
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://gymflow.app";
+  const portalUrl = `${siteUrl}/m/${memberId}`;
+
+  const svgString = await QRCode.toString(portalUrl, {
     type: "svg",
     margin: 2,
     color: {
@@ -53,7 +56,7 @@ export async function MemberQR({ memberId, memberNumber, memberName, gymName }: 
             <p className="truncate text-base font-semibold leading-tight">{memberName}</p>
             <p className="mt-1 font-mono text-xs text-neutral-500">#{memberNum}</p>
             <p className="mt-2 text-xs leading-4 text-neutral-400">
-              Scanner pour<br />valider le passage
+              Scanner pour<br />voir votre fiche
             </p>
           </div>
         </div>

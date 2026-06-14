@@ -10,6 +10,7 @@ import {
   CreditCard,
   DoorOpen,
   Gauge,
+  MessageCircle,
   Plus,
   ReceiptText,
   ShieldCheck,
@@ -17,13 +18,14 @@ import {
   TrendingUp,
   UserPlus,
   UserCheck,
+  UserX,
   Users,
 } from "lucide-react";
 import { AppShell } from "@/components/app-shell";
 import { PageHeader } from "@/components/page-header";
 import { StatusBadge } from "@/components/status-badge";
 import { formatCurrency } from "@/lib/demo-data";
-import { getCurrentGym, getDashboardData, getTodayCheckins } from "@/lib/supabase/queries";
+import { getCurrentGym, getDashboardData, getInactiveMembers, getTodayCheckins } from "@/lib/supabase/queries";
 
 function formatTime(value: string) {
   return new Intl.DateTimeFormat("fr-FR", {
@@ -154,19 +156,22 @@ export default async function Home({ searchParams }: HomeProps) {
     );
   }
 
-  const dashboard = gym
-    ? await getDashboardData(gym.id)
-    : {
-        revenueToday: 0,
-        paymentsToday: 0,
-        checkinsToday: [],
-        activeMembers: 0,
-        totalMembers: 0,
-        alerts: [],
-        revenue7Days: [],
-        recentPayments: [],
-        topPlans: [],
-      };
+  const [dashboard, inactiveMembers] = await Promise.all([
+    gym
+      ? getDashboardData(gym.id)
+      : Promise.resolve({
+          revenueToday: 0,
+          paymentsToday: 0,
+          checkinsToday: [],
+          activeMembers: 0,
+          totalMembers: 0,
+          alerts: [],
+          revenue7Days: [],
+          recentPayments: [],
+          topPlans: [],
+        }),
+    gym ? getInactiveMembers(gym.id) : Promise.resolve([]),
+  ]);
 
   const todayLabel = new Intl.DateTimeFormat("fr-FR", { dateStyle: "full" }).format(new Date());
   const maxRevenue = Math.max(...dashboard.revenue7Days.map((day) => day.amount), 1);
@@ -553,6 +558,61 @@ export default async function Home({ searchParams }: HomeProps) {
             )}
           </div>
         </section>
+
+        {inactiveMembers.length > 0 && (
+          <section className="mt-6 rounded-md border border-amber/30 bg-amber/5 shadow-soft">
+            <div className="flex items-center justify-between border-b border-amber/20 p-5">
+              <div>
+                <div className="flex items-center gap-2">
+                  <UserX size={18} className="text-amber" />
+                  <h2 className="text-lg font-semibold">Membres a relancer</h2>
+                </div>
+                <p className="mt-1 text-sm text-neutral-500">
+                  {plural(inactiveMembers.length, "membre")} sans passage depuis 14 jours ou plus.
+                </p>
+              </div>
+              <Link href="/members" className="inline-flex h-10 items-center justify-center gap-2 rounded-md border border-line bg-white px-4 text-sm font-semibold text-ink transition hover:bg-neutral-50">
+                Voir membres
+                <ArrowRight size={16} />
+              </Link>
+            </div>
+            <div className="divide-y divide-amber/10">
+              {inactiveMembers.slice(0, 8).map((m) => {
+                const waText = encodeURIComponent(
+                  `Bonjour ${m.full_name.split(" ")[0]} ! On ne vous a pas vu depuis un moment. Votre abonnement${m.plan ? ` (${m.plan})` : ""} est toujours actif — revenez quand vous voulez !`,
+                );
+                const waPhone = m.phone?.replace(/[\s\-\(\)\.]/g, "").replace(/^\+/, "") ?? null;
+
+                return (
+                  <div key={m.id} className="flex items-center gap-3 p-4 transition hover:bg-amber/5">
+                    <Link href={`/members/${m.id}`} className="min-w-0 flex-1">
+                      <p className="truncate text-sm font-semibold">{m.full_name}</p>
+                      <p className="mt-0.5 truncate text-xs text-neutral-500">
+                        {m.plan ?? "Sans formule"}{m.phone ? ` · ${m.phone}` : ""}
+                      </p>
+                    </Link>
+                    <div className="flex shrink-0 items-center gap-2">
+                      {waPhone && (
+                        <a
+                          href={`https://wa.me/${waPhone}?text=${waText}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          title="Envoyer un message WhatsApp"
+                          className="flex size-8 items-center justify-center rounded-md bg-emerald-50 text-mint transition hover:bg-emerald-100"
+                        >
+                          <MessageCircle size={15} />
+                        </a>
+                      )}
+                      <span className="rounded-full bg-amber/10 px-2.5 py-1 text-xs font-semibold text-amber">
+                        {m.days_since_checkin >= 999 ? "Jamais" : `J+${m.days_since_checkin}`}
+                      </span>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </section>
+        )}
       </div>
     </AppShell>
   );

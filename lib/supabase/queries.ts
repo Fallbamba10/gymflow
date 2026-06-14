@@ -1395,12 +1395,14 @@ export type AnalyticsData = {
   avgCheckinsPerDay: number;
   peakHour: number;
   peakDay: string;
+  totalRevenue30d: number;
+  avgRevenuePerDay: number;
   // Fréquentation par heure (0–23)
   byHour: { hour: number; count: number }[];
   // Fréquentation par jour de semaine (0=Lun … 6=Dim)
   byWeekday: { day: number; label: string; count: number }[];
-  // Évolution sur 30 jours (date → count)
-  last30Days: { date: string; count: number }[];
+  // Évolution sur 30 jours (date → count + revenue)
+  last30Days: { date: string; count: number; revenue: number }[];
   // Top 10 membres les plus assidus
   topMembers: { id: string; name: string; count: number }[];
   // Nouveaux membres par semaine (4 dernières semaines)
@@ -1416,13 +1418,23 @@ export async function getAnalyticsData(gymId: string): Promise<AnalyticsData> {
   since.setDate(since.getDate() - 30);
   const sinceIso = since.toISOString();
 
-  // Checkins des 30 derniers jours
-  const { data: checkins } = await supabase
-    .from("checkins")
-    .select("checked_in_at, member_id, members(full_name)")
-    .eq("gym_id", gymId)
-    .gte("checked_in_at", sinceIso)
-    .order("checked_in_at", { ascending: true });
+  // Checkins et paiements des 30 derniers jours (en parallèle)
+  const [checkinsResult, paymentsResult] = await Promise.all([
+    supabase
+      .from("checkins")
+      .select("checked_in_at, member_id, members(full_name)")
+      .eq("gym_id", gymId)
+      .gte("checked_in_at", sinceIso)
+      .order("checked_in_at", { ascending: true }),
+    supabase
+      .from("payments")
+      .select("amount, paid_at")
+      .eq("gym_id", gymId)
+      .gte("paid_at", sinceIso),
+  ]);
+
+  const { data: checkins } = checkinsResult;
+  const payments30d = (paymentsResult.data ?? []) as { amount: number; paid_at: string }[];
 
   const rows = (checkins ?? []) as {
     checked_in_at: string;
@@ -1440,6 +1452,7 @@ export async function getAnalyticsData(gymId: string): Promise<AnalyticsData> {
 
   // Par date (YYYY-MM-DD)
   const dateMap: Record<string, number> = {};
+  const revenueMap: Record<string, number> = {};
 
   // Par membre
   const memberMap: Record<string, { name: string; count: number }> = {};
@@ -1469,14 +1482,22 @@ export async function getAnalyticsData(gymId: string): Promise<AnalyticsData> {
     }
   }
 
+  // Remplir revenueMap depuis les paiements
+  for (const p of payments30d) {
+    const ds = p.paid_at.slice(0, 10);
+    revenueMap[ds] = (revenueMap[ds] ?? 0) + Number(p.amount ?? 0);
+  }
+
   // Remplir les 30 derniers jours
-  const last30Days: { date: string; count: number }[] = [];
+  const last30Days: { date: string; count: number; revenue: number }[] = [];
   for (let i = 29; i >= 0; i--) {
     const d = new Date();
     d.setDate(d.getDate() - i);
     const ds = d.toISOString().slice(0, 10);
-    last30Days.push({ date: ds, count: dateMap[ds] ?? 0 });
+    last30Days.push({ date: ds, count: dateMap[ds] ?? 0, revenue: revenueMap[ds] ?? 0 });
   }
+
+  const totalRevenue30d = payments30d.reduce((s, p) => s + Number(p.amount ?? 0), 0);
 
   const byHour = Object.entries(hourMap).map(([h, count]) => ({
     hour: Number(h),
@@ -1531,6 +1552,8 @@ export async function getAnalyticsData(gymId: string): Promise<AnalyticsData> {
     avgCheckinsPerDay: Math.round((rows.length / 30) * 10) / 10,
     peakHour,
     peakDay: peakWeekday?.label ?? "-",
+    totalRevenue30d,
+    avgRevenuePerDay: Math.round(totalRevenue30d / 30),
     byHour,
     byWeekday,
     last30Days,
@@ -1625,4 +1648,184 @@ export async function getNotifications(gymId: string): Promise<AppNotification[]
     const order = { expiry_today: 0, expiry_soon: 1, new_member: 2, payment_pending: 3 };
     return order[a.type] - order[b.type];
   });
+}
+
+export type InactiveMember = {
+  id: string;
+  full_name: string;
+  phone: string | null;
+  plan: string | null;
+  days_since_checkin: number;
+};
+
+export async function getInactiveMembers(
+  gymId: string,
+  inactiveDays = 14,
+): Promise<InactiveMember[]> {
+  const supabase = await createClient();
+  const cutoff = new Date(Date.now() - inactiveDays * 86400000).toISOString();
+
+  // Get active members with a last checkin before cutoff (or never checked in)
+  const { data: members, error } = await supabase
+    .from("members")
+    .select("id, full_name, phone")
+    .eq("gym_id", gymId)
+    .is("archived_at", null);
+
+  if (error) throw new Error(error.message);
+  if (!members?.length) return [];
+
+  const memberIds = members.map((m) => m.id);
+
+  const { data: recentCheckins } = await supabase
+    .from("checkins")
+    .select("member_id, checked_in_at")
+    .eq("gym_id", gymId)
+    .in("member_id", memberIds)
+    .gte("checked_in_at", cutoff);
+
+  const activeSet = new Set((recentCheckins ?? []).map((c) => c.member_id as string));
+
+  const { data: subscriptions } = await supabase
+    .from("subscriptions")
+    .select("member_id, subscription_types(name)")
+    .eq("gym_id", gymId)
+    .eq("status", "active")
+    .in("member_id", memberIds);
+
+  const planByMember = new Map<string, string>();
+  for (const s of subscriptions ?? []) {
+    const st = Array.isArray(s.subscription_types) ? s.subscription_types[0] : s.subscription_types;
+    if (st?.name) planByMember.set(s.member_id as string, st.name as string);
+  }
+
+  // Last checkin per member (regardless of cutoff)
+  const { data: allLastCheckins } = await supabase
+    .from("checkins")
+    .select("member_id, checked_in_at")
+    .eq("gym_id", gymId)
+    .in("member_id", memberIds)
+    .order("checked_in_at", { ascending: false });
+
+  const lastCheckinByMember = new Map<string, string>();
+  for (const c of allLastCheckins ?? []) {
+    const mid = c.member_id as string;
+    if (!lastCheckinByMember.has(mid)) {
+      lastCheckinByMember.set(mid, c.checked_in_at as string);
+    }
+  }
+
+  const inactive: InactiveMember[] = [];
+  for (const m of members) {
+    if (activeSet.has(m.id)) continue;
+    const lastCheckin = lastCheckinByMember.get(m.id);
+    const daysSince = lastCheckin
+      ? Math.floor((Date.now() - new Date(lastCheckin).getTime()) / 86400000)
+      : 999;
+    inactive.push({
+      id: m.id,
+      full_name: m.full_name as string,
+      phone: (m.phone as string | null) ?? null,
+      plan: planByMember.get(m.id) ?? null,
+      days_since_checkin: daysSince,
+    });
+  }
+
+  return inactive.sort((a, b) => b.days_since_checkin - a.days_since_checkin).slice(0, 12);
+}
+
+export type MemberPortal = {
+  member: {
+    id: string;
+    full_name: string;
+    member_number: number;
+    phone: string | null;
+    photo_url: string | null;
+    created_at: string;
+  };
+  gym: {
+    id: string;
+    name: string;
+    address: string | null;
+    phone: string | null;
+    cover_image_url: string | null;
+  };
+  subscription: {
+    id: string;
+    status: string;
+    expires_at: string | null;
+    sessions_left: number | null;
+    plan_name: string | null;
+  } | null;
+  checkins_count: number;
+};
+
+export async function getMemberPortal(memberId: string): Promise<MemberPortal | null> {
+  // Uses service client (no auth required — public portal)
+  const { createServiceClient } = await import("@/lib/supabase/service");
+  const supabase = createServiceClient();
+
+  const { data: member, error } = await supabase
+    .from("members")
+    .select("id, member_number, full_name, phone, photo_url, created_at, gym_id")
+    .eq("id", memberId)
+    .is("archived_at", null)
+    .single();
+
+  if (error || !member) return null;
+
+  const gymId = member.gym_id as string;
+
+  const [gymResult, subscriptionResult, checkinsResult] = await Promise.all([
+    supabase
+      .from("gyms")
+      .select("id, name, address, phone, cover_image_url")
+      .eq("id", gymId)
+      .single(),
+    supabase
+      .from("subscriptions")
+      .select("id, status, expires_at, sessions_left, subscription_types(name)")
+      .eq("gym_id", gymId)
+      .eq("member_id", memberId)
+      .order("created_at", { ascending: false })
+      .limit(1),
+    supabase
+      .from("checkins")
+      .select("id", { count: "exact", head: true })
+      .eq("gym_id", gymId)
+      .eq("member_id", memberId),
+  ]);
+
+  if (!gymResult.data) return null;
+
+  const sub = subscriptionResult.data?.[0] ?? null;
+  const subType = sub ? (Array.isArray(sub.subscription_types) ? sub.subscription_types[0] : sub.subscription_types) : null;
+
+  return {
+    member: {
+      id: member.id as string,
+      full_name: member.full_name as string,
+      member_number: member.member_number as number,
+      phone: (member.phone as string | null) ?? null,
+      photo_url: (member.photo_url as string | null) ?? null,
+      created_at: member.created_at as string,
+    },
+    gym: {
+      id: gymResult.data.id as string,
+      name: gymResult.data.name as string,
+      address: (gymResult.data.address as string | null) ?? null,
+      phone: (gymResult.data.phone as string | null) ?? null,
+      cover_image_url: (gymResult.data.cover_image_url as string | null) ?? null,
+    },
+    subscription: sub
+      ? {
+          id: sub.id as string,
+          status: sub.status as string,
+          expires_at: (sub.expires_at as string | null) ?? null,
+          sessions_left: (sub.sessions_left as number | null) ?? null,
+          plan_name: (subType as { name?: string } | null)?.name ?? null,
+        }
+      : null,
+    checkins_count: checkinsResult.count ?? 0,
+  };
 }
