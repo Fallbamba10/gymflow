@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { notFound } from "next/navigation";
 import { requireAdminGym } from "@/lib/supabase/guards";
 import { getClass } from "@/lib/supabase/queries";
@@ -116,9 +117,9 @@ export default async function EditClassPage({ params }: { params: Promise<{ id: 
         </div>
 
         <div className="flex gap-3 pt-2">
-          <a href={`/classes/${cls.id}`} className="flex-1 rounded-md border border-line bg-paper px-4 py-2 text-center text-sm font-medium text-ink hover:bg-white transition-colors">
+          <Link href={`/classes/${cls.id}`} className="flex-1 rounded-md border border-line bg-paper px-4 py-2 text-center text-sm font-medium text-ink hover:bg-white transition-colors">
             Annuler
-          </a>
+          </Link>
           <button
             type="submit"
             className="flex-1 rounded-md bg-emerald-600 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-700 transition-colors"
