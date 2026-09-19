@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { stripe, STRIPE_PRICE_ID, SITE_URL, TRIAL_DAYS } from "@/lib/stripe";
+import { stripe, STRIPE_PRICE_ID, SITE_URL } from "@/lib/stripe";
 import { createClient } from "@/lib/supabase/server";
 import { getCurrentGym } from "@/lib/supabase/queries";
 
@@ -52,10 +52,9 @@ export async function POST() {
     mode: "subscription",
     payment_method_types: ["card"],
     line_items: [{ price: STRIPE_PRICE_ID, quantity: 1 }],
-    subscription_data: {
-      trial_period_days: TRIAL_DAYS,
-      metadata: { gym_id: gym.id },
-    },
+    // L'essai est déjà accordé à la création de la salle. Ne pas en recréer
+    // un second dans Stripe au moment où le client choisit de payer.
+    subscription_data: { metadata: { gym_id: gym.id } },
     success_url: `${SITE_URL}/billing?success=1`,
     cancel_url: `${SITE_URL}/billing?canceled=1`,
     metadata: { gym_id: gym.id },

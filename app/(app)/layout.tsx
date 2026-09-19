@@ -13,11 +13,10 @@ export default async function AppGroupLayout({
     if (!gym) {
       redirect("/onboarding");
     }
-    if (!isActiveSubscription(gym.billing_status)) {
+    if (!isActiveSubscription(gym.billing_status, gym.trial_ends_at)) {
       redirect("/billing");
     }
   }
 
   return children;
 }
-

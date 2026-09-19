@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { sendWelcomeEmail } from "@/lib/email";
+import { TRIAL_DAYS } from "@/lib/stripe";
 
 function getString(formData: FormData, key: string) {
   const value = formData.get(key);
@@ -71,7 +72,7 @@ export async function createGym(formData: FormData) {
     redirect("/login");
   }
 
-  const trialEndsAt = new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString();
+  const trialEndsAt = new Date(Date.now() + TRIAL_DAYS * 24 * 60 * 60 * 1000).toISOString();
 
   const { error } = await supabase.from("gyms").insert({
     name,
@@ -95,4 +96,3 @@ export async function createGym(formData: FormData) {
   revalidatePath("/", "layout");
   redirect("/?welcome=1");
 }
-

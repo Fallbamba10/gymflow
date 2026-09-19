@@ -54,7 +54,7 @@ export async function sendWelcomeEmail({
               <tr>
                 <td>
                   <p style="margin:0;font-size:13px;font-weight:600;color:#888;text-transform:uppercase;letter-spacing:0.06em;">Essai gratuit</p>
-                  <p style="margin:6px 0 0;font-size:18px;font-weight:700;color:#0a0a0a;">14 jours — jusqu'au ${trialDate}</p>
+                  <p style="margin:6px 0 0;font-size:18px;font-weight:700;color:#0a0a0a;">30 jours — jusqu'au ${trialDate}</p>
                   <p style="margin:6px 0 0;font-size:13px;color:#777;">Aucune carte requise pour l'instant. Souscris avant la fin pour continuer.</p>
                 </td>
               </tr>

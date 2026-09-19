@@ -11,9 +11,14 @@ export const STRIPE_WEBHOOK_SECRET = process.env.STRIPE_WEBHOOK_SECRET ?? "";
 export const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
 
 // Statuts considérés comme "accès actif"
-export function isActiveSubscription(status: string | null | undefined): boolean {
-  return status === "active" || status === "trialing";
+export function isActiveSubscription(
+  status: string | null | undefined,
+  trialEndsAt?: string | null,
+): boolean {
+  if (status === "active") return true;
+  if (status !== "trialing") return false;
+  return Boolean(trialEndsAt && new Date(trialEndsAt).getTime() > Date.now());
 }
 
-// Durée trial par défaut : 14 jours
-export const TRIAL_DAYS = 14;
+// Essai sans carte, accordé à la création de la salle.
+export const TRIAL_DAYS = 30;

@@ -59,8 +59,9 @@ export default async function BillingPage({ searchParams }: BillingPageProps) {
   const gym = await getCurrentGym();
   if (!gym) redirect("/onboarding");
 
-  const isActive = isActiveSubscription(gym.billing_status);
-  const isTrialing = gym.billing_status === "trialing";
+  const isActive = isActiveSubscription(gym.billing_status, gym.trial_ends_at);
+  const isTrialing = gym.billing_status === "trialing" && isActive;
+  const isTrialExpired = gym.billing_status === "trialing" && !isActive;
   const isCanceled = gym.billing_status === "canceled";
   const isPastDue = gym.billing_status === "past_due";
   const trialDays = daysLeft(gym.trial_ends_at);
@@ -131,6 +132,7 @@ export default async function BillingPage({ searchParams }: BillingPageProps) {
                     </div>
                     <h1 className="mt-4 text-2xl font-semibold">
                       {isTrialing && "Période d'essai en cours"}
+                      {isTrialExpired && "Période d'essai terminée"}
                       {gym.billing_status === "active" && "Abonnement actif"}
                       {isCanceled && "Abonnement annulé"}
                       {isPastDue && "Paiement en échec"}
@@ -138,6 +140,7 @@ export default async function BillingPage({ searchParams }: BillingPageProps) {
                     </h1>
                     <p className="mt-2 text-sm leading-6 text-white/62">
                       {isTrialing && `Profite de ${trialDays} jour${trialDays > 1 ? "s" : ""} d'essai gratuit. Souscris avant la fin pour conserver ton accès.`}
+                      {isTrialExpired && "Ton essai de 30 jours est terminé. Souscris pour retrouver l'accès à GymFlow."}
                       {gym.billing_status === "active" && `Prochain renouvellement le ${formatDate(gym.billing_period_end)}.`}
                       {isCanceled && "Ton abonnement est résilié. Souscris à nouveau pour retrouver l'accès."}
                       {isPastDue && "Le dernier paiement a échoué. Mets à jour ton moyen de paiement."}
@@ -178,7 +181,7 @@ export default async function BillingPage({ searchParams }: BillingPageProps) {
 
               {/* Actions */}
               <div className="border-t border-white/10 p-5 space-y-4">
-                {isTrialing || isCanceled || isPastDue || !isActive ? (
+                {isTrialing || isTrialExpired || isCanceled || isPastDue || !isActive ? (
                   <>
                     <CheckoutButton label={isCanceled || isPastDue ? "Réactiver l'abonnement" : "Souscrire — 5 900 FCFA/mois"} />
                     <BillingMobileMoneyButtons phone={gym.phone} />
@@ -243,7 +246,7 @@ export default async function BillingPage({ searchParams }: BillingPageProps) {
                 ))}
               </div>
 
-              {(isTrialing || !isActive || isCanceled) && (
+              {(isTrialing || isTrialExpired || !isActive || isCanceled) && (
                 <div className="mt-5">
                   <CheckoutButton label="Souscrire maintenant" fullWidth />
                 </div>
@@ -261,7 +264,7 @@ export default async function BillingPage({ searchParams }: BillingPageProps) {
                 <div>
                   <p className="text-sm font-semibold">Paiement sécurisé</p>
                   <p className="mt-1 text-xs leading-5 text-neutral-500">
-                    Paiement traité par Stripe. GymFlow ne stocke aucune donnée de carte bancaire.
+                    Carte via Stripe, ou mobile money via Intech. GymFlow ne stocke aucune donnée de carte bancaire.
                   </p>
                 </div>
               </div>
@@ -287,4 +290,3 @@ export default async function BillingPage({ searchParams }: BillingPageProps) {
     </main>
   );
 }
-
