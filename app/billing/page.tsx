@@ -181,7 +181,7 @@ export default async function BillingPage({ searchParams }: BillingPageProps) {
                 {isTrialing || isCanceled || isPastDue || !isActive ? (
                   <>
                     <CheckoutButton label={isCanceled || isPastDue ? "Réactiver l'abonnement" : "Souscrire — 5 900 FCFA/mois"} />
-                    <BillingMobileMoneyButtons />
+                    <BillingMobileMoneyButtons phone={gym.phone} />
                   </>
                 ) : (
                   <div className="flex flex-wrap gap-3">

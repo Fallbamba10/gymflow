@@ -32,6 +32,7 @@ export type CurrentGym = {
   id: string;
   name: string;
   currency: string;
+  phone: string | null;
   role: "admin" | "operator";
   billing_status: string;
   trial_ends_at: string | null;
@@ -301,7 +302,7 @@ export async function getCurrentGym(): Promise<CurrentGym | null> {
 
   const { data, error } = await supabase
     .from("gym_users")
-    .select("role, gyms(id, name, currency, billing_status, trial_ends_at, billing_period_end)")
+    .select("role, gyms(id, name, currency, phone, billing_status, trial_ends_at, billing_period_end)")
     .eq("user_id", user.id)
     .eq("active", true);
 
@@ -329,6 +330,7 @@ export async function getCurrentGym(): Promise<CurrentGym | null> {
     id: g.id as string,
     name: g.name as string,
     currency: g.currency as string,
+    phone: g.phone as string | null ?? null,
     role: row.role as "admin" | "operator",
     billing_status: g.billing_status as string ?? "trialing",
     trial_ends_at: g.trial_ends_at as string | null ?? null,

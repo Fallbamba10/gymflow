@@ -2,18 +2,20 @@
 
 ## Technique
 
-- [ ] Executer `supabase/schema.sql`
-- [ ] Executer `supabase/team-management.sql`
-- [ ] Executer `supabase/public-pages.sql`
-- [ ] Executer `supabase/walk-in-sessions.sql`
-- [ ] Configurer `NEXT_PUBLIC_SUPABASE_URL` dans Vercel
-- [ ] Configurer `NEXT_PUBLIC_SUPABASE_ANON_KEY` dans Vercel
-- [ ] Configurer `NEXT_PUBLIC_SITE_URL` dans Vercel
-- [ ] Configurer Supabase Auth Site URL
-- [ ] Configurer Supabase Auth Redirect URLs
-- [ ] Verifier `npm run typecheck`
-- [ ] Verifier `npm run lint`
-- [ ] Verifier `npm run build`
+- [x] Executer `supabase/schema.sql`
+- [x] Executer `supabase/team-management.sql`
+- [x] Executer `supabase/public-pages.sql`
+- [x] Executer `supabase/walk-in-sessions.sql`
+- [x] Executer `supabase/intech.sql`
+- [x] Configurer `NEXT_PUBLIC_SUPABASE_URL` dans Vercel
+- [x] Configurer `NEXT_PUBLIC_SUPABASE_ANON_KEY` dans Vercel
+- [x] Configurer `NEXT_PUBLIC_SITE_URL` dans Vercel (https://gymflow-ten-tan.vercel.app)
+- [x] Configurer `INTECH_API_KEY` dans Vercel
+- [x] Configurer Supabase Auth Site URL → https://gymflow-ten-tan.vercel.app
+- [x] Configurer Supabase Auth Redirect URLs → https://gymflow-ten-tan.vercel.app/**
+- [x] Verifier `npm run typecheck`
+- [x] Verifier `npm run lint`
+- [x] Verifier `npm run build`
 
 ## Test terrain
 
@@ -28,13 +30,16 @@
 - [ ] Tester une seance simple sans abonnement
 - [ ] Verifier que la seance simple apparait dans le journal du jour
 - [ ] Verifier que la seance simple apparait dans la caisse
-- [ ] Tester un renouvellement
+- [ ] Tester un renouvellement cash
+- [ ] Tester un renouvellement Wave via Intech
+- [ ] Tester un renouvellement Orange Money via Intech
 - [ ] Tester un paiement manuel
 - [ ] Ouvrir et imprimer un recu
 - [ ] Exporter les membres CSV
 - [ ] Exporter la caisse CSV
 - [ ] Exporter la sauvegarde JSON
 - [ ] Ouvrir la vitrine `/g/[id]`
+- [ ] Tester un cours collectif : creer, planifier une seance, inscrire un membre, pointer
 
 ## Roles
 
@@ -46,9 +51,9 @@
 
 ## Avant client
 
-- [ ] Remplacer l'URL Vercel par le domaine final
+- [ ] Remplacer l'URL Vercel par le domaine final (ou garder gymflow-ten-tan.vercel.app)
 - [ ] Verifier favicon et logo
-- [ ] Verifier les textes de la page publique
+- [ ] Verifier les textes de la page publique `/site`
 - [ ] Verifier le lien public `/g/[id]`
-- [ ] Verifier les boutons principaux sur mobile
+- [ ] Verifier les boutons principaux sur mobile (Chrome DevTools iPhone 14)
 - [ ] Faire une sauvegarde JSON apres configuration

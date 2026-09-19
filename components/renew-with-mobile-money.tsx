@@ -1,10 +1,18 @@
 "use client";
 
 import { useState } from "react";
-import { CheckCircle2, ExternalLink, Loader2, Smartphone } from "lucide-react";
+import { CheckCircle2, Loader2, Smartphone } from "lucide-react";
 import { SubmitButton } from "@/components/submit-button";
 import { renewMemberSubscription } from "@/app/(app)/members/actions";
 import { formatCurrency } from "@/lib/demo-data";
+import type { IntechService } from "@/lib/intech";
+
+const INTECH_PROVIDERS: { service: IntechService; label: string; color: string }[] = [
+  { service: "WAVE_SN_API_CASH_IN", label: "Wave", color: "sky" },
+  { service: "ORANGE_SN_API_CASH_IN", label: "Orange Money", color: "orange" },
+  { service: "FREE_SN_WALLET_CASH_IN", label: "Free Money", color: "red" },
+  { service: "WIZALL_SN_API_CASH_IN", label: "Wizall", color: "purple" },
+];
 
 type SubscriptionType = {
   id: string;
@@ -20,7 +28,7 @@ type Props = {
 };
 
 type MobileResult = {
-  payment_url: string | null;
+  success?: boolean;
   demo?: boolean;
   message?: string;
   error?: string;
@@ -29,36 +37,33 @@ type MobileResult = {
 export function RenewWithMobileMoney({ memberId, subscriptionTypes, memberPhone, isArchived }: Props) {
   const [selectedTypeId, setSelectedTypeId] = useState(subscriptionTypes[0]?.id ?? "");
   const [paymentMethod, setPaymentMethod] = useState("cash");
-  const [mmLoading, setMmLoading] = useState(false);
+  const [mmLoading, setMmLoading] = useState<IntechService | null>(null);
   const [mmResult, setMmResult] = useState<MobileResult | null>(null);
 
   const selectedType = subscriptionTypes.find((t) => t.id === selectedTypeId);
 
-  async function initiateMobileMoney() {
-    if (!selectedTypeId) return;
-    setMmLoading(true);
+  async function initiateIntech(service: IntechService) {
+    if (!selectedTypeId || !memberPhone) return;
+    setMmLoading(service);
     setMmResult(null);
 
     try {
-      const res = await fetch("/api/payments/paydunya", {
+      const res = await fetch("/api/payments/intech", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ member_id: memberId, subscription_type_id: selectedTypeId }),
+        body: JSON.stringify({ member_id: memberId, subscription_type_id: selectedTypeId, service }),
       });
       const data = (await res.json()) as MobileResult;
 
       if (!res.ok || data.error) {
-        setMmResult({ payment_url: null, error: data.error ?? "Erreur serveur" });
-      } else if (data.payment_url) {
-        window.open(data.payment_url, "_blank", "noopener,noreferrer");
-        setMmResult(data);
+        setMmResult({ error: data.error ?? "Erreur serveur" });
       } else {
         setMmResult(data);
       }
     } catch {
-      setMmResult({ payment_url: null, error: "Erreur réseau" });
+      setMmResult({ error: "Erreur réseau" });
     } finally {
-      setMmLoading(false);
+      setMmLoading(null);
     }
   }
 
@@ -130,47 +135,55 @@ export function RenewWithMobileMoney({ memberId, subscriptionTypes, memberPhone,
         <div className="h-px flex-1 bg-line" />
       </div>
 
-      {/* Bouton PayDunya — Wave / Orange / Free Money */}
+      {/* Boutons Intech — Wave / Orange / Free Money / Wizall */}
       <div className="space-y-2">
-        <p className="text-xs text-neutral-500">
-          Génère un lien de paiement — l&apos;abonnement s&apos;active automatiquement après confirmation.
+        <p className="text-xs text-neutral-500 flex items-center gap-1">
+          <Smartphone size={12} className="text-mint" />
+          La demande est envoyée directement sur le téléphone du membre.
         </p>
         {selectedType && memberPhone && (
           <p className="text-xs text-neutral-400">
             {formatCurrency(selectedType.price)} · {memberPhone}
           </p>
         )}
-        <button
-          type="button"
-          onClick={initiateMobileMoney}
-          disabled={mmLoading || isArchived || !selectedTypeId}
-          className="inline-flex h-12 w-full items-center justify-center gap-2 rounded-md border border-line bg-paper px-4 text-sm font-semibold text-neutral-700 transition hover:bg-neutral-50 disabled:cursor-not-allowed disabled:opacity-50"
-        >
-          {mmLoading
-            ? <Loader2 size={16} className="animate-spin" />
-            : <Smartphone size={16} className="text-mint" />
-          }
-          Payer par Wave / Orange / Free Money
-        </button>
+        {!memberPhone && (
+          <p className="text-xs text-amber-600">
+            Ce membre n&apos;a pas de numéro — ajoutez-en un pour activer le mobile money.
+          </p>
+        )}
+        <div className="grid grid-cols-2 gap-2">
+          {INTECH_PROVIDERS.map(({ service, label, color }) => (
+            <button
+              key={service}
+              type="button"
+              onClick={() => initiateIntech(service)}
+              disabled={mmLoading !== null || isArchived || !selectedTypeId || !memberPhone}
+              className={[
+                "inline-flex h-10 items-center justify-center gap-1.5 rounded-md border px-3 text-sm font-semibold transition disabled:cursor-not-allowed disabled:opacity-50",
+                color === "sky" ? "border-sky-200 bg-sky-50 text-sky-700 hover:bg-sky-100" : "",
+                color === "orange" ? "border-orange-200 bg-orange-50 text-orange-700 hover:bg-orange-100" : "",
+                color === "red" ? "border-red-200 bg-red-50 text-red-700 hover:bg-red-100" : "",
+                color === "purple" ? "border-purple-200 bg-purple-50 text-purple-700 hover:bg-purple-100" : "",
+              ].join(" ")}
+            >
+              {mmLoading === service && <Loader2 size={13} className="animate-spin" />}
+              {label}
+            </button>
+          ))}
+        </div>
       </div>
 
       {/* Résultat */}
-      {mmResult?.payment_url && (
+      {mmResult?.success && (
         <div className="rounded-md border border-emerald-200 bg-emerald-50 p-3 text-sm">
-          <p className="font-semibold text-emerald-700">Page de paiement ouverte</p>
-          <p className="mt-1 text-emerald-600">L&apos;abonnement sera activé automatiquement après confirmation.</p>
-          <a
-            href={mmResult.payment_url}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="mt-2 inline-flex items-center gap-1 text-xs font-semibold text-emerald-700 underline"
-          >
-            Rouvrir le lien <ExternalLink size={11} />
-          </a>
+          <p className="font-semibold text-emerald-700">Demande envoyée !</p>
+          <p className="mt-1 text-emerald-600">
+            Une notification a été envoyée sur le téléphone du membre. L&apos;abonnement s&apos;activera automatiquement après confirmation.
+          </p>
         </div>
       )}
 
-      {mmResult?.demo && !mmResult.payment_url && (
+      {mmResult?.demo && (
         <div className="rounded-md border border-amber-200 bg-amber-50 p-3 text-sm text-amber-700">
           <p className="font-semibold">Mode démo</p>
           <p className="mt-1">{mmResult.message}</p>

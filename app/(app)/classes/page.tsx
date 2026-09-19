@@ -1,40 +1,75 @@
 import Link from "next/link";
 import { requireAdminGym } from "@/lib/supabase/guards";
 import { getClasses, getClassSessions } from "@/lib/supabase/queries";
-import { Plus, Clock, Users, ChevronRight, CalendarDays, Dumbbell } from "lucide-react";
+import { WeekNav } from "@/components/week-nav";
+import { Plus, Clock, Users, Dumbbell, CalendarDays } from "lucide-react";
 
 export const metadata = { title: "Cours collectifs" };
 
-const STATUS_LABELS: Record<string, string> = {
-  scheduled: "Planifiée",
-  ongoing: "En cours",
-  done: "Terminée",
-  cancelled: "Annulée",
-};
+const DAY_LABELS = ["Lun", "Mar", "Mer", "Jeu", "Ven", "Sam", "Dim"];
+
 const STATUS_STYLES: Record<string, string> = {
-  scheduled: "bg-sky-50 text-sky-700",
-  ongoing: "bg-emerald-50 text-emerald-700",
-  done: "bg-gray-100 text-gray-500",
-  cancelled: "bg-red-50 text-red-500",
+  scheduled: "border-sky-200 bg-sky-50 text-sky-700",
+  ongoing: "border-emerald-200 bg-emerald-50 text-emerald-700",
+  done: "border-gray-200 bg-gray-100 text-gray-500",
+  cancelled: "border-red-200 bg-red-50 text-red-500",
 };
 
-export default async function ClassesPage() {
+function getMondayOf(date: Date): Date {
+  const d = new Date(date);
+  const day = d.getDay(); // 0=Sun
+  const diff = day === 0 ? -6 : 1 - day;
+  d.setDate(d.getDate() + diff);
+  d.setHours(0, 0, 0, 0);
+  return d;
+}
+
+type PageProps = {
+  searchParams: Promise<{ week?: string }>;
+};
+
+export default async function ClassesPage({ searchParams }: PageProps) {
+  const { week } = await searchParams;
   const gym = await requireAdminGym();
-  const [classes, upcomingSessions] = await Promise.all([
+
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  const weekStart = week ? getMondayOf(new Date(week)) : getMondayOf(today);
+  const weekEnd = new Date(weekStart);
+  weekEnd.setDate(weekEnd.getDate() + 7);
+
+  const [classes, weekSessions] = await Promise.all([
     getClasses(gym.id),
-    getClassSessions(gym.id, { upcoming: true, limit: 8 }),
+    getClassSessions(gym.id, {
+      from: weekStart.toISOString(),
+      to: weekEnd.toISOString(),
+    }),
   ]);
 
   const hasData = classes.length > 0;
 
+  // Group sessions by day-of-week index (0=Mon … 6=Sun)
+  const byDay: typeof weekSessions[] = Array.from({ length: 7 }, () => []);
+  for (const s of weekSessions) {
+    const d = new Date(s.starts_at);
+    const dow = d.getDay(); // 0=Sun
+    const idx = dow === 0 ? 6 : dow - 1; // convert to Mon=0
+    byDay[idx].push(s);
+  }
+
+  const weekStartStr = weekStart.toISOString().slice(0, 10);
+
   return (
     <div className="space-y-8">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <h1 className="text-xl font-semibold text-ink">Cours collectifs</h1>
           <p className="text-sm text-muted mt-0.5">
-            {hasData ? `${classes.length} cours · ${upcomingSessions.length} séances à venir` : "Planifiez et gérez vos cours"}
+            {hasData
+              ? `${classes.length} cours · ${weekSessions.length} séance${weekSessions.length !== 1 ? "s" : ""} cette semaine`
+              : "Planifiez et gérez vos cours"}
           </p>
         </div>
         <Link
@@ -64,8 +99,6 @@ export default async function ClassesPage() {
               <Plus size={14} /> Créer un cours
             </Link>
           </div>
-
-          {/* Steps */}
           <div className="mt-10 grid grid-cols-1 sm:grid-cols-3 gap-4 text-left max-w-lg mx-auto">
             {[
               { n: "1", title: "Créez un cours", desc: "Nom, durée, capacité, couleur" },
@@ -84,59 +117,112 @@ export default async function ClassesPage() {
         </div>
       )}
 
-      {/* Content when there's data */}
       {hasData && (
         <>
-          {/* Prochaines séances */}
+          {/* Planning semaine */}
           <section>
-            <h2 className="text-sm font-semibold text-ink mb-3 flex items-center gap-2">
-              <CalendarDays size={14} className="text-muted" />
-              Prochaines séances
-            </h2>
-            {upcomingSessions.length === 0 ? (
-              <p className="text-sm text-muted rounded-md border border-dashed border-line bg-paper px-4 py-6 text-center">
-                Aucune séance planifiée.{" "}
-                <Link href={`/classes/${classes[0].id}/sessions/new`} className="text-emerald-600 underline underline-offset-2">
-                  Planifier maintenant
-                </Link>
-              </p>
-            ) : (
-              <div className="divide-y divide-line rounded-md border border-line bg-white shadow-soft">
-                {upcomingSessions.map((s) => {
-                  const d = new Date(s.starts_at);
-                  return (
-                    <Link
-                      key={s.id}
-                      href={`/classes/sessions/${s.id}`}
-                      className="flex items-center gap-3 px-4 py-3 hover:bg-paper transition-colors"
+            <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
+              <h2 className="flex items-center gap-2 text-sm font-semibold text-ink">
+                <CalendarDays size={14} className="text-muted" />
+                Planning de la semaine
+              </h2>
+              <WeekNav weekStart={weekStartStr} />
+            </div>
+
+            {/* Desktop: grille 7 colonnes */}
+            <div className="hidden sm:grid sm:grid-cols-7 gap-px rounded-lg border border-line bg-line overflow-hidden shadow-soft">
+              {byDay.map((sessions, i) => {
+                const dayDate = new Date(weekStart);
+                dayDate.setDate(dayDate.getDate() + i);
+                const isToday = dayDate.toDateString() === today.toDateString();
+                const isPast = dayDate < today;
+
+                return (
+                  <div
+                    key={i}
+                    className={`min-h-[160px] bg-white flex flex-col ${isPast ? "opacity-60" : ""}`}
+                  >
+                    {/* Entête jour */}
+                    <div
+                      className={`px-2 py-1.5 text-center border-b border-line ${isToday ? "bg-emerald-50" : "bg-paper"}`}
                     >
-                      <span
-                        className="h-2.5 w-2.5 rounded-full shrink-0"
-                        style={{ backgroundColor: s.class_color }}
-                      />
-                      <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium text-ink truncate">{s.class_name}</p>
-                        <p className="text-xs text-muted">
-                          {d.toLocaleDateString("fr-FR", { weekday: "short", day: "numeric", month: "short" })}
-                          {" à "}
-                          {d.toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" })}
-                          {s.instructor && ` · ${s.instructor}`}
-                        </p>
-                      </div>
-                      <div className="flex items-center gap-3 shrink-0">
-                        <span className="text-xs text-muted flex items-center gap-1">
+                      <p className={`text-xs font-semibold uppercase tracking-wide ${isToday ? "text-emerald-700" : "text-muted"}`}>
+                        {DAY_LABELS[i]}
+                      </p>
+                      <p className={`text-sm font-bold ${isToday ? "text-emerald-700" : "text-ink"}`}>
+                        {dayDate.getDate()}
+                      </p>
+                    </div>
+
+                    {/* Séances */}
+                    <div className="flex flex-col gap-1 p-1.5 flex-1">
+                      {sessions.length === 0 ? (
+                        <p className="text-[10px] text-muted text-center mt-3">—</p>
+                      ) : (
+                        sessions.map((s) => (
+                          <Link
+                            key={s.id}
+                            href={`/classes/sessions/${s.id}`}
+                            className={`rounded border px-1.5 py-1 text-[11px] leading-tight hover:opacity-80 transition-opacity ${STATUS_STYLES[s.status] ?? "border-gray-200 bg-gray-50 text-gray-600"}`}
+                          >
+                            <p className="font-semibold truncate">{s.class_name}</p>
+                            <p className="opacity-75">
+                              {new Date(s.starts_at).toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" })}
+                              {" · "}{s.bookings_count}/{s.capacity}
+                            </p>
+                          </Link>
+                        ))
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+
+            {/* Mobile: liste par jour */}
+            <div className="sm:hidden space-y-3">
+              {byDay.map((sessions, i) => {
+                const dayDate = new Date(weekStart);
+                dayDate.setDate(dayDate.getDate() + i);
+                const isToday = dayDate.toDateString() === today.toDateString();
+                if (sessions.length === 0) return null;
+
+                return (
+                  <div key={i} className="rounded-lg border border-line bg-white shadow-soft overflow-hidden">
+                    <div className={`px-3 py-2 border-b border-line ${isToday ? "bg-emerald-50" : "bg-paper"}`}>
+                      <p className={`text-xs font-semibold ${isToday ? "text-emerald-700" : "text-muted"}`}>
+                        {DAY_LABELS[i]} {dayDate.getDate()} {dayDate.toLocaleDateString("fr-FR", { month: "short" })}
+                        {isToday && " · Aujourd'hui"}
+                      </p>
+                    </div>
+                    {sessions.map((s) => (
+                      <Link
+                        key={s.id}
+                        href={`/classes/sessions/${s.id}`}
+                        className="flex items-center gap-3 px-3 py-2.5 border-b border-line last:border-0 hover:bg-paper transition-colors"
+                      >
+                        <span className="h-2 w-2 rounded-full shrink-0" style={{ backgroundColor: s.class_color }} />
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-medium text-ink truncate">{s.class_name}</p>
+                          <p className="text-xs text-muted">
+                            {new Date(s.starts_at).toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" })}
+                            {s.instructor && ` · ${s.instructor}`}
+                          </p>
+                        </div>
+                        <span className="text-xs text-muted flex items-center gap-1 shrink-0">
                           <Users size={11} /> {s.bookings_count}/{s.capacity}
                         </span>
-                        <span className={`rounded-full px-2 py-0.5 text-xs font-medium ${STATUS_STYLES[s.status] ?? "bg-gray-100 text-gray-500"}`}>
-                          {STATUS_LABELS[s.status] ?? s.status}
-                        </span>
-                        <ChevronRight size={14} className="text-muted" />
-                      </div>
-                    </Link>
-                  );
-                })}
-              </div>
-            )}
+                      </Link>
+                    ))}
+                  </div>
+                );
+              })}
+              {weekSessions.length === 0 && (
+                <p className="text-sm text-muted text-center py-8 rounded-lg border border-dashed border-line bg-paper">
+                  Aucune séance cette semaine.
+                </p>
+              )}
+            </div>
           </section>
 
           {/* Catalogue */}
@@ -154,10 +240,10 @@ export default async function ClassesPage() {
                 >
                   <div className="flex items-center gap-3">
                     <span
-                      className="h-9 w-9 rounded-lg flex items-center justify-center shrink-0 text-lg"
+                      className="h-9 w-9 rounded-lg flex items-center justify-center shrink-0"
                       style={{ backgroundColor: `${c.color}1A` }}
                     >
-                      🏋️
+                      <Dumbbell size={17} style={{ color: c.color }} />
                     </span>
                     <div className="flex-1 min-w-0">
                       <p className="text-sm font-semibold text-ink truncate group-hover:text-emerald-700 transition-colors">{c.name}</p>
@@ -173,8 +259,6 @@ export default async function ClassesPage() {
                   </div>
                 </Link>
               ))}
-
-              {/* Add card */}
               <Link
                 href="/classes/new"
                 className="rounded-lg border border-dashed border-line bg-paper p-4 flex items-center justify-center gap-2 text-sm text-muted hover:text-emerald-600 hover:border-emerald-300 hover:bg-emerald-50/30 transition-all"

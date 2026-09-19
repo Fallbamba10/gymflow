@@ -13,7 +13,7 @@ export async function MemberQR({ memberId, memberNumber, memberName, gymName }: 
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://gymflow.app";
   const portalUrl = `${siteUrl}/m/${memberId}`;
 
-  const svgString = await QRCode.toString(portalUrl, {
+  const rawSvg = await QRCode.toString(portalUrl, {
     type: "svg",
     margin: 2,
     color: {
@@ -23,6 +23,10 @@ export async function MemberQR({ memberId, memberNumber, memberName, gymName }: 
     errorCorrectionLevel: "H",
     width: 200,
   });
+  // Replace fixed width/height so the SVG scales to its container
+  const svgString = rawSvg
+    .replace(/width="\d+"/, 'width="100%"')
+    .replace(/height="\d+"/, 'height="100%"');
 
   const memberNum = String(memberNumber).padStart(6, "0");
 

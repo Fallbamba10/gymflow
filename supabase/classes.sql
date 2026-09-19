@@ -55,13 +55,21 @@ alter table public.classes enable row level security;
 alter table public.class_sessions enable row level security;
 alter table public.class_bookings enable row level security;
 
+drop policy if exists "gym_members_can_read_classes" on public.classes;
+drop policy if exists "gym_admins_manage_classes" on public.classes;
+drop policy if exists "gym_members_can_read_sessions" on public.class_sessions;
+drop policy if exists "gym_admins_manage_sessions" on public.class_sessions;
+drop policy if exists "gym_members_can_read_bookings" on public.class_bookings;
+drop policy if exists "gym_admins_manage_bookings" on public.class_bookings;
+
 create policy "gym_members_can_read_classes"
   on public.classes for select
   using (public.is_gym_member(gym_id));
 
 create policy "gym_admins_manage_classes"
   on public.classes for all
-  using (public.is_gym_admin(gym_id));
+  using (public.is_gym_admin(gym_id))
+  with check (public.is_gym_admin(gym_id));
 
 create policy "gym_members_can_read_sessions"
   on public.class_sessions for select
@@ -69,7 +77,8 @@ create policy "gym_members_can_read_sessions"
 
 create policy "gym_admins_manage_sessions"
   on public.class_sessions for all
-  using (public.is_gym_admin(gym_id));
+  using (public.is_gym_admin(gym_id))
+  with check (public.is_gym_admin(gym_id));
 
 create policy "gym_members_can_read_bookings"
   on public.class_bookings for select
@@ -77,4 +86,5 @@ create policy "gym_members_can_read_bookings"
 
 create policy "gym_admins_manage_bookings"
   on public.class_bookings for all
-  using (public.is_gym_admin(gym_id));
+  using (public.is_gym_admin(gym_id))
+  with check (public.is_gym_admin(gym_id));
