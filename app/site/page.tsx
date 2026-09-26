@@ -44,6 +44,11 @@ export default function SitePage() {
       </nav>
 
       <section className="relative overflow-hidden px-6 pb-24 pt-40 md:px-12 md:pb-32 md:pt-48">
+        <div
+          className="absolute inset-0 bg-cover bg-center opacity-25"
+          style={{ backgroundImage: "url('/gym-hero.jpg')" }}
+        />
+        <div className="absolute inset-0 bg-gradient-to-b from-[#080808]/70 via-[#080808]/45 to-[#080808]" />
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_20%,rgba(16,185,129,0.18),transparent_42%)]" />
         <div className="relative mx-auto max-w-4xl text-center">
           <p className="inline-flex items-center gap-2 rounded-full border border-emerald-400/20 bg-emerald-400/10 px-4 py-2 text-xs font-semibold text-emerald-300"><span className="size-1.5 rounded-full bg-emerald-400" /> Pensé pour les salles de sport</p>
@@ -73,10 +78,41 @@ export default function SitePage() {
         </div>
       </section>
 
+      <section className="px-6 pb-20 md:px-12">
+        <div className="mx-auto grid max-w-6xl items-center gap-10 lg:grid-cols-2">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-[0.14em] text-emerald-400">Une salle mieux organisée</p>
+            <h2 className="mt-3 text-3xl font-semibold tracking-tight md:text-4xl">Toute ton activité, au même endroit.</h2>
+            <p className="mt-4 max-w-xl leading-7 text-white/55">Suis les entrées, les paiements et les alertes de ta salle depuis un tableau de bord clair, pensé pour le quotidien de ton équipe.</p>
+          </div>
+          <div className="relative min-h-[360px] overflow-hidden rounded-3xl border border-white/10 md:min-h-[440px]">
+            <div
+              className="absolute inset-0 bg-cover bg-center"
+              style={{ backgroundImage: "url('/gym-landing.jpg')" }}
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-[#080808]/95 via-[#080808]/20 to-transparent" />
+            <div className="absolute inset-x-5 bottom-5 rounded-2xl border border-white/15 bg-[#080808]/65 p-5 backdrop-blur-md md:inset-x-7 md:bottom-7 md:p-6">
+              <div className="flex items-center gap-3 border-b border-white/10 pb-4">
+                <span className="size-2.5 rounded-full bg-emerald-400" />
+                <p className="text-sm font-semibold">Tableau de bord · Aujourd&apos;hui</p>
+              </div>
+              <div className="mt-4 grid grid-cols-3 gap-3">
+                {[{ label: "Pointages", value: "47" }, { label: "Revenus", value: "185k" }, { label: "Alertes", value: "3" }].map((stat) => (
+                  <div key={stat.label} className="rounded-xl bg-white/10 p-3 text-center">
+                    <p className="text-lg font-semibold md:text-xl">{stat.value}</p>
+                    <p className="mt-1 text-xs text-white/60">{stat.label}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       <section className="border-y border-white/8 px-6 py-20 md:px-12" id="tarifs">
         <div className="mx-auto max-w-4xl text-center"><p className="text-xs font-semibold uppercase tracking-[0.14em] text-emerald-400">Un tarif clair</p><h2 className="mt-3 text-3xl font-semibold tracking-tight md:text-4xl">Un plan. Toute ta salle.</h2>
           <div className="mx-auto mt-9 max-w-2xl rounded-3xl border border-emerald-400/25 bg-gradient-to-b from-emerald-950/35 to-white/[0.03] p-8 text-left md:p-10">
-            <div className="flex flex-wrap items-end justify-between gap-5 border-b border-white/10 pb-7"><div><p className="text-lg font-semibold">GymFlow</p><p className="mt-1 text-sm text-white/55">Par salle · sans engagement</p></div><p className="text-4xl font-semibold">5 900 <span className="text-base font-medium text-white/55">FCFA/mois</span></p></div>
+            <div className="flex flex-wrap items-end justify-between gap-5 border-b border-white/10 pb-7"><div><p className="text-lg font-semibold">GymFlow</p><p className="mt-1 text-sm text-white/55">Par salle · sans engagement</p></div><p className="text-4xl font-semibold">9 900 <span className="text-base font-medium text-white/55">FCFA/mois</span></p></div>
             <ul className="mt-7 grid gap-3 sm:grid-cols-2">{included.map((item) => <li key={item} className="flex gap-2 text-sm text-white/75"><CheckCircle2 size={17} className="shrink-0 text-emerald-400" />{item}</li>)}</ul>
             <Link href="/signup" className="mt-8 flex items-center justify-center gap-2 rounded-2xl bg-emerald-500 px-6 py-4 text-sm font-semibold hover:bg-emerald-400">Commencer mes 30 jours gratuits <ArrowRight size={16} /></Link>
           </div>
@@ -85,7 +121,14 @@ export default function SitePage() {
 
       <section className="px-6 py-20 md:px-12" id="faq"><div className="mx-auto max-w-3xl"><h2 className="text-center text-3xl font-semibold tracking-tight">Questions fréquentes</h2><div className="mt-8 space-y-3">{faqs.map(({ q, a }) => <details key={q} className="rounded-2xl border border-white/8 bg-white/[0.03] px-6"><summary className="cursor-pointer py-5 font-semibold">{q}</summary><p className="pb-5 text-sm leading-7 text-white/55">{a}</p></details>)}</div></div></section>
 
-      <section className="border-t border-white/8 px-6 py-20 text-center md:px-12"><ShieldCheck className="mx-auto text-emerald-400" size={28} /><h2 className="mt-5 text-3xl font-semibold tracking-tight md:text-4xl">Essaie GymFlow avec ta salle.</h2><p className="mx-auto mt-4 max-w-xl text-white/55">30 jours pour vérifier que l&apos;outil convient à ton équipe, sans carte et sans engagement.</p><Link href="/signup" className="mt-8 inline-flex items-center gap-2 rounded-full bg-emerald-500 px-7 py-4 text-sm font-semibold hover:bg-emerald-400">Créer mon espace <ArrowRight size={16} /></Link><footer className="mt-16 flex flex-wrap items-center justify-center gap-x-6 gap-y-3 text-sm text-white/40"><Link href="/login" className="hover:text-white">Connexion</Link><a href="mailto:support@gymflow.app" className="hover:text-white">Support</a><span>© 2026 GymFlow</span></footer></section>
+      <section className="relative overflow-hidden border-t border-white/8 px-6 py-20 text-center md:px-12">
+        <div
+          className="absolute inset-0 bg-cover bg-center opacity-15"
+          style={{ backgroundImage: "url('/gym-cta.jpg')" }}
+        />
+        <div className="absolute inset-0 bg-gradient-to-b from-[#080808] via-[#080808]/70 to-[#080808]" />
+        <div className="relative"><ShieldCheck className="mx-auto text-emerald-400" size={28} /><h2 className="mt-5 text-3xl font-semibold tracking-tight md:text-4xl">Essaie GymFlow avec ta salle.</h2><p className="mx-auto mt-4 max-w-xl text-white/55">30 jours pour vérifier que l&apos;outil convient à ton équipe, sans carte et sans engagement.</p><Link href="/signup" className="mt-8 inline-flex items-center gap-2 rounded-full bg-emerald-500 px-7 py-4 text-sm font-semibold hover:bg-emerald-400">Créer mon espace <ArrowRight size={16} /></Link><footer className="mt-16 flex flex-wrap items-center justify-center gap-x-6 gap-y-3 text-sm text-white/40"><Link href="/login" className="hover:text-white">Connexion</Link><a href="mailto:support@gymflow.app" className="hover:text-white">Support</a><span>© 2026 GymFlow</span></footer></div>
+      </section>
     </main>
   );
 }
