@@ -277,8 +277,8 @@ export default async function BillingPage({ searchParams }: BillingPageProps) {
                   <p className="text-sm font-semibold">Questions ?</p>
                   <p className="mt-1 text-xs leading-5 text-neutral-500">
                     Contacte-nous à{" "}
-                    <a href="mailto:support@gymflow.app" className="font-semibold text-mint hover:underline">
-                      support@gymflow.app
+                    <a href="mailto:doolefit.support@gmail.com" className="font-semibold text-mint hover:underline">
+                      doolefit.support@gmail.com
                     </a>
                   </p>
                 </div>

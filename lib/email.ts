@@ -93,7 +93,7 @@ export async function sendWelcomeEmail({
         <tr>
           <td style="padding:20px 32px;border-top:1px solid #e5e5e0;">
             <p style="margin:0;font-size:12px;color:#aaa;line-height:1.6;">
-              Des questions ? Réponds à cet email ou écris-nous à <a href="mailto:support@gymflow.app" style="color:#10b981;">support@gymflow.app</a><br/>
+              Des questions ? Réponds à cet email ou écris-nous à <a href="mailto:doolefit.support@gmail.com" style="color:#10b981;">doolefit.support@gmail.com</a><br/>
               DooleFit — Gestion de salle intelligente
             </p>
           </td>
@@ -148,7 +148,7 @@ export async function sendTrialEndingEmail({
             </td></tr>
           </table>
           <p style="margin:20px 0 0;font-size:13px;color:#aaa;">
-            Questions ? <a href="mailto:support@gymflow.app" style="color:#10b981;">support@gymflow.app</a>
+            Questions ? <a href="mailto:doolefit.support@gmail.com" style="color:#10b981;">doolefit.support@gmail.com</a>
           </p>
         </td></tr>
       </table>
@@ -241,7 +241,7 @@ export async function sendMonthlyReportEmail({
 
             <p style="margin:24px 0 0;font-size:12px;color:#aaa;line-height:1.6;">
               Ce rapport a été généré depuis DooleFit.<br/>
-              Questions ? <a href="mailto:support@gymflow.app" style="color:#10b981;">support@gymflow.app</a>
+              Questions ? <a href="mailto:doolefit.support@gmail.com" style="color:#10b981;">doolefit.support@gmail.com</a>
             </p>
           </td>
         </tr>
