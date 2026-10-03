@@ -4,7 +4,7 @@
 
 1. Le gerant cree un compte.
 2. Il renseigne le nom de la salle, la devise et le telephone.
-3. GymFlow cree automatiquement son role `admin`.
+3. DooleFit cree automatiquement son role `admin`.
 4. Il arrive sur le dashboard vide avec une action principale: creer une formule d'abonnement.
 
 ## 2. Creation des formules
@@ -22,21 +22,21 @@
 1. Le gerant clique sur ajouter un membre.
 2. Il renseigne nom, telephone et optionnellement des notes.
 3. Il choisit une formule d'abonnement.
-4. GymFlow cree le membre, cree l'abonnement actif et enregistre un paiement.
+4. DooleFit cree le membre, cree l'abonnement actif et enregistre un paiement.
 5. L'encaissement est attribue au compte connecte.
 
 ## 4. Check-in
 
 1. L'employe connecte ouvre l'espace pointage.
 2. Il recherche un membre par nom, telephone ou numero.
-3. GymFlow affiche son statut:
+3. DooleFit affiche son statut:
    - actif
    - expire
    - bientot expire
    - seances faibles
 4. L'employe valide l'entree.
-5. GymFlow enregistre le check-in.
-6. Si l'abonnement est a seances, GymFlow decremente `sessions_left`.
+5. DooleFit enregistre le check-in.
+6. Si l'abonnement est a seances, DooleFit decremente `sessions_left`.
 7. Un membre peut etre pointe plusieurs fois dans la meme journee, par exemple matin et soir.
 
 ## 5. Seance simple
@@ -45,7 +45,7 @@
 2. Il saisit le prix de la seance.
 3. Il choisit le mode de paiement.
 4. Il peut ajouter un nom client facultatif.
-5. GymFlow encaisse la seance et valide l'entree dans le journal du jour.
+5. DooleFit encaisse la seance et valide l'entree dans le journal du jour.
 6. La seance simple apparait aussi dans la caisse.
 
 ## 6. Renouvellement
@@ -53,7 +53,7 @@
 1. Le gerant ouvre la fiche membre.
 2. Il clique sur renouveler.
 3. Il choisit une formule et le mode de paiement.
-4. GymFlow archive implicitement l'ancien abonnement comme historique et cree le nouveau.
+4. DooleFit archive implicitement l'ancien abonnement comme historique et cree le nouveau.
 5. Le paiement est attribue au compte connecte.
 
 ## 7. Dashboard quotidien

@@ -1,5 +1,5 @@
 // POST /api/billing/intech/webhook
-// Reçoit les callbacks Intech pour l'abonnement SaaS GymFlow.
+// Reçoit les callbacks Intech pour l'abonnement SaaS DooleFit.
 // → si SUCCESS : met à jour billing_status de la gym
 
 import { NextRequest, NextResponse } from "next/server";

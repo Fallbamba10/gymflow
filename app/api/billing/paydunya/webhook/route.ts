@@ -1,7 +1,7 @@
 // POST /api/billing/paydunya/webhook
-// Reçoit la confirmation PayDunya pour un paiement GymFlow billing
+// Reçoit la confirmation PayDunya pour un paiement DooleFit billing
 // Pour l'instant : marque la demande comme complète et log.
-// L'activation de l'abonnement GymFlow via Stripe reste le flux principal ;
+// L'activation de l'abonnement DooleFit via Stripe reste le flux principal ;
 // ce webhook servira à activer manuellement si le gérant a payé par mobile money.
 
 import { NextRequest, NextResponse } from "next/server";
@@ -36,7 +36,7 @@ export async function POST(req: NextRequest) {
     .eq("status", "pending");
 
   // TODO: quand PayDunya fournit un webhook de confiance avec signature,
-  // activer ici l'abonnement GymFlow directement (mettre billing_status = 'active').
+  // activer ici l'abonnement DooleFit directement (mettre billing_status = 'active').
 
   return NextResponse.json({ received: true });
 }

@@ -12,12 +12,12 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
 
   if (!page) {
     return {
-      title: "Salle introuvable · GymFlow",
+      title: "Salle introuvable · DooleFit",
     };
   }
 
   const { gym, plans } = page;
-  const title = `${gym.name} · GymFlow`;
+  const title = `${gym.name} · DooleFit`;
   const description =
     gym.public_description ||
     `Découvrez ${gym.name}${gym.address ? ` à ${gym.address}` : ""}. ${plans.length} formule${plans.length > 1 ? "s" : ""} disponible${plans.length > 1 ? "s" : ""}. Contactez-nous pour vous inscrire.`;
@@ -26,7 +26,7 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
     gym.cover_image_url ||
     "https://images.unsplash.com/photo-1571902943202-507ec2618e8f?auto=format&fit=crop&w=1200&q=80";
 
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://gymflow.app";
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://gymflow-ten-tan.vercel.app";
 
   return {
     title,
@@ -36,7 +36,7 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
       description,
       type: "website",
       url: `${siteUrl}/g/${id}`,
-      siteName: "GymFlow",
+      siteName: "DooleFit",
       images: [
         {
           url: coverImage,

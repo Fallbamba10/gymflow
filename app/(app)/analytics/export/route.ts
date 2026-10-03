@@ -22,7 +22,7 @@ export async function GET(request: Request) {
         entrees: row.count,
       })),
     );
-    filename = "gymflow-analytics-heures.csv";
+    filename = "doolefit-analytics-heures.csv";
   } else if (sheet === "weekday") {
     csv = toCsv(
       data.byWeekday.map((row) => ({
@@ -30,7 +30,7 @@ export async function GET(request: Request) {
         entrees: row.count,
       })),
     );
-    filename = "gymflow-analytics-jours.csv";
+    filename = "doolefit-analytics-jours.csv";
   } else if (sheet === "members") {
     csv = toCsv(
       data.topMembers.map((row) => ({
@@ -38,7 +38,7 @@ export async function GET(request: Request) {
         entrees_30j: row.count,
       })),
     );
-    filename = "gymflow-analytics-top-membres.csv";
+    filename = "doolefit-analytics-top-membres.csv";
   } else {
     // daily (default)
     csv = toCsv(
@@ -48,7 +48,7 @@ export async function GET(request: Request) {
         revenus: row.revenue,
       })),
     );
-    filename = "gymflow-analytics-30j.csv";
+    filename = "doolefit-analytics-30j.csv";
   }
 
   return csvResponse(filename, csv);

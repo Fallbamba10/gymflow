@@ -93,7 +93,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           <Link href="/" className="flex min-w-0 items-center gap-3">
             <BrandMark />
             <div className="min-w-0">
-              <p className="text-base font-semibold leading-none">GymFlow</p>
+              <p className="text-base font-semibold leading-none">DooleFit</p>
               <p className="mt-1 truncate text-sm text-neutral-500">{gymName}</p>
             </div>
           </Link>
@@ -150,7 +150,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         <Link href="/" className="flex items-center gap-3">
           <BrandMark />
           <div>
-            <p className="text-lg font-semibold leading-none">GymFlow</p>
+            <p className="text-lg font-semibold leading-none">DooleFit</p>
             <p className="mt-1 text-sm text-neutral-500">{gymName}</p>
             {roleLabel ? <p className="mt-0.5 text-xs font-medium text-mint">{roleLabel}</p> : null}
           </div>

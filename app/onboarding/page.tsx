@@ -38,7 +38,7 @@ export default async function OnboardingPage({ searchParams }: OnboardingPagePro
           <Link href="/site" className="flex items-center gap-3">
             <BrandMark inverse />
             <div>
-              <p className="text-base font-semibold leading-none">GymFlow</p>
+              <p className="text-base font-semibold leading-none">DooleFit</p>
               <p className="mt-0.5 text-xs text-white/55">Gestion de salle premium</p>
             </div>
           </Link>

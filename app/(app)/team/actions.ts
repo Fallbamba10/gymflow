@@ -16,7 +16,7 @@ function getRole(value: string): "admin" | "operator" {
 
 function translateTeamError(message: string) {
   if (message.includes("user_not_found")) {
-    return "Utilisateur introuvable. Il doit d'abord creer un compte GymFlow.";
+    return "Utilisateur introuvable. Il doit d'abord creer un compte DooleFit.";
   }
   if (message.includes("not_allowed")) {
     return "Action reservee aux admins.";

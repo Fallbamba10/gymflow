@@ -25,7 +25,7 @@ function getMemberStatus(member: Awaited<ReturnType<typeof getMembers>>[number])
 export async function GET() {
   const gym = await getCurrentGym();
   if (!gym || gym.role !== "admin") {
-    return csvResponse("gymflow-membres.csv", toCsv([{ erreur: "Export reserve aux admins" }]));
+    return csvResponse("doolefit-membres.csv", toCsv([{ erreur: "Export reserve aux admins" }]));
   }
 
   const members = await getMembers(gym.id);
@@ -42,5 +42,5 @@ export async function GET() {
     })),
   );
 
-  return csvResponse("gymflow-membres.csv", csv);
+  return csvResponse("doolefit-membres.csv", csv);
 }

@@ -1,4 +1,4 @@
-# Checklist lancement GymFlow
+# Checklist lancement DooleFit
 
 ## Technique
 

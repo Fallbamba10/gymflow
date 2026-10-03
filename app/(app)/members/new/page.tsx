@@ -98,7 +98,7 @@ export default async function NewMemberPage() {
             </div>
             <div className="rounded-md bg-paper p-4">
               <p className="font-semibold">Abonnement actif</p>
-              <p className="mt-1 text-neutral-500">GymFlow cree automatiquement l&apos;abonnement et le paiement.</p>
+              <p className="mt-1 text-neutral-500">DooleFit cree automatiquement l&apos;abonnement et le paiement.</p>
             </div>
           </div>
         </aside>

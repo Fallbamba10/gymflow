@@ -1,4 +1,4 @@
--- GymFlow billing schema
+-- DooleFit billing schema
 -- Run this after schema.sql
 
 -- Colonnes billing sur la table gyms

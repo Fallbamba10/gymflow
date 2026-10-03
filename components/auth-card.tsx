@@ -24,7 +24,7 @@ export function AuthCard({ title, subtitle, children }: AuthCardProps) {
             <div className="flex items-center gap-3">
               <BrandMark inverse />
               <div>
-                <p className="text-lg font-semibold leading-none">GymFlow</p>
+                <p className="text-lg font-semibold leading-none">DooleFit</p>
                 <p className="mt-1 text-sm text-white/60">Gestion de salle premium</p>
               </div>
             </div>
@@ -55,7 +55,7 @@ export function AuthCard({ title, subtitle, children }: AuthCardProps) {
               <div className="flex items-center gap-3">
                 <BrandMark />
                 <div>
-                  <p className="text-lg font-semibold leading-none">GymFlow</p>
+                  <p className="text-lg font-semibold leading-none">DooleFit</p>
                   <p className="mt-1 text-sm text-neutral-500">Acces securise</p>
                 </div>
               </div>

@@ -1,6 +1,6 @@
-# GymFlow
+# DooleFit
 
-GymFlow est une plateforme SaaS de gestion de salles de sport, pensee pour les petites et moyennes salles en Afrique de l'Ouest.
+DooleFit est une plateforme SaaS de gestion de salles de sport, pensee pour les petites et moyennes salles en Afrique de l'Ouest.
 
 Le produit remplace la gestion papier par une interface simple pour suivre les membres, les abonnements, les entrees, les paiements et les revenus.
 
@@ -8,7 +8,7 @@ Le produit remplace la gestion papier par une interface simple pour suivre les m
 
 La version actuelle permet a un gerant de piloter une salle sans cahier papier, avec des flux prets pour un test terrain.
 
-GymFlow couvre:
+DooleFit couvre:
 
 - creation de compte et creation d'une salle;
 - gestion des membres;

@@ -1,4 +1,4 @@
-// WhatsApp Cloud API — Option B: numéro centralisé GymFlow
+// WhatsApp Cloud API — Option B: numéro centralisé DooleFit
 // Silently no-op si WHATSAPP_TOKEN ou WHATSAPP_PHONE_NUMBER_ID non configurés.
 // Templates à soumettre à Meta Business Manager avant utilisation.
 

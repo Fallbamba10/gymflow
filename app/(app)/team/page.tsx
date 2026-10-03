@@ -210,7 +210,7 @@ export default async function TeamPage() {
             </div>
             <div>
               <h2 className="text-lg font-semibold">Ajouter un employe</h2>
-              <p className="mt-1 text-sm text-neutral-500">L&apos;utilisateur doit deja avoir un compte GymFlow.</p>
+              <p className="mt-1 text-sm text-neutral-500">L&apos;utilisateur doit deja avoir un compte DooleFit.</p>
             </div>
           </div>
 

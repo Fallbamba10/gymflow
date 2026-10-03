@@ -1,4 +1,4 @@
-const CACHE_NAME = "gymflow-v1";
+const CACHE_NAME = "doolefit-v1";
 
 // Ressources à mettre en cache immédiatement à l'installation
 const PRECACHE_URLS = ["/", "/checkin", "/offline"];

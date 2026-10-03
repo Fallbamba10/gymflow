@@ -13,7 +13,7 @@ export default function OfflinePage() {
       </div>
       <h1 className="mt-6 text-2xl font-semibold">Pas de connexion</h1>
       <p className="mt-3 max-w-sm text-sm leading-6 text-neutral-500">
-        GymFlow est hors ligne. Les pages déjà visitées sont disponibles en cache. Reconnecte-toi pour accéder aux données en direct.
+        DooleFit est hors ligne. Les pages déjà visitées sont disponibles en cache. Reconnecte-toi pour accéder aux données en direct.
       </p>
       <div className="mt-8 flex flex-wrap justify-center gap-3">
         <Link
@@ -29,7 +29,7 @@ export default function OfflinePage() {
           Réessayer
         </button>
       </div>
-      <p className="mt-12 text-xs text-neutral-400">GymFlow · Mode hors ligne</p>
+      <p className="mt-12 text-xs text-neutral-400">DooleFit · Mode hors ligne</p>
     </main>
   );
 }

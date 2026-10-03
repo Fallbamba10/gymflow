@@ -13,7 +13,7 @@ function jsonDownload(filename: string, data: unknown) {
 export async function GET() {
   const gym = await getCurrentGym();
   if (!gym || gym.role !== "admin") {
-    return jsonDownload("gymflow-export-erreur.json", {
+    return jsonDownload("doolefit-export-erreur.json", {
       erreur: "Export reserve aux admins",
     });
   }
@@ -58,14 +58,14 @@ export async function GET() {
     .filter(Boolean);
 
   if (errors.length > 0) {
-    return jsonDownload("gymflow-export-erreur.json", {
+    return jsonDownload("doolefit-export-erreur.json", {
       gym: settings,
       erreurs: errors,
     });
   }
 
   const date = new Date().toISOString().slice(0, 10);
-  return jsonDownload(`gymflow-sauvegarde-${date}.json`, {
+  return jsonDownload(`doolefit-sauvegarde-${date}.json`, {
     exported_at: new Date().toISOString(),
     gym: settings,
     members: members.data ?? [],

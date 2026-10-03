@@ -38,7 +38,7 @@ export async function POST(req: NextRequest) {
 
   const member = memberRes.data;
   const type = typeRes.data;
-  const gymName = gymRes.data?.name ?? "GymFlow";
+  const gymName = gymRes.data?.name ?? "DooleFit";
 
   // Créer la demande en base
   const { data: mmRequest, error: insertError } = await supabase
@@ -69,7 +69,7 @@ export async function POST(req: NextRequest) {
     });
   }
 
-  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL ?? "https://gymflow.app";
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL ?? "https://gymflow-ten-tan.vercel.app";
   const invoice = await createPayDunyaInvoice({
     amount: type.price,
     description: `Abonnement ${type.name} — ${member.full_name}`,

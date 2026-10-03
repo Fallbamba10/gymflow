@@ -10,7 +10,7 @@ type MemberQRProps = {
 };
 
 export async function MemberQR({ memberId, memberNumber, memberName, gymName }: MemberQRProps) {
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://gymflow.app";
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://gymflow-ten-tan.vercel.app";
   const portalUrl = `${siteUrl}/m/${memberId}`;
 
   const rawSvg = await QRCode.toString(portalUrl, {
@@ -38,7 +38,7 @@ export async function MemberQR({ memberId, memberNumber, memberName, gymName }: 
         <div className="bg-ink px-4 py-3 text-white">
           <div className="flex items-center justify-between gap-3">
             <div className="min-w-0">
-              <p className="text-xs font-semibold uppercase tracking-[0.1em] text-white/50">GymFlow</p>
+              <p className="text-xs font-semibold uppercase tracking-[0.1em] text-white/50">DooleFit</p>
               <p className="truncate text-base font-semibold">{gymName}</p>
             </div>
             <div className="shrink-0 rounded-md border border-white/15 bg-white/10 px-2 py-1 font-mono text-xs font-bold text-white/80">
@@ -68,7 +68,7 @@ export async function MemberQR({ memberId, memberNumber, memberName, gymName }: 
         {/* Footer */}
         <div className="border-t border-line bg-paper px-4 py-2 text-center">
           <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-neutral-400">
-            Carte membre · GymFlow
+            Carte membre · DooleFit
           </p>
         </div>
       </div>

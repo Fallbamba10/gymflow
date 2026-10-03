@@ -82,7 +82,7 @@ export async function POST(req: NextRequest) {
     });
   }
 
-  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://gymflow.app";
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://gymflow-ten-tan.vercel.app";
   const result = await intechCashIn({
     phone: member.phone,
     amount: type.price,

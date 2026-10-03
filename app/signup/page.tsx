@@ -40,7 +40,7 @@ export default async function SignupPage({ searchParams }: SignupPageProps) {
             className="mt-2 h-11 w-full rounded-md border border-line bg-paper px-3 outline-none focus:border-mint"
             name="email"
             type="email"
-            placeholder="gerant@gymflow.sn"
+            placeholder="gerant@exemple.sn"
             required
           />
         </label>

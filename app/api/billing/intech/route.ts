@@ -1,5 +1,5 @@
 // POST /api/billing/intech
-// Initie un cash-in Intech pour l'abonnement GymFlow mensuel.
+// Initie un cash-in Intech pour l'abonnement DooleFit mensuel.
 // Body: { service: IntechService, phone: string }
 
 import { NextRequest, NextResponse } from "next/server";
@@ -7,7 +7,7 @@ import { intechCashIn, isIntechConfigured, type IntechService } from "@/lib/inte
 import { createClient } from "@/lib/supabase/server";
 import { getCurrentGym } from "@/lib/supabase/queries";
 
-const GYMFLOW_MONTHLY_PRICE = 5900;
+const DOOLEFIT_MONTHLY_PRICE = 9900;
 
 const VALID_SERVICES: IntechService[] = [
   "WAVE_SN_API_CASH_IN",
@@ -41,7 +41,7 @@ export async function POST(req: NextRequest) {
       kind: "gymflow_billing",
       provider: "intech",
       status: "pending",
-      amount: GYMFLOW_MONTHLY_PRICE,
+      amount: DOOLEFIT_MONTHLY_PRICE,
       currency: "XOF",
     })
     .select("id")
@@ -59,10 +59,10 @@ export async function POST(req: NextRequest) {
     });
   }
 
-  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://gymflow.app";
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://gymflow-ten-tan.vercel.app";
   const result = await intechCashIn({
     phone,
-    amount: GYMFLOW_MONTHLY_PRICE,
+    amount: DOOLEFIT_MONTHLY_PRICE,
     codeService: service,
     externalTransactionId: mmRequest.id,
     callbackUrl: `${baseUrl}/api/billing/intech/webhook`,

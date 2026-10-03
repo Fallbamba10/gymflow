@@ -1,133 +1,284 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { ArrowRight, CheckCircle2, QrCode, ShieldCheck, UserCheck, Users, WalletCards, Zap } from "lucide-react";
+import {
+  ArrowDownRight,
+  ArrowRight,
+  BarChart3,
+  Check,
+  CheckCircle2,
+  ChevronDown,
+  CreditCard,
+  QrCode,
+  ShieldCheck,
+  Smartphone,
+  UserRoundCheck,
+  Users,
+  Wallet,
+  Zap,
+} from "lucide-react";
 
 export const metadata: Metadata = {
-  title: "GymFlow · Gérez votre salle simplement",
-  description: "Membres, abonnements, pointage et caisse pour les salles de sport. Essai gratuit de 30 jours.",
+  title: "DooleFit · La gestion de ta salle, enfin simple",
+  description:
+    "Membres, abonnements, pointage et paiements réunis dans un seul outil. Essaie DooleFit gratuitement pendant 30 jours.",
 };
 
 const features = [
-  { icon: UserCheck, title: "Pointage rapide", text: "Retrouve un membre, scanne son QR code et valide son entrée en quelques secondes." },
-  { icon: WalletCards, title: "Caisse claire", text: "Enregistre les paiements, imprime les reçus et retrouve l'historique sans cahier." },
-  { icon: QrCode, title: "Cartes membres", text: "Chaque membre a une carte QR personnelle, facile à utiliser à l'accueil." },
-  { icon: Users, title: "Équipe encadrée", text: "Donne à tes employés un accès adapté au pointage et à l'encaissement." },
+  {
+    icon: Users,
+    number: "01",
+    title: "Tes membres, bien suivis",
+    text: "Retrouve les fiches, les abonnements et l'historique de chaque membre sans fouiller dans les cahiers.",
+  },
+  {
+    icon: QrCode,
+    number: "02",
+    title: "Un passage, un scan",
+    text: "La carte QR permet de vérifier l'abonnement et d'enregistrer une entrée en quelques secondes.",
+  },
+  {
+    icon: Wallet,
+    number: "03",
+    title: "Une caisse lisible",
+    text: "Note les règlements, retrouve les paiements et imprime un reçu depuis le même espace.",
+  },
+  {
+    icon: BarChart3,
+    number: "04",
+    title: "Les bons chiffres au bon moment",
+    text: "Repère les abonnements qui arrivent à échéance et garde un œil sur l'activité de ta salle.",
+  },
 ];
 
 const included = [
   "Membres, formules et pointages illimités",
   "Caisse et reçus imprimables",
-  "Paiements Wave, Orange Money, Free Money et Wizall",
+  "Wave, Orange Money, Free Money et Wizall",
   "Import CSV et export de tes données",
-  "Tableau de bord et alertes d'expiration",
-  "Application installable sur téléphone",
+  "Alertes d'expiration et tableau de bord",
+  "Utilisable sur ordinateur et téléphone",
 ];
 
 const faqs = [
-  { q: "Faut-il une carte pour essayer ?", a: "Non. Tu crées ton espace et tu as 30 jours pour tester GymFlow sans carte bancaire." },
-  { q: "Comment puis-je payer ?", a: "Tu peux payer par carte bancaire via Stripe ou par mobile money avec Wave, Orange Money, Free Money ou Wizall." },
-  { q: "Puis-je arrêter quand je veux ?", a: "Oui. Il n'y a pas d'engagement : tu peux résilier quand tu veux et exporter tes données." },
+  {
+    q: "Faut-il une carte bancaire pour essayer ?",
+    a: "Non. Tu peux créer ton espace et essayer DooleFit pendant 30 jours sans saisir de carte bancaire.",
+  },
+  {
+    q: "Comment régler l'abonnement ?",
+    a: "L'abonnement peut être réglé par carte bancaire ou par mobile money selon les moyens de paiement disponibles.",
+  },
+  {
+    q: "Puis-je arrêter quand je veux ?",
+    a: "Oui. L'abonnement est sans engagement. Tu peux aussi exporter les données de ta salle.",
+  },
+  {
+    q: "Est-ce que mon équipe peut l'utiliser sur téléphone ?",
+    a: "Oui. DooleFit s'utilise depuis le navigateur du téléphone et peut être ajouté à l'écran d'accueil.",
+  },
 ];
+
+function Brand() {
+  return (
+    <Link href="/site" className="flex items-center gap-2.5" aria-label="DooleFit, accueil">
+      <span className="flex size-9 items-center justify-center rounded-xl bg-emerald-400 text-[#07130f] shadow-lg shadow-emerald-500/20">
+        <Zap size={18} fill="currentColor" />
+      </span>
+      <span className="text-lg font-bold tracking-[-0.04em]">Doole<span className="text-emerald-400">Fit</span></span>
+    </Link>
+  );
+}
+
+function DashboardPreview() {
+  return (
+    <div className="relative mx-auto w-full max-w-[590px] lg:mr-0">
+      <div className="absolute -inset-8 rounded-[2.5rem] bg-emerald-400/10 blur-3xl" />
+      <div className="absolute -right-5 -top-7 hidden h-32 w-32 rounded-full border border-emerald-300/15 sm:block" />
+      <div className="relative overflow-hidden rounded-[1.6rem] border border-white/15 bg-[#101714] shadow-[0_35px_100px_-35px_rgba(0,0,0,0.9)]">
+        <div className="flex items-center justify-between border-b border-white/8 px-5 py-4 sm:px-6">
+          <div className="flex items-center gap-2.5">
+            <span className="flex size-8 items-center justify-center rounded-lg bg-emerald-400/15 text-emerald-300"><Zap size={15} fill="currentColor" /></span>
+            <div><p className="text-xs font-semibold">Espace de gestion</p><p className="mt-0.5 text-[10px] text-white/40">Exemple d&apos;interface DooleFit</p></div>
+          </div>
+          <span className="rounded-full border border-emerald-300/20 bg-emerald-300/10 px-2.5 py-1 text-[10px] font-medium text-emerald-200">En ligne</span>
+        </div>
+        <div className="grid min-h-[330px] sm:grid-cols-[132px_1fr]">
+          <aside className="hidden border-r border-white/8 p-4 sm:block">
+            <p className="mb-3 px-2 text-[9px] font-semibold uppercase tracking-[0.16em] text-white/30">Menu</p>
+            <div className="space-y-1 text-[11px]">
+              <div className="flex items-center gap-2 rounded-lg bg-emerald-300/10 px-2.5 py-2 text-emerald-200"><BarChart3 size={13} /> Vue d&apos;ensemble</div>
+              <div className="flex items-center gap-2 px-2.5 py-2 text-white/50"><Users size={13} /> Membres</div>
+              <div className="flex items-center gap-2 px-2.5 py-2 text-white/50"><CreditCard size={13} /> Paiements</div>
+              <div className="flex items-center gap-2 px-2.5 py-2 text-white/50"><UserRoundCheck size={13} /> Pointages</div>
+            </div>
+            <div className="mt-8 rounded-xl border border-white/8 bg-white/[0.03] p-3">
+              <p className="text-[10px] font-medium text-white/75">Besoin d&apos;aide ?</p>
+              <p className="mt-1 text-[9px] leading-4 text-white/40">Ton espace reste accessible sur mobile.</p>
+            </div>
+          </aside>
+          <div className="min-w-0 p-4 sm:p-5">
+            <div className="flex items-start justify-between gap-3">
+              <div><p className="text-[10px] text-white/40">VUE D&apos;ENSEMBLE</p><h3 className="mt-1 text-base font-semibold sm:text-lg">Bonjour, ton équipe 👋</h3></div>
+              <span className="flex size-8 items-center justify-center rounded-full border border-white/10 bg-white/5 text-[10px] font-semibold">DF</span>
+            </div>
+            <div className="mt-5 grid grid-cols-2 gap-2.5">
+              {[
+                { label: "Membres", icon: Users, note: "Fiches centralisées" },
+                { label: "Abonnements", icon: CreditCard, note: "Statuts à jour" },
+                { label: "Présences", icon: QrCode, note: "Pointage par QR" },
+                { label: "Encaissements", icon: Wallet, note: "Historique clair" },
+              ].map(({ label, icon: Icon, note }) => (
+                <div key={label} className="rounded-xl border border-white/8 bg-white/[0.035] p-3 sm:p-3.5">
+                  <div className="flex items-center justify-between"><span className="text-[10px] text-white/50">{label}</span><Icon size={13} className="text-emerald-300" /></div>
+                  <p className="mt-3 text-xs font-semibold sm:text-sm">Tout au même endroit</p>
+                  <p className="mt-1 text-[9px] text-white/35">{note}</p>
+                </div>
+              ))}
+            </div>
+            <div className="mt-3 rounded-xl border border-white/8 bg-white/[0.035] p-3.5">
+              <div className="flex items-center justify-between"><p className="text-[10px] font-semibold">À suivre cette semaine</p><ArrowDownRight size={14} className="text-emerald-300" /></div>
+              <div className="mt-3 flex items-center gap-3">
+                <span className="flex size-8 items-center justify-center rounded-lg bg-amber-300/10 text-amber-200"><ShieldCheck size={15} /></span>
+                <div className="min-w-0 flex-1"><p className="truncate text-[10px] font-medium">Abonnements bientôt expirés</p><p className="mt-0.5 text-[9px] text-white/40">Repère les renouvellements à relancer</p></div>
+                <ArrowRight size={13} className="text-white/35" />
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div className="absolute -bottom-5 -left-4 hidden items-center gap-3 rounded-2xl border border-white/10 bg-[#121a16]/95 px-4 py-3 shadow-xl backdrop-blur sm:flex">
+        <span className="flex size-9 items-center justify-center rounded-xl bg-emerald-300/10 text-emerald-300"><Smartphone size={17} /></span>
+        <div><p className="text-[11px] font-semibold">Aussi sur téléphone</p><p className="mt-0.5 text-[10px] text-white/45">Au bureau ou à l&apos;accueil</p></div>
+        <Check size={14} className="ml-2 text-emerald-300" />
+      </div>
+    </div>
+  );
+}
 
 export default function SitePage() {
   return (
-    <main className="min-h-screen bg-[#080808] text-white">
-      <nav className="fixed inset-x-0 top-0 z-50 flex items-center justify-between border-b border-white/5 bg-[#080808]/90 px-6 py-4 backdrop-blur md:px-12">
-        <Link href="/site" className="flex items-center gap-2.5">
-          <span className="flex size-8 items-center justify-center rounded-md bg-white"><Zap size={15} className="text-[#080808]" fill="currentColor" /></span>
-          <span className="font-semibold tracking-tight">GymFlow</span>
-        </Link>
-        <div className="flex items-center gap-3">
-          <Link href="/login" className="hidden text-sm font-medium text-white/65 hover:text-white sm:block">Connexion</Link>
-          <Link href="/signup" className="inline-flex h-10 items-center rounded-full bg-emerald-500 px-5 text-sm font-semibold hover:bg-emerald-400">Essayer gratuitement</Link>
+    <main className="min-h-screen overflow-hidden bg-[#080b09] text-white selection:bg-emerald-300 selection:text-black">
+      <nav className="fixed inset-x-0 top-0 z-50 border-b border-white/[0.07] bg-[#080b09]/85 backdrop-blur-xl">
+        <div className="mx-auto flex h-[72px] max-w-7xl items-center justify-between px-5 sm:px-8 lg:px-10">
+          <Brand />
+          <div className="hidden items-center gap-8 text-[13px] font-medium text-white/55 md:flex">
+            <Link href="#fonctionnalites" className="transition hover:text-white">Fonctionnalités</Link>
+            <Link href="#comment-ca-marche" className="transition hover:text-white">Comment ça marche</Link>
+            <Link href="#tarifs" className="transition hover:text-white">Tarif</Link>
+          </div>
+          <div className="flex items-center gap-4">
+            <Link href="/login" className="hidden text-sm font-medium text-white/65 transition hover:text-white sm:block">Connexion</Link>
+            <Link href="/signup" className="inline-flex h-10 items-center gap-2 rounded-full bg-emerald-300 px-4 text-xs font-bold text-[#07130f] transition hover:bg-emerald-200 sm:px-5 sm:text-sm">Essai gratuit <ArrowRight size={15} /></Link>
+          </div>
         </div>
       </nav>
 
-      <section className="relative overflow-hidden px-6 pb-24 pt-40 md:px-12 md:pb-32 md:pt-48">
-        <div
-          className="absolute inset-0 bg-cover bg-center opacity-25"
-          style={{ backgroundImage: "url('/gym-hero.jpg')" }}
-        />
-        <div className="absolute inset-0 bg-gradient-to-b from-[#080808]/70 via-[#080808]/45 to-[#080808]" />
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_20%,rgba(16,185,129,0.18),transparent_42%)]" />
-        <div className="relative mx-auto max-w-4xl text-center">
-          <p className="inline-flex items-center gap-2 rounded-full border border-emerald-400/20 bg-emerald-400/10 px-4 py-2 text-xs font-semibold text-emerald-300"><span className="size-1.5 rounded-full bg-emerald-400" /> Pensé pour les salles de sport</p>
-          <h1 className="mt-7 text-5xl font-semibold leading-[1.04] tracking-tight md:text-7xl">Gère ta salle.<br /><span className="text-emerald-400">Pas ton cahier.</span></h1>
-          <p className="mx-auto mt-7 max-w-2xl text-lg leading-8 text-white/60 md:text-xl">GymFlow réunit membres, abonnements, pointage et caisse dans un outil simple pour ton équipe.</p>
-          <div className="mt-10 flex flex-wrap justify-center gap-3">
-            <Link href="/signup" className="inline-flex h-14 items-center gap-2 rounded-full bg-emerald-500 px-7 text-sm font-semibold shadow-xl shadow-emerald-500/25 hover:bg-emerald-400">Créer mon espace <ArrowRight size={17} /></Link>
-            <Link href="#tarifs" className="inline-flex h-14 items-center rounded-full border border-white/15 px-7 text-sm font-semibold text-white/85 hover:bg-white/10">Voir le tarif</Link>
+      <section className="relative isolate px-5 pb-20 pt-32 sm:px-8 sm:pt-36 lg:px-10 lg:pb-28 lg:pt-40">
+        <div className="absolute inset-0 -z-20 bg-cover bg-[center_40%] opacity-[0.22]" style={{ backgroundImage: "url('/gym-hero.jpg')" }} />
+        <div className="absolute inset-0 -z-10 bg-gradient-to-r from-[#080b09] via-[#080b09]/95 to-[#080b09]/65" />
+        <div className="absolute inset-0 -z-10 bg-gradient-to-b from-[#080b09]/10 via-transparent to-[#080b09]" />
+        <div className="absolute -left-36 top-40 -z-10 size-[440px] rounded-full bg-emerald-500/10 blur-[120px]" />
+        <div className="mx-auto grid max-w-7xl items-center gap-16 lg:grid-cols-[0.92fr_1.08fr] lg:gap-12">
+          <div className="max-w-2xl">
+            <p className="inline-flex items-center gap-2 rounded-full border border-emerald-200/20 bg-emerald-200/[0.07] px-3.5 py-2 text-[11px] font-semibold tracking-wide text-emerald-100 sm:text-xs"><span className="size-1.5 rounded-full bg-emerald-300 shadow-[0_0_12px_#6ee7b7]" /> L&apos;outil de gestion pensé pour ta salle</p>
+            <h1 className="mt-7 max-w-[680px] text-[clamp(3rem,7vw,5.8rem)] font-semibold leading-[0.98] tracking-[-0.065em]">Ta salle avance.<br /><span className="text-emerald-300">Ta gestion aussi.</span></h1>
+            <p className="mt-7 max-w-xl text-base leading-7 text-white/60 sm:text-lg sm:leading-8">Membres, abonnements, pointages et paiements : garde l&apos;essentiel sous les yeux et simplifie le quotidien de ton équipe.</p>
+            <div className="mt-9 flex flex-col gap-3 sm:flex-row sm:items-center">
+              <Link href="/signup" className="inline-flex h-14 items-center justify-center gap-2 rounded-full bg-emerald-300 px-7 text-sm font-bold text-[#07130f] shadow-[0_10px_40px_-14px_rgba(110,231,183,0.75)] transition hover:-translate-y-0.5 hover:bg-emerald-200">Créer mon espace gratuitement <ArrowRight size={17} /></Link>
+              <Link href="#fonctionnalites" className="inline-flex h-14 items-center justify-center rounded-full border border-white/15 px-6 text-sm font-semibold text-white/80 transition hover:border-white/30 hover:bg-white/[0.04]">Découvrir DooleFit</Link>
+            </div>
+            <div className="mt-5 flex flex-wrap items-center gap-x-5 gap-y-2 text-[11px] font-medium text-white/45 sm:text-xs">
+              <span className="inline-flex items-center gap-1.5"><CheckCircle2 size={14} className="text-emerald-300" /> 30 jours gratuits</span>
+              <span className="inline-flex items-center gap-1.5"><CheckCircle2 size={14} className="text-emerald-300" /> Sans carte bancaire</span>
+              <span className="inline-flex items-center gap-1.5"><CheckCircle2 size={14} className="text-emerald-300" /> Sans engagement</span>
+            </div>
+            <p className="mt-12 max-w-lg border-t border-white/10 pt-5 text-xs leading-5 text-white/50">Conçu pour les réalités des salles et des paiements en Afrique de l&apos;Ouest.</p>
           </div>
-          <p className="mt-5 text-sm text-white/40">30 jours gratuits · Sans carte · Sans engagement</p>
+          <DashboardPreview />
         </div>
       </section>
 
-      <section className="border-y border-white/8 px-6 py-20 md:px-12">
-        <div className="mx-auto max-w-6xl">
-          <div className="mb-10 max-w-xl"><p className="text-xs font-semibold uppercase tracking-[0.14em] text-emerald-400">L&apos;essentiel, bien fait</p><h2 className="mt-3 text-3xl font-semibold tracking-tight md:text-4xl">Tout ce qu&apos;il faut pour faire tourner la salle.</h2></div>
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            {features.map(({ icon: Icon, title, text }) => <article key={title} className="rounded-2xl border border-white/8 bg-white/[0.03] p-6"><span className="flex size-10 items-center justify-center rounded-xl bg-emerald-500/15 text-emerald-400"><Icon size={19} /></span><h3 className="mt-5 font-semibold">{title}</h3><p className="mt-2 text-sm leading-6 text-white/55">{text}</p></article>)}
+      <section className="border-y border-white/[0.07] bg-white/[0.018] px-5 py-7 sm:px-8 lg:px-10">
+        <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-center gap-x-8 gap-y-4 text-[11px] font-semibold uppercase tracking-[0.15em] text-white/40 sm:justify-between sm:text-xs">
+          <span className="text-white/55">Une seule plateforme pour</span><span>Membres</span><span>Abonnements</span><span>Pointages</span><span>Paiements</span><span>Rapports</span>
+        </div>
+      </section>
+
+      <section className="px-5 py-24 sm:px-8 sm:py-28 lg:px-10" id="fonctionnalites">
+        <div className="mx-auto max-w-7xl">
+          <div className="grid gap-8 md:grid-cols-[0.85fr_1.15fr] md:items-end">
+            <div><p className="text-xs font-bold uppercase tracking-[0.18em] text-emerald-300">Moins de paperasse, plus de visibilité</p><h2 className="mt-4 max-w-xl text-3xl font-semibold leading-tight tracking-[-0.04em] sm:text-5xl">Le quotidien de ta salle, enfin au même endroit.</h2></div>
+            <p className="max-w-xl text-sm leading-7 text-white/50 md:justify-self-end md:text-base">Tu sais qui est à jour, qui est passé et ce qui a été encaissé. Ton équipe retrouve les informations sans changer d&apos;outil.</p>
+          </div>
+          <div className="mt-12 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+            {features.map(({ icon: Icon, number, title, text }) => (
+              <article key={number} className="group relative overflow-hidden rounded-2xl border border-white/[0.09] bg-gradient-to-b from-white/[0.045] to-white/[0.015] p-6 transition duration-300 hover:-translate-y-1 hover:border-emerald-300/30">
+                <div className="flex items-start justify-between"><span className="flex size-11 items-center justify-center rounded-xl border border-emerald-300/15 bg-emerald-300/[0.08] text-emerald-200"><Icon size={19} /></span><span className="text-xs font-semibold tracking-widest text-white/25">{number}</span></div>
+                <h3 className="mt-8 text-base font-semibold">{title}</h3><p className="mt-2 text-sm leading-6 text-white/50">{text}</p>
+                <div className="absolute -bottom-12 -right-10 size-28 rounded-full bg-emerald-300/[0.05] blur-2xl transition group-hover:bg-emerald-300/[0.12]" />
+              </article>
+            ))}
           </div>
         </div>
       </section>
 
-      <section className="px-6 py-20 md:px-12">
-        <div className="mx-auto grid max-w-6xl gap-8 rounded-3xl border border-white/8 bg-white/[0.03] p-8 md:grid-cols-[1fr_1.2fr] md:p-12">
-          <div><p className="text-xs font-semibold uppercase tracking-[0.14em] text-emerald-400">Simple à démarrer</p><h2 className="mt-3 text-3xl font-semibold tracking-tight md:text-4xl">Prêt pour le prochain passage à l&apos;accueil.</h2><p className="mt-4 leading-7 text-white/55">Crée ta salle, importe tes membres et commence à pointer. Ton équipe apprend l&apos;essentiel rapidement.</p></div>
-          <ol className="space-y-4">{["Crée ta salle et tes formules", "Ajoute ou importe tes membres", "Pointe, encaisse et suis ta journée"].map((step, index) => <li key={step} className="flex items-center gap-4 rounded-2xl border border-white/8 bg-black/20 p-4"><span className="flex size-9 shrink-0 items-center justify-center rounded-full bg-emerald-400 font-semibold text-[#080808]">{index + 1}</span><span className="font-medium text-white/85">{step}</span></li>)}</ol>
+      <section className="px-5 pb-24 sm:px-8 lg:px-10" id="comment-ca-marche">
+        <div className="mx-auto grid max-w-7xl overflow-hidden rounded-[2rem] border border-white/10 bg-[#101512] lg:grid-cols-2">
+          <div className="relative min-h-[330px] overflow-hidden sm:min-h-[420px]">
+            <div className="absolute inset-0 bg-cover bg-center" style={{ backgroundImage: "url('/gym-landing.jpg')" }} />
+            <div className="absolute inset-0 bg-gradient-to-t from-[#0b100d] via-[#0b100d]/25 to-transparent" />
+            <div className="absolute bottom-6 left-6 right-6 rounded-2xl border border-white/15 bg-[#080b09]/70 p-5 backdrop-blur-lg sm:bottom-8 sm:left-8 sm:right-8">
+              <p className="text-[10px] font-bold uppercase tracking-[0.17em] text-emerald-200">À l&apos;accueil comme au bureau</p><p className="mt-2 text-lg font-semibold">Les informations utiles, sans chercher.</p>
+            </div>
+          </div>
+          <div className="p-7 sm:p-10 lg:p-12">
+            <p className="text-xs font-bold uppercase tracking-[0.18em] text-emerald-300">Simple à prendre en main</p><h2 className="mt-4 text-3xl font-semibold leading-tight tracking-[-0.04em] sm:text-4xl">Tu démarres en quelques étapes.</h2><p className="mt-4 text-sm leading-7 text-white/50">Configure ta salle une fois, puis laisse DooleFit t&apos;aider à suivre les opérations du quotidien.</p>
+            <ol className="mt-8 space-y-5">
+              {["Crée ton espace et tes formules", "Ajoute tes membres ou importe ton fichier", "Pointe les entrées et suis les paiements"].map((step, index) => (
+                <li key={step} className="flex gap-4"><span className="flex size-9 shrink-0 items-center justify-center rounded-full border border-emerald-300/25 bg-emerald-300/10 text-sm font-bold text-emerald-200">0{index + 1}</span><div className="pt-1.5"><p className="text-sm font-semibold">{step}</p><p className="mt-1 text-xs leading-5 text-white/40">{index === 0 ? "Définis les informations de ta salle." : index === 1 ? "Garde tes données organisées au même endroit." : "Retrouve l'activité et l'historique facilement."}</p></div></li>
+              ))}
+            </ol>
+            <Link href="/signup" className="mt-8 inline-flex items-center gap-2 text-sm font-semibold text-emerald-200 transition hover:text-white">Créer mon espace <ArrowRight size={16} /></Link>
+          </div>
         </div>
       </section>
 
-      <section className="px-6 pb-20 md:px-12">
-        <div className="mx-auto grid max-w-6xl items-center gap-10 lg:grid-cols-2">
-          <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.14em] text-emerald-400">Une salle mieux organisée</p>
-            <h2 className="mt-3 text-3xl font-semibold tracking-tight md:text-4xl">Toute ton activité, au même endroit.</h2>
-            <p className="mt-4 max-w-xl leading-7 text-white/55">Suis les entrées, les paiements et les alertes de ta salle depuis un tableau de bord clair, pensé pour le quotidien de ton équipe.</p>
+      <section className="border-y border-white/[0.07] bg-[#0b100d] px-5 py-20 sm:px-8 sm:py-24 lg:px-10">
+        <div className="mx-auto grid max-w-7xl items-center gap-12 lg:grid-cols-[0.9fr_1.1fr]">
+          <div><p className="text-xs font-bold uppercase tracking-[0.18em] text-emerald-300">Pensé pour le terrain</p><h2 className="mt-4 text-3xl font-semibold leading-tight tracking-[-0.04em] sm:text-5xl">Même quand tu n&apos;es pas derrière le comptoir.</h2><p className="mt-5 max-w-lg text-sm leading-7 text-white/50 sm:text-base">Ouvre ton espace sur ordinateur ou téléphone. Ton équipe peut retrouver les informations dont elle a besoin à l&apos;accueil.</p>
+            <div className="mt-7 space-y-3">{["Interface adaptée au téléphone", "Paiements mobile money", "Cartes membres avec QR code"].map((item) => <p key={item} className="flex items-center gap-3 text-sm font-medium text-white/75"><span className="flex size-6 items-center justify-center rounded-full bg-emerald-300/10 text-emerald-200"><Check size={13} /></span>{item}</p>)}</div>
           </div>
-          <div className="relative min-h-[360px] overflow-hidden rounded-3xl border border-white/10 md:min-h-[440px]">
-            <div
-              className="absolute inset-0 bg-cover bg-center"
-              style={{ backgroundImage: "url('/gym-landing.jpg')" }}
-            />
-            <div className="absolute inset-0 bg-gradient-to-t from-[#080808]/95 via-[#080808]/20 to-transparent" />
-            <div className="absolute inset-x-5 bottom-5 rounded-2xl border border-white/15 bg-[#080808]/65 p-5 backdrop-blur-md md:inset-x-7 md:bottom-7 md:p-6">
-              <div className="flex items-center gap-3 border-b border-white/10 pb-4">
-                <span className="size-2.5 rounded-full bg-emerald-400" />
-                <p className="text-sm font-semibold">Tableau de bord · Aujourd&apos;hui</p>
-              </div>
-              <div className="mt-4 grid grid-cols-3 gap-3">
-                {[{ label: "Pointages", value: "47" }, { label: "Revenus", value: "185k" }, { label: "Alertes", value: "3" }].map((stat) => (
-                  <div key={stat.label} className="rounded-xl bg-white/10 p-3 text-center">
-                    <p className="text-lg font-semibold md:text-xl">{stat.value}</p>
-                    <p className="mt-1 text-xs text-white/60">{stat.label}</p>
-                  </div>
-                ))}
+          <div className="relative min-h-[350px] overflow-hidden rounded-[1.75rem] border border-white/10 sm:min-h-[470px]">
+            <div className="absolute inset-0 bg-cover bg-center" style={{ backgroundImage: "url('/gym-cta.jpg')" }} /><div className="absolute inset-0 bg-gradient-to-br from-emerald-950/55 via-[#080b09]/30 to-[#080b09]/80" />
+            <div className="absolute inset-0 flex items-center justify-center p-5 sm:p-8">
+              <div className="w-full max-w-sm rounded-[1.7rem] border border-white/15 bg-[#111713]/90 p-5 shadow-2xl backdrop-blur-xl sm:p-6">
+                <div className="flex items-center justify-between"><div className="flex items-center gap-2.5"><span className="flex size-9 items-center justify-center rounded-xl bg-emerald-300/15 text-emerald-200"><Smartphone size={17} /></span><div><p className="text-xs font-semibold">Carte membre</p><p className="text-[10px] text-white/40">Accès rapide</p></div></div><span className="rounded-full bg-emerald-300/10 px-2.5 py-1 text-[9px] font-semibold text-emerald-200">ACTIVE</span></div>
+                <div className="mt-5 rounded-2xl border border-white/8 bg-white/[0.035] p-4"><div className="flex items-center gap-3"><span className="flex size-11 items-center justify-center rounded-full bg-gradient-to-br from-emerald-200 to-teal-600 text-sm font-bold text-[#08110d]">AM</span><div><p className="text-sm font-semibold">Profil membre</p><p className="mt-0.5 text-[10px] text-white/45">Abonnement en cours</p></div></div><div className="mt-4 flex items-center justify-between border-t border-white/8 pt-3 text-[10px]"><span className="text-white/45">Carte QR personnelle</span><QrCode size={22} className="text-emerald-200" /></div></div>
+                <p className="mt-4 text-center text-[10px] text-white/40">Un aperçu illustratif de l&apos;espace membre</p>
               </div>
             </div>
           </div>
         </div>
       </section>
 
-      <section className="border-y border-white/8 px-6 py-20 md:px-12" id="tarifs">
-        <div className="mx-auto max-w-4xl text-center"><p className="text-xs font-semibold uppercase tracking-[0.14em] text-emerald-400">Un tarif clair</p><h2 className="mt-3 text-3xl font-semibold tracking-tight md:text-4xl">Un plan. Toute ta salle.</h2>
-          <div className="mx-auto mt-9 max-w-2xl rounded-3xl border border-emerald-400/25 bg-gradient-to-b from-emerald-950/35 to-white/[0.03] p-8 text-left md:p-10">
-            <div className="flex flex-wrap items-end justify-between gap-5 border-b border-white/10 pb-7"><div><p className="text-lg font-semibold">GymFlow</p><p className="mt-1 text-sm text-white/55">Par salle · sans engagement</p></div><p className="text-4xl font-semibold">9 900 <span className="text-base font-medium text-white/55">FCFA/mois</span></p></div>
-            <ul className="mt-7 grid gap-3 sm:grid-cols-2">{included.map((item) => <li key={item} className="flex gap-2 text-sm text-white/75"><CheckCircle2 size={17} className="shrink-0 text-emerald-400" />{item}</li>)}</ul>
-            <Link href="/signup" className="mt-8 flex items-center justify-center gap-2 rounded-2xl bg-emerald-500 px-6 py-4 text-sm font-semibold hover:bg-emerald-400">Commencer mes 30 jours gratuits <ArrowRight size={16} /></Link>
+      <section className="px-5 py-24 sm:px-8 sm:py-28 lg:px-10" id="tarifs">
+        <div className="mx-auto max-w-6xl">
+          <div className="text-center"><p className="text-xs font-bold uppercase tracking-[0.18em] text-emerald-300">Un tarif, sans surprise</p><h2 className="mt-4 text-3xl font-semibold tracking-[-0.04em] sm:text-5xl">Toute ta salle. Un seul plan.</h2><p className="mx-auto mt-4 max-w-xl text-sm leading-6 text-white/50">Commence par l&apos;essai gratuit, puis décide quand tu as vu l&apos;outil en action.</p></div>
+          <div className="mx-auto mt-10 grid max-w-4xl overflow-hidden rounded-[1.75rem] border border-white/10 bg-[#101512] md:grid-cols-[1fr_0.9fr]">
+            <div className="p-7 sm:p-10"><div className="flex items-center gap-2 text-xs font-semibold text-emerald-200"><ShieldCheck size={15} /> DOOLEFIT POUR TA SALLE</div><h3 className="mt-4 text-2xl font-semibold">Tout l&apos;essentiel inclus.</h3><ul className="mt-7 grid gap-x-5 gap-y-4 sm:grid-cols-2">{included.map((item) => <li key={item} className="flex gap-2.5 text-xs leading-5 text-white/65"><CheckCircle2 size={15} className="mt-0.5 shrink-0 text-emerald-300" />{item}</li>)}</ul></div>
+            <div className="flex flex-col justify-center border-t border-white/10 bg-gradient-to-br from-emerald-950/35 to-[#0b100d] p-7 sm:p-10 md:border-l md:border-t-0"><p className="text-sm font-medium text-white/50">Après l&apos;essai gratuit</p><p className="mt-3 flex items-baseline gap-2"><span className="text-4xl font-semibold tracking-tight">9 900</span><span className="text-sm text-white/45">FCFA / mois</span></p><p className="mt-2 text-xs text-white/40">Par salle · sans engagement</p><Link href="/signup" className="mt-7 inline-flex h-12 items-center justify-center gap-2 rounded-xl bg-emerald-300 px-5 text-sm font-bold text-[#07130f] transition hover:bg-emerald-200">Essayer 30 jours gratuitement <ArrowRight size={16} /></Link><p className="mt-3 text-center text-[10px] text-white/35">Pas de carte bancaire pour commencer</p></div>
           </div>
         </div>
       </section>
 
-      <section className="px-6 py-20 md:px-12" id="faq"><div className="mx-auto max-w-3xl"><h2 className="text-center text-3xl font-semibold tracking-tight">Questions fréquentes</h2><div className="mt-8 space-y-3">{faqs.map(({ q, a }) => <details key={q} className="rounded-2xl border border-white/8 bg-white/[0.03] px-6"><summary className="cursor-pointer py-5 font-semibold">{q}</summary><p className="pb-5 text-sm leading-7 text-white/55">{a}</p></details>)}</div></div></section>
+      <section className="border-t border-white/[0.07] bg-[#0b100d] px-5 py-20 sm:px-8 lg:px-10" id="faq">
+        <div className="mx-auto grid max-w-6xl gap-10 md:grid-cols-[0.7fr_1.3fr]"><div><p className="text-xs font-bold uppercase tracking-[0.18em] text-emerald-300">Questions fréquentes</p><h2 className="mt-4 text-3xl font-semibold tracking-[-0.04em] sm:text-4xl">Tu veux en savoir plus ?</h2><p className="mt-4 text-sm leading-6 text-white/45">Voici les réponses aux questions avant de démarrer.</p></div><div className="space-y-2">{faqs.map(({ q, a }) => <details key={q} className="group rounded-xl border border-white/[0.08] bg-white/[0.025] px-5 open:bg-white/[0.045]"><summary className="flex cursor-pointer list-none items-center justify-between gap-4 py-5 text-sm font-semibold marker:hidden">{q}<ChevronDown size={16} className="shrink-0 text-white/45 transition group-open:rotate-180" /></summary><p className="max-w-2xl pb-5 text-sm leading-6 text-white/50">{a}</p></details>)}</div></div>
+      </section>
 
-      <section className="relative overflow-hidden border-t border-white/8 px-6 py-20 text-center md:px-12">
-        <div
-          className="absolute inset-0 bg-cover bg-center opacity-15"
-          style={{ backgroundImage: "url('/gym-cta.jpg')" }}
-        />
-        <div className="absolute inset-0 bg-gradient-to-b from-[#080808] via-[#080808]/70 to-[#080808]" />
-        <div className="relative"><ShieldCheck className="mx-auto text-emerald-400" size={28} /><h2 className="mt-5 text-3xl font-semibold tracking-tight md:text-4xl">Essaie GymFlow avec ta salle.</h2><p className="mx-auto mt-4 max-w-xl text-white/55">30 jours pour vérifier que l&apos;outil convient à ton équipe, sans carte et sans engagement.</p><Link href="/signup" className="mt-8 inline-flex items-center gap-2 rounded-full bg-emerald-500 px-7 py-4 text-sm font-semibold hover:bg-emerald-400">Créer mon espace <ArrowRight size={16} /></Link><footer className="mt-16 flex flex-wrap items-center justify-center gap-x-6 gap-y-3 text-sm text-white/40"><Link href="/login" className="hover:text-white">Connexion</Link><a href="mailto:support@gymflow.app" className="hover:text-white">Support</a><span>© 2026 GymFlow</span></footer></div>
+      <section className="relative isolate overflow-hidden px-5 py-24 text-center sm:px-8 sm:py-28 lg:px-10">
+        <div className="absolute inset-0 -z-20 bg-cover bg-center opacity-20" style={{ backgroundImage: "url('/gym-hero.jpg')" }} /><div className="absolute inset-0 -z-10 bg-gradient-to-b from-[#080b09]/80 via-[#080b09]/55 to-[#080b09]" /><div className="absolute left-1/2 top-0 -z-10 h-64 w-[min(90vw,800px)] -translate-x-1/2 rounded-full bg-emerald-400/10 blur-[100px]" />
+        <ShieldCheck className="mx-auto text-emerald-200" size={27} /><h2 className="mx-auto mt-5 max-w-3xl text-3xl font-semibold leading-tight tracking-[-0.04em] sm:text-5xl">Prêt à mieux gérer ta salle ?</h2><p className="mx-auto mt-4 max-w-xl text-sm leading-7 text-white/55 sm:text-base">Crée ton espace DooleFit et découvre une gestion plus claire pendant 30 jours.</p><Link href="/signup" className="mt-8 inline-flex h-14 items-center gap-2 rounded-full bg-emerald-300 px-7 text-sm font-bold text-[#07130f] transition hover:-translate-y-0.5 hover:bg-emerald-200">Commencer gratuitement <ArrowRight size={17} /></Link>
+        <footer className="mx-auto mt-20 flex max-w-7xl flex-col items-center justify-between gap-5 border-t border-white/10 pt-6 text-xs text-white/40 sm:flex-row"><Brand /><div className="flex flex-wrap justify-center gap-5"><Link href="#fonctionnalites" className="hover:text-white">Fonctionnalités</Link><Link href="#tarifs" className="hover:text-white">Tarif</Link><Link href="#faq" className="hover:text-white">FAQ</Link><Link href="/login" className="hover:text-white">Connexion</Link></div><span>© 2026 DooleFit</span></footer>
       </section>
     </main>
   );

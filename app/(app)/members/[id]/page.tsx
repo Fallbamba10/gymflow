@@ -371,10 +371,10 @@ export default async function MemberDetailPage({ params }: MemberDetailPageProps
                 Portail
               </a>
               {member.phone && (() => {
-                const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://gymflow.app";
+                const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://gymflow-ten-tan.vercel.app";
                 const portalUrl = `${siteUrl}/m/${member.id}`;
                 const waPhone = member.phone.replace(/[\s\-\(\)\.]/g, "").replace(/^\+/, "");
-                const waText = encodeURIComponent(`Bonjour ${member.full_name.split(" ")[0]} ! Voici votre fiche membre GymFlow : ${portalUrl}`);
+                const waText = encodeURIComponent(`Bonjour ${member.full_name.split(" ")[0]} ! Voici votre fiche membre DooleFit : ${portalUrl}`);
                 return (
                   <a
                     href={`https://wa.me/${waPhone}?text=${waText}`}

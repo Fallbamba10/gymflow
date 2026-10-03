@@ -4,7 +4,7 @@ const resend = process.env.RESEND_API_KEY
   ? new Resend(process.env.RESEND_API_KEY)
   : null;
 
-const FROM = "GymFlow <onboarding@resend.dev>";
+const FROM = "DooleFit <onboarding@resend.dev>";
 
 export async function sendWelcomeEmail({
   to,
@@ -24,7 +24,7 @@ export async function sendWelcomeEmail({
   await resend.emails.send({
     from: FROM,
     to,
-    subject: `Bienvenue sur GymFlow — ${gymName} est prêt !`,
+    subject: `Bienvenue sur DooleFit — ${gymName} est prêt !`,
     html: `
 <!DOCTYPE html>
 <html lang="fr">
@@ -37,7 +37,7 @@ export async function sendWelcomeEmail({
         <!-- Header -->
         <tr>
           <td style="background:#0a0a0a;padding:28px 32px;">
-            <p style="margin:0;font-size:20px;font-weight:700;color:#ffffff;letter-spacing:-0.3px;">GymFlow</p>
+            <p style="margin:0;font-size:20px;font-weight:700;color:#ffffff;letter-spacing:-0.3px;">DooleFit</p>
             <p style="margin:4px 0 0;font-size:13px;color:rgba(255,255,255,0.5);">Gestion de salle intelligente</p>
           </td>
         </tr>
@@ -47,7 +47,7 @@ export async function sendWelcomeEmail({
           <td style="padding:32px;">
             <p style="margin:0;font-size:22px;font-weight:700;color:#0a0a0a;">Bienvenue, ${gymName} 🎉</p>
             <p style="margin:12px 0 0;font-size:15px;line-height:1.7;color:#555;">
-              Ton espace GymFlow est configuré et prêt à l'emploi. Gère tes membres, encaisse tes abonnements et suis tes pointages depuis un seul endroit.
+              Ton espace DooleFit est configuré et prêt à l'emploi. Gère tes membres, encaisse tes abonnements et suis tes pointages depuis un seul endroit.
             </p>
 
             <table cellpadding="0" cellspacing="0" style="margin:28px 0;background:#f5f5f0;border-radius:8px;padding:20px;width:100%;box-sizing:border-box;">
@@ -94,7 +94,7 @@ export async function sendWelcomeEmail({
           <td style="padding:20px 32px;border-top:1px solid #e5e5e0;">
             <p style="margin:0;font-size:12px;color:#aaa;line-height:1.6;">
               Des questions ? Réponds à cet email ou écris-nous à <a href="mailto:support@gymflow.app" style="color:#10b981;">support@gymflow.app</a><br/>
-              GymFlow — Gestion de salle intelligente
+              DooleFit — Gestion de salle intelligente
             </p>
           </td>
         </tr>
@@ -121,7 +121,7 @@ export async function sendTrialEndingEmail({
   await resend.emails.send({
     from: FROM,
     to,
-    subject: `⚠️ Ton essai GymFlow se termine dans ${daysLeft} jour${daysLeft > 1 ? "s" : ""}`,
+    subject: `⚠️ Ton essai DooleFit se termine dans ${daysLeft} jour${daysLeft > 1 ? "s" : ""}`,
     html: `
 <!DOCTYPE html>
 <html lang="fr">
@@ -131,19 +131,19 @@ export async function sendTrialEndingEmail({
     <tr><td align="center">
       <table width="560" cellpadding="0" cellspacing="0" style="background:#ffffff;border-radius:12px;border:1px solid #e5e5e0;overflow:hidden;max-width:560px;width:100%;">
         <tr><td style="background:#0a0a0a;padding:28px 32px;">
-          <p style="margin:0;font-size:20px;font-weight:700;color:#ffffff;">GymFlow</p>
+          <p style="margin:0;font-size:20px;font-weight:700;color:#ffffff;">DooleFit</p>
         </td></tr>
         <tr><td style="padding:32px;">
           <p style="margin:0;font-size:22px;font-weight:700;color:#0a0a0a;">
             Ton essai se termine dans ${daysLeft} jour${daysLeft > 1 ? "s" : ""}
           </p>
           <p style="margin:12px 0 0;font-size:15px;line-height:1.7;color:#555;">
-            Salut ${gymName}, ton accès GymFlow expire bientôt. Souscris maintenant pour continuer à gérer ta salle sans interruption.
+            Salut ${gymName}, ton accès DooleFit expire bientôt. Souscris maintenant pour continuer à gérer ta salle sans interruption.
           </p>
           <table cellpadding="0" cellspacing="0" style="margin-top:24px;">
             <tr><td>
               <a href="https://gymflow-ten-tan.vercel.app/billing" style="display:inline-block;background:#10b981;color:#ffffff;font-size:15px;font-weight:600;padding:14px 28px;border-radius:8px;text-decoration:none;">
-                Souscrire — 5 900 FCFA/mois →
+                Souscrire — 9 900 FCFA/mois →
               </a>
             </td></tr>
           </table>
@@ -210,7 +210,7 @@ export async function sendMonthlyReportEmail({
       <table width="560" cellpadding="0" cellspacing="0" style="background:#ffffff;border-radius:12px;border:1px solid #e5e5e0;overflow:hidden;max-width:560px;width:100%;">
         <tr>
           <td style="background:#0a0a0a;padding:28px 32px;">
-            <p style="margin:0;font-size:20px;font-weight:700;color:#ffffff;">GymFlow</p>
+            <p style="margin:0;font-size:20px;font-weight:700;color:#ffffff;">DooleFit</p>
             <p style="margin:4px 0 0;font-size:13px;color:rgba(255,255,255,0.5);">Rapport mensuel</p>
           </td>
         </tr>
@@ -240,7 +240,7 @@ export async function sendMonthlyReportEmail({
             </table>
 
             <p style="margin:24px 0 0;font-size:12px;color:#aaa;line-height:1.6;">
-              Ce rapport a été généré depuis GymFlow.<br/>
+              Ce rapport a été généré depuis DooleFit.<br/>
               Questions ? <a href="mailto:support@gymflow.app" style="color:#10b981;">support@gymflow.app</a>
             </p>
           </td>

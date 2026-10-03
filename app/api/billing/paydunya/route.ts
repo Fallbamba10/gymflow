@@ -1,12 +1,12 @@
 // POST /api/billing/paydunya
-// Crée une facture PayDunya pour l'abonnement GymFlow mensuel (5900 FCFA)
+// Crée une facture PayDunya pour l'abonnement DooleFit mensuel (9900 FCFA)
 
 import { NextResponse } from "next/server";
 import { createPayDunyaInvoice, isPayDunyaConfigured } from "@/lib/paydunya";
 import { createClient } from "@/lib/supabase/server";
 import { getCurrentGym } from "@/lib/supabase/queries";
 
-const GYMFLOW_MONTHLY_PRICE = 5900;
+const DOOLEFIT_MONTHLY_PRICE = 9900;
 
 export async function POST(/* _req: NextRequest */) {
   const supabase = await createClient();
@@ -23,7 +23,7 @@ export async function POST(/* _req: NextRequest */) {
       kind: "gymflow_billing",
       provider: "paydunya",
       status: "pending",
-      amount: GYMFLOW_MONTHLY_PRICE,
+      amount: DOOLEFIT_MONTHLY_PRICE,
       currency: "XOF",
     })
     .select("id")
@@ -42,22 +42,22 @@ export async function POST(/* _req: NextRequest */) {
     });
   }
 
-  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL ?? "https://gymflow.app";
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL ?? "https://gymflow-ten-tan.vercel.app";
   const invoice = await createPayDunyaInvoice({
-    amount: GYMFLOW_MONTHLY_PRICE,
-    description: "Abonnement GymFlow Pro — mensuel",
+    amount: DOOLEFIT_MONTHLY_PRICE,
+    description: "Abonnement DooleFit Pro — mensuel",
     clientReference: `billing_${mmRequest.id}`,
     returnUrl: `${baseUrl}/billing?success=1`,
     cancelUrl: `${baseUrl}/billing?canceled=1`,
     callbackUrl: `${baseUrl}/api/billing/paydunya/webhook`,
-    storeName: "GymFlow",
+    storeName: "DooleFit",
     items: [
       {
-        name: "GymFlow Pro",
+        name: "DooleFit Pro",
         quantity: 1,
-        unit_price: String(GYMFLOW_MONTHLY_PRICE),
-        total_price: String(GYMFLOW_MONTHLY_PRICE),
-        description: "Accès complet à GymFlow — 1 salle, membres illimités",
+        unit_price: String(DOOLEFIT_MONTHLY_PRICE),
+        total_price: String(DOOLEFIT_MONTHLY_PRICE),
+        description: "Accès complet à DooleFit — 1 salle, membres illimités",
       },
     ],
   });

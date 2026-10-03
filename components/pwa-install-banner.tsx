@@ -71,7 +71,7 @@ export function PwaInstallBanner() {
           </svg>
         </div>
         <div className="min-w-0 flex-1">
-          <p className="font-semibold text-sm">Installer GymFlow</p>
+          <p className="font-semibold text-sm">Installer DooleFit</p>
           {isIos ? (
             <p className="mt-0.5 text-xs leading-5 text-neutral-500">
               Appuie sur <Share size={12} className="inline-block align-middle" /> puis <strong>« Sur l&apos;écran d&apos;accueil »</strong> pour accéder en un geste.

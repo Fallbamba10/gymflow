@@ -83,7 +83,7 @@ export async function createPayDunyaInvoice(opts: {
       description: opts.description,
     },
     store: {
-      name: opts.storeName ?? "GymFlow",
+      name: opts.storeName ?? "DooleFit",
     },
     actions: {
       cancel_url: opts.cancelUrl,

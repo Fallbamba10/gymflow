@@ -82,7 +82,7 @@ Ousmane Ba,,Abonnement famille`}
             </pre>
             <a
               href="data:text/csv;charset=utf-8,%EF%BB%BFnom%2Ctelephone%2Cnotes%0AMoussa+Diallo%2C%2B221771234567%2CCoach+sportif%0AFatou+Ndiaye%2C%2B221770000001%2C%0AOusmane+Ba%2C%2CAbonnement+famille"
-              download="gymflow-import-exemple.csv"
+              download="doolefit-import-exemple.csv"
               className="mt-3 inline-flex h-9 items-center gap-2 rounded-md border border-line bg-white px-3 text-xs font-semibold text-neutral-700 transition hover:bg-neutral-50"
             >
               <Download size={14} />

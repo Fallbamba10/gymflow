@@ -75,7 +75,7 @@ export default async function BillingPage({ searchParams }: BillingPageProps) {
           <Link href="/" className="flex items-center gap-3">
             <BrandMark />
             <div>
-              <p className="text-base font-semibold leading-none">GymFlow</p>
+              <p className="text-base font-semibold leading-none">DooleFit</p>
               <p className="mt-0.5 text-sm text-neutral-500">{gym.name}</p>
             </div>
           </Link>
@@ -106,7 +106,7 @@ export default async function BillingPage({ searchParams }: BillingPageProps) {
             <CheckCircle2 size={18} className="mt-0.5 shrink-0" />
             <div>
               <p className="font-semibold">Abonnement activé !</p>
-              <p className="mt-0.5 text-neutral-600">Bienvenue. Toutes les fonctionnalités GymFlow sont maintenant disponibles.</p>
+              <p className="mt-0.5 text-neutral-600">Bienvenue. Toutes les fonctionnalités DooleFit sont maintenant disponibles.</p>
             </div>
           </div>
         )}
@@ -128,7 +128,7 @@ export default async function BillingPage({ searchParams }: BillingPageProps) {
                   <div>
                     <div className="inline-flex items-center gap-2 rounded-md border border-white/15 bg-white/10 px-3 py-1 text-xs font-semibold uppercase tracking-[0.08em] text-white/70">
                       <ShieldCheck size={13} />
-                      Abonnement GymFlow
+                      Abonnement DooleFit
                     </div>
                     <h1 className="mt-4 text-2xl font-semibold">
                       {isTrialing && "Période d'essai en cours"}
@@ -140,7 +140,7 @@ export default async function BillingPage({ searchParams }: BillingPageProps) {
                     </h1>
                     <p className="mt-2 text-sm leading-6 text-white/62">
                       {isTrialing && `Profite de ${trialDays} jour${trialDays > 1 ? "s" : ""} d'essai gratuit. Souscris avant la fin pour conserver ton accès.`}
-                      {isTrialExpired && "Ton essai de 30 jours est terminé. Souscris pour retrouver l'accès à GymFlow."}
+                      {isTrialExpired && "Ton essai de 30 jours est terminé. Souscris pour retrouver l'accès à DooleFit."}
                       {gym.billing_status === "active" && `Prochain renouvellement le ${formatDate(gym.billing_period_end)}.`}
                       {isCanceled && "Ton abonnement est résilié. Souscris à nouveau pour retrouver l'accès."}
                       {isPastDue && "Le dernier paiement a échoué. Mets à jour ton moyen de paiement."}
@@ -183,7 +183,7 @@ export default async function BillingPage({ searchParams }: BillingPageProps) {
               <div className="border-t border-white/10 p-5 space-y-4">
                 {isTrialing || isTrialExpired || isCanceled || isPastDue || !isActive ? (
                   <>
-                    <CheckoutButton label={isCanceled || isPastDue ? "Réactiver l'abonnement" : "Souscrire — 5 900 FCFA/mois"} />
+                    <CheckoutButton label={isCanceled || isPastDue ? "Réactiver l'abonnement" : "Souscrire — 9 900 FCFA/mois"} />
                     <BillingMobileMoneyButtons phone={gym.phone} />
                   </>
                 ) : (
@@ -221,12 +221,12 @@ export default async function BillingPage({ searchParams }: BillingPageProps) {
             <div className="rounded-xl border border-line bg-white p-6 shadow-soft">
               <div className="flex items-center gap-2">
                 <Crown size={18} className="text-amber" />
-                <h2 className="font-semibold">GymFlow Pro</h2>
+                <h2 className="font-semibold">DooleFit Pro</h2>
               </div>
 
               <div className="mt-4">
                 <p className="text-4xl font-semibold">
-                  5 900<span className="text-lg font-medium text-neutral-500"> FCFA/mois</span>
+                  9 900<span className="text-lg font-medium text-neutral-500"> FCFA/mois</span>
                 </p>
                 <p className="mt-1 text-sm text-neutral-500">Par salle, sans engagement</p>
               </div>
@@ -264,7 +264,7 @@ export default async function BillingPage({ searchParams }: BillingPageProps) {
                 <div>
                   <p className="text-sm font-semibold">Paiement sécurisé</p>
                   <p className="mt-1 text-xs leading-5 text-neutral-500">
-                    Carte via Stripe, ou mobile money via Intech. GymFlow ne stocke aucune donnée de carte bancaire.
+                    Carte via Stripe, ou mobile money via Intech. DooleFit ne stocke aucune donnée de carte bancaire.
                   </p>
                 </div>
               </div>

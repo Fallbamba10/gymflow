@@ -1,4 +1,4 @@
--- GymFlow — Cours collectifs
+-- DooleFit — Cours collectifs
 -- Run after schema.sql
 
 -- Définition d'un cours (template récurrent)

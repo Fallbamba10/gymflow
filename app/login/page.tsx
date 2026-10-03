@@ -17,7 +17,7 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
   const enabled = hasSupabaseEnv();
 
   return (
-    <AuthCard title="Connexion" subtitle="Accede a ton espace de gestion GymFlow.">
+    <AuthCard title="Connexion" subtitle="Accede a ton espace de gestion DooleFit.">
       {!enabled ? <EnvWarning /> : null}
       {params.error ? (
         <div className="mb-5 rounded-md border border-red-200 bg-red-50 p-4 text-sm font-semibold text-danger">
@@ -33,7 +33,7 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
             className="mt-2 h-11 w-full rounded-md border border-line bg-paper px-3 outline-none focus:border-mint"
             name="email"
             type="email"
-            placeholder="gerant@gymflow.sn"
+            placeholder="gerant@exemple.sn"
             required
           />
         </label>

@@ -122,7 +122,7 @@ export default async function SettingsPage() {
               </div>
               <div>
                 <h2 className="text-lg font-semibold">Informations salle</h2>
-                <p className="mt-1 text-sm text-neutral-500">Ces informations identifient ton espace GymFlow.</p>
+                <p className="mt-1 text-sm text-neutral-500">Ces informations identifient ton espace DooleFit.</p>
               </div>
             </div>
 

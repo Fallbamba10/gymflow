@@ -192,7 +192,7 @@ export default async function PaymentReceiptPage({ params }: ReceiptPageProps) {
 
             <div className="mt-8 border-t border-line pt-5 text-center text-sm text-neutral-500">
               <p className="font-semibold text-ink">Merci pour votre paiement.</p>
-              <p className="mt-1">Recu genere par GymFlow pour {settings.name}.</p>
+              <p className="mt-1">Recu genere par DooleFit pour {settings.name}.</p>
             </div>
           </div>
         </article>

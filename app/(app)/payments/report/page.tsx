@@ -174,7 +174,7 @@ export default async function MonthlyReportPage({ searchParams }: ReportPageProp
                   <p className="mt-1.5 text-xl font-semibold">{report.monthLabel}</p>
                   <p className="mt-1 text-sm text-white/55 print:text-neutral-500">
                     <ShieldCheck className="mr-1 inline" size={13} />
-                    Généré par GymFlow
+                    Généré par DooleFit
                   </p>
                 </div>
               </div>
@@ -406,7 +406,7 @@ export default async function MonthlyReportPage({ searchParams }: ReportPageProp
 
           {/* Pied de page */}
           <footer className="border-t border-line pt-4 text-center text-xs text-neutral-400 print:mt-8">
-            <p>Rapport généré par <strong>GymFlow</strong> pour {report.gym.name} · {report.monthLabel}</p>
+            <p>Rapport généré par <strong>DooleFit</strong> pour {report.gym.name} · {report.monthLabel}</p>
           </footer>
 
         </article>

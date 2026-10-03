@@ -5,16 +5,16 @@ import { PwaRegister } from "@/components/pwa-register";
 
 export const metadata: Metadata = {
   title: {
-    default: "GymFlow",
-    template: "%s · GymFlow",
+    default: "DooleFit",
+    template: "%s · DooleFit",
   },
   description: "Gestion complète de salle de sport : membres, abonnements, pointage, caisse et reçus.",
-  applicationName: "GymFlow",
+  applicationName: "DooleFit",
   manifest: "/site.webmanifest",
   appleWebApp: {
     capable: true,
     statusBarStyle: "black-translucent",
-    title: "GymFlow",
+    title: "DooleFit",
   },
   formatDetection: {
     telephone: false,

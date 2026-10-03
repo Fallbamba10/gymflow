@@ -39,7 +39,7 @@ function getMethod(value: string | null): PaymentMethod | "all" {
 export async function GET(request: Request) {
   const gym = await getCurrentGym();
   if (!gym || gym.role !== "admin") {
-    return csvResponse("gymflow-caisse.csv", toCsv([{ erreur: "Export reserve aux admins" }]));
+    return csvResponse("doolefit-caisse.csv", toCsv([{ erreur: "Export reserve aux admins" }]));
   }
 
   const url = new URL(request.url);
@@ -60,5 +60,5 @@ export async function GET(request: Request) {
     })),
   );
 
-  return csvResponse("gymflow-caisse.csv", csv);
+  return csvResponse("doolefit-caisse.csv", csv);
 }

@@ -67,7 +67,7 @@ export default function ErrorPage({ error, reset }: ErrorPageProps) {
         </div>
 
         <p className="mt-10 text-xs text-white/28">
-          GymFlow · Gestion de salle premium
+          DooleFit · Gestion de salle premium
         </p>
       </div>
     </main>

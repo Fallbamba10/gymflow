@@ -76,7 +76,7 @@ export default async function PublicGymProfilePage({ params }: PublicGymPageProp
               <div className="flex size-8 items-center justify-center rounded-md bg-white">
                 <Zap size={15} className="text-[#080808]" fill="currentColor" />
               </div>
-              <span className="text-sm font-semibold tracking-tight">GymFlow</span>
+              <span className="text-sm font-semibold tracking-tight">DooleFit</span>
             </Link>
             <Link
               href="/login"
@@ -92,7 +92,7 @@ export default async function PublicGymProfilePage({ params }: PublicGymPageProp
             <div className="max-w-4xl">
               <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-1.5 text-xs font-semibold uppercase tracking-[0.1em] text-white/50 backdrop-blur">
                 <span className="size-1.5 rounded-full bg-emerald-400" />
-                Salle partenaire GymFlow
+                Salle partenaire DooleFit
               </div>
 
               <h1 className="text-6xl font-semibold leading-[1.05] tracking-tight md:text-8xl lg:text-[7rem]">
@@ -403,7 +403,7 @@ export default async function PublicGymProfilePage({ params }: PublicGymPageProp
             className="inline-flex items-center gap-2 text-xs font-semibold text-white/30 transition hover:text-white/60"
           >
             <CheckCircle2 size={13} className="text-emerald-400" />
-            Propulsé par GymFlow
+            Propulsé par DooleFit
           </Link>
         </div>
       </footer>

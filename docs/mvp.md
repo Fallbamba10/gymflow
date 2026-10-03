@@ -1,8 +1,8 @@
-# Perimetre MVP GymFlow
+# Perimetre MVP DooleFit
 
 ## Objectif
 
-Permettre a une salle de sport de remplacer son cahier papier par GymFlow en moins d'une journee d'utilisation.
+Permettre a une salle de sport de remplacer son cahier papier par DooleFit en moins d'une journee d'utilisation.
 
 Le MVP doit etre rapide, fiable et utilisable sur telephone, tablette et ordinateur.
 

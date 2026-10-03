@@ -10,10 +10,10 @@ type Props = { params: Promise<{ id: string }> };
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { id } = await params;
   const portal = await getMemberPortal(id);
-  if (!portal) return { title: "Membre introuvable · GymFlow" };
+  if (!portal) return { title: "Membre introuvable · DooleFit" };
   return {
     title: `${portal.member.full_name} · ${portal.gym.name}`,
-    description: `Carte membre GymFlow — ${portal.gym.name}`,
+    description: `Carte membre DooleFit — ${portal.gym.name}`,
     robots: "noindex",
   };
 }
@@ -34,7 +34,7 @@ export default async function MemberPortalPage({ params }: Props) {
   if (!portal) notFound();
 
   const { member, gym, subscription, checkins_count } = portal;
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://gymflow.app";
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://gymflow-ten-tan.vercel.app";
   const portalUrl = `${siteUrl}/m/${member.id}`;
   const memberNum = String(member.member_number).padStart(6, "0");
 
@@ -79,7 +79,7 @@ export default async function MemberPortalPage({ params }: Props) {
         <div className="absolute inset-0 bg-gradient-to-t from-slate-900/90 via-slate-900/20 to-transparent" />
         <div className="absolute bottom-5 left-5 right-5 flex items-end justify-between gap-4">
           <div>
-            <p className="text-[11px] font-bold uppercase tracking-widest text-white/50">GymFlow</p>
+            <p className="text-[11px] font-bold uppercase tracking-widest text-white/50">DooleFit</p>
             <h1 className="mt-1 text-xl font-bold text-white leading-tight">{gym.name}</h1>
           </div>
           {gym.phone && (
@@ -216,7 +216,7 @@ export default async function MemberPortalPage({ params }: Props) {
 
         {/* Footer */}
         <p className="mt-8 text-center text-[11px] text-slate-400">
-          Powered by <span className="font-semibold text-slate-500">GymFlow</span>
+          Powered by <span className="font-semibold text-slate-500">DooleFit</span>
         </p>
       </div>
     </div>

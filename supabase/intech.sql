@@ -1,4 +1,4 @@
--- GymFlow — Intech API integration
+-- DooleFit — Intech API integration
 -- Run after supabase/mobile-money.sql
 
 -- Ajoute 'intech' comme provider valide

@@ -277,7 +277,7 @@ export default async function Home({ searchParams }: HomeProps) {
               <div>
                 <p className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.08em] text-mint">
                   <Sparkles size={13} />
-                  Bienvenue sur GymFlow
+                  Bienvenue sur DooleFit
                 </p>
                 <h2 className="mt-2 text-lg font-semibold text-ink">Votre espace est prêt. Voici les 3 premières étapes.</h2>
               </div>

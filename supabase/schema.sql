@@ -1,4 +1,4 @@
--- GymFlow initial Supabase schema
+-- DooleFit initial Supabase schema
 -- MVP focus: gyms, roles, members, subscriptions, check-ins, payments.
 
 create extension if not exists pgcrypto;
