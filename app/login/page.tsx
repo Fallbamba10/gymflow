@@ -47,6 +47,11 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
             required
           />
         </label>
+        <div className="-mt-2 text-right">
+          <Link href="/forgot-password" className="text-sm font-semibold text-mint hover:underline">
+            Mot de passe oublié ?
+          </Link>
+        </div>
         <SubmitButton className="h-11 w-full" disabled={!enabled} pendingLabel="Connexion...">
           Se connecter
         </SubmitButton>
