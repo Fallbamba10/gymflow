@@ -192,15 +192,20 @@ export default function SitePage() {
               <span className="inline-flex items-center gap-1.5"><CheckCircle2 size={14} className="text-emerald-300" /> Sans carte bancaire</span>
               <span className="inline-flex items-center gap-1.5"><CheckCircle2 size={14} className="text-emerald-300" /> Sans engagement</span>
             </div>
-            <p className="mt-12 max-w-lg border-t border-white/10 pt-5 text-xs leading-5 text-white/50">Conçu pour les réalités des salles et des paiements en Afrique de l&apos;Ouest.</p>
+            <p className="mt-12 max-w-lg border-t border-white/10 pt-5 text-xs leading-5 text-white/50">Conçu pour les salles d&apos;Afrique de l&apos;Ouest : suivi des membres, encaissements et pointage réunis dans le même espace.</p>
           </div>
           <DashboardPreview />
         </div>
       </section>
 
       <section className="border-y border-white/[0.07] bg-white/[0.018] px-5 py-7 sm:px-8 lg:px-10">
-        <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-center gap-x-8 gap-y-4 text-[11px] font-semibold uppercase tracking-[0.15em] text-white/40 sm:justify-between sm:text-xs">
-          <span className="text-white/55">Une seule plateforme pour</span><span>Membres</span><span>Abonnements</span><span>Pointages</span><span>Paiements</span><span>Rapports</span>
+        <div className="mx-auto grid max-w-6xl grid-cols-2 gap-5 sm:grid-cols-4 sm:gap-8">
+          {[
+            { title: "30 jours", detail: "pour essayer gratuitement" },
+            { title: "9 900 FCFA", detail: "par salle et par mois" },
+            { title: "QR inclus", detail: "pour le pointage des membres" },
+            { title: "Sans installation", detail: "ouvre DooleFit dans ton navigateur" },
+          ].map(({ title, detail }) => <div key={title}><p className="text-sm font-semibold tracking-tight text-white sm:text-base">{title}</p><p className="mt-1 text-[10px] leading-4 text-white/40 sm:text-xs">{detail}</p></div>)}
         </div>
       </section>
 
@@ -266,7 +271,7 @@ export default function SitePage() {
           <div className="text-center"><p className="text-xs font-bold uppercase tracking-[0.18em] text-emerald-300">Un tarif, sans surprise</p><h2 className="mt-4 text-3xl font-semibold tracking-[-0.04em] sm:text-5xl">Toute ta salle. Un seul plan.</h2><p className="mx-auto mt-4 max-w-xl text-sm leading-6 text-white/50">Commence par l&apos;essai gratuit, puis décide quand tu as vu l&apos;outil en action.</p></div>
           <div className="mx-auto mt-10 grid max-w-4xl overflow-hidden rounded-[1.75rem] border border-white/10 bg-[#101512] md:grid-cols-[1fr_0.9fr]">
             <div className="p-7 sm:p-10"><div className="flex items-center gap-2 text-xs font-semibold text-emerald-200"><ShieldCheck size={15} /> DOOLEFIT POUR TA SALLE</div><h3 className="mt-4 text-2xl font-semibold">Tout l&apos;essentiel inclus.</h3><ul className="mt-7 grid gap-x-5 gap-y-4 sm:grid-cols-2">{included.map((item) => <li key={item} className="flex gap-2.5 text-xs leading-5 text-white/65"><CheckCircle2 size={15} className="mt-0.5 shrink-0 text-emerald-300" />{item}</li>)}</ul></div>
-            <div className="flex flex-col justify-center border-t border-white/10 bg-gradient-to-br from-emerald-950/35 to-[#0b100d] p-7 sm:p-10 md:border-l md:border-t-0"><p className="text-sm font-medium text-white/50">Après l&apos;essai gratuit</p><p className="mt-3 flex items-baseline gap-2"><span className="text-4xl font-semibold tracking-tight">9 900</span><span className="text-sm text-white/45">FCFA / mois</span></p><p className="mt-2 text-xs text-white/40">Par salle · sans engagement</p><Link href="/signup" className="mt-7 inline-flex h-12 items-center justify-center gap-2 rounded-xl bg-emerald-300 px-5 text-sm font-bold text-[#07130f] transition hover:bg-emerald-200">Essayer 30 jours gratuitement <ArrowRight size={16} /></Link><p className="mt-3 text-center text-[10px] text-white/35">Pas de carte bancaire pour commencer</p></div>
+            <div className="flex flex-col justify-center border-t border-white/10 bg-gradient-to-br from-emerald-950/35 to-[#0b100d] p-7 sm:p-10 md:border-l md:border-t-0"><p className="text-sm font-medium text-white/50">Après l&apos;essai gratuit</p><p className="mt-3 flex items-baseline gap-2"><span className="text-4xl font-semibold tracking-tight">9 900</span><span className="text-sm text-white/45">FCFA / mois</span></p><p className="mt-2 text-xs text-white/40">Par salle · sans frais d&apos;installation · sans engagement</p><Link href="/signup" className="mt-7 inline-flex h-12 items-center justify-center gap-2 rounded-xl bg-emerald-300 px-5 text-sm font-bold text-[#07130f] transition hover:bg-emerald-200">Essayer 30 jours gratuitement <ArrowRight size={16} /></Link><p className="mt-3 text-center text-[10px] text-white/35">Pas de carte bancaire pour commencer</p></div>
           </div>
         </div>
       </section>
